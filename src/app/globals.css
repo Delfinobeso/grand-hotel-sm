@@ -1,35 +1,39 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
 
-:root, [data-theme="dark"] {
-  --color-surface: #1b1b1b;
-  --color-surface-secondary: #242424;
-  --color-surface-tertiary: #2e2e2e;
-  --color-accent: #bfa055;
-  --color-accent-soft: rgba(191, 160, 85, 0.15);
-  --color-text-primary: #e6e6e6;
-  --color-text-secondary: #999999;
-  --color-text-tertiary: #666666;
-  --color-danger: #e05252;
-  --color-success: #4caf84;
-  --color-divider: rgba(255, 255, 255, 0.06);
+:root, [data-theme="light"] {
+  --color-surface: #f6f4ef;
+  --color-surface-secondary: #ede9e2;
+  --color-surface-tertiary: #e4dfd6;
+  --color-accent: #092545;
+  --color-accent-soft: rgba(9, 37, 69, 0.08);
+  --color-accent-hover: #0d3460;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #5c5c5c;
+  --color-text-tertiary: #8a8a8a;
+  --color-danger: #c0392b;
+  --color-success: #2d7d46;
+  --color-divider: rgba(0, 0, 0, 0.06);
+  --color-gold: #c4af63;
   --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
 }
 
-[data-theme="light"] {
-  --color-surface: #fafafa;
-  --color-surface-secondary: #f0f0f0;
-  --color-surface-tertiary: #e5e5e5;
-  --color-accent: #a8883a;
-  --color-accent-soft: rgba(168, 136, 58, 0.12);
-  --color-text-primary: #1a1a1a;
-  --color-text-secondary: #555555;
-  --color-text-tertiary: #777777;
-  --color-danger: #d94141;
-  --color-success: #3d9e6d;
-  --color-divider: rgba(0, 0, 0, 0.06);
+[data-theme="dark"] {
+  --color-surface: #0a1628;
+  --color-surface-secondary: #0f1f38;
+  --color-surface-tertiary: #162d4d;
+  --color-accent: #3b7dcc;
+  --color-accent-soft: rgba(59, 125, 204, 0.1);
+  --color-accent-hover: #4a8edb;
+  --color-text-primary: #e8e6e1;
+  --color-text-secondary: #a09c94;
+  --color-text-tertiary: #6e6b65;
+  --color-danger: #e74c3c;
+  --color-success: #27ae60;
+  --color-divider: rgba(255, 255, 255, 0.06);
+  --color-gold: #d4c07a;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -53,10 +57,7 @@ body {
 
 .touch-target { min-height: 44px; min-width: 44px; }
 
-.gpu-layer {
-  transform: translateZ(0);
-  will-change: transform;
-}
+.gpu-layer { transform: translateZ(0); will-change: transform; }
 
 .gpu-scroll {
   -webkit-overflow-scrolling: touch;

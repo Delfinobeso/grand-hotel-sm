@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="theme-color" content="#1b1b1b" />
+        <meta name="theme-color" content="#f6f4ef" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
       <body className="antialiased">{children}</body>
