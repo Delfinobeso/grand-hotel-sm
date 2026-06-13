@@ -1,5 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: "Grand Hotel San Marino",
@@ -7,8 +15,6 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: { icon: "/icon-192.png", apple: "/apple-icon-180.png" },
   appleWebApp: { capable: true, title: "Grand Hotel SM", statusBarStyle: "black-translucent" },
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
-  themeColor: "#1b1b1b",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
