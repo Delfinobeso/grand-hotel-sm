@@ -7,15 +7,12 @@
   --color-surface-secondary: #ede9e2;
   --color-surface-tertiary: #e4dfd6;
   --color-accent: #092545;
-  --color-accent-soft: rgba(9, 37, 69, 0.08);
-  --color-accent-hover: #0d3460;
   --color-text-primary: #1a1a1a;
   --color-text-secondary: #5c5c5c;
   --color-text-tertiary: #8a8a8a;
+  --color-divider: rgba(0, 0, 0, 0.06);
   --color-danger: #c0392b;
   --color-success: #2d7d46;
-  --color-divider: rgba(0, 0, 0, 0.06);
-  --color-gold: #c4af63;
   --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
 }
@@ -25,15 +22,12 @@
   --color-surface-secondary: #0f1f38;
   --color-surface-tertiary: #162d4d;
   --color-accent: #3b7dcc;
-  --color-accent-soft: rgba(59, 125, 204, 0.1);
-  --color-accent-hover: #4a8edb;
   --color-text-primary: #e8e6e1;
   --color-text-secondary: #a09c94;
   --color-text-tertiary: #6e6b65;
+  --color-divider: rgba(255, 255, 255, 0.06);
   --color-danger: #e74c3c;
   --color-success: #27ae60;
-  --color-divider: rgba(255, 255, 255, 0.06);
-  --color-gold: #d4c07a;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -57,14 +51,6 @@ body {
 
 .touch-target { min-height: 44px; min-width: 44px; }
 
-.gpu-layer { transform: translateZ(0); will-change: transform; }
-
-.gpu-scroll {
-  -webkit-overflow-scrolling: touch;
-  transform: translateZ(0);
-}
-
-.pb-safe { padding-bottom: max(16px, var(--sab)); }
-.pt-safe { padding-top: var(--sat); }
+.gpu-scroll { -webkit-overflow-scrolling: touch; transform: translateZ(0); }
 
 ::-webkit-scrollbar { display: none; }
