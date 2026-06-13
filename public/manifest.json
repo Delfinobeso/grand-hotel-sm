@@ -1,0 +1,14 @@
+{
+  "name": "Grand Hotel San Marino",
+  "short_name": "Grand Hotel SM",
+  "description": "Grand Hotel San Marino — 4 stelle nel centro storico UNESCO",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1b1b1b",
+  "theme_color": "#1b1b1b",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0d0d0d"/>
+  <g transform="translate(256,200)" fill="none" stroke="#bfa055" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Hotel building -->
+    <rect x="-120" y="-100" width="240" height="260" rx="12"/>
+    <!-- Door -->
+    <rect x="-24" y="60" width="48" height="100" rx="4"/>
+    <!-- Windows row 1 -->
+    <rect x="-88" y="-60" width="32" height="36" rx="4"/>
+    <rect x="-16" y="-60" width="32" height="36" rx="4"/>
+    <rect x="56" y="-60" width="32" height="36" rx="4"/>
+    <!-- Windows row 2 -->
+    <rect x="-88" y="0" width="32" height="36" rx="4"/>
+    <rect x="-16" y="0" width="32" height="36" rx="4"/>
+    <rect x="56" y="0" width="32" height="36" rx="4"/>
+    <!-- Roof -->
+    <path d="M-140,-100 L0,-200 L140,-100"/>
+  </g>
+  <!-- Stars -->
+  <g fill="#bfa055">
+    <polygon points="160,360 166,378 185,378 170,389 176,407 160,396 144,407 150,389 135,378 154,378"/>
+    <polygon points="210,360 216,378 235,378 220,389 226,407 210,396 194,407 200,389 185,378 204,378"/>
+    <polygon points="260,360 266,378 285,378 270,389 276,407 260,396 244,407 250,389 235,378 254,378"/>
+    <polygon points="310,360 316,378 335,378 320,389 326,407 310,396 294,407 300,389 285,378 304,378"/>
+  </g>
+</svg>
