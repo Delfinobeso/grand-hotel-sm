@@ -4,7 +4,7 @@
   "description": "La tua camera al Grand Hotel San Marino — servizi, concierge, ristorante",
   "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#f6f4ef",
   "theme_color": "#f6f4ef",
   "icons": [
