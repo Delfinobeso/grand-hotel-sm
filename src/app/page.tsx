@@ -27,6 +27,7 @@ import { DiningSection } from "@/components/sections/DiningSection";
 import { WellnessSection } from "@/components/sections/WellnessSection";
 import { InfoSection } from "@/components/sections/InfoSection";
 import { AboutSection } from "@/components/sections/AboutSection";
+import ChatAssistant from "@/components/ChatAssistant";
 
 type TabKey = "home" | "room" | "facility" | "dining" | "wellness" | "info" | "about";
 
@@ -275,6 +276,7 @@ export default function Home() {
           </div>
         </div>
       )}
+      <ChatAssistant lang={lang} />
     </div>
   );
 }
