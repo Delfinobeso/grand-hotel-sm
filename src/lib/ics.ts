@@ -33,5 +33,10 @@ export function buildEventIcsUri(title: string, location: string, dates: EventDa
     "END:VCALENDAR",
   ];
 
-  return `data:text/calendar;charset=utf-8,${encodeURIComponent(lines.join("\r\n"))}`;
+  const ics = lines.join("\r\n");
+
+  // base64-encode to avoid URI-encoding ICS control characters (: ; =)
+  const bytes = new TextEncoder().encode(ics);
+  const b64 = btoa(String.fromCharCode(...bytes));
+  return `data:text/calendar;charset=utf-8;base64,${b64}`;
 }
