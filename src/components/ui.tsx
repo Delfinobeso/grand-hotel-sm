@@ -287,6 +287,19 @@ export function ImageBanner({ src, alt, className = "" }: { src: string; alt: st
   );
 }
 
+export function CardImage({ src, alt }: { src: string; alt: string }) {
+  const base = src.replace(/\.webp$/, "");
+  const sm = `${base}-sm.webp`;
+  return (
+    <div className="-mx-4 -mt-4 mb-1 overflow-hidden rounded-t-2xl bg-[var(--color-surface-muted)] lg:-mx-5 lg:-mt-5">
+      <picture>
+        <source srcSet={sm} media="(max-width: 640px)" />
+        <img src={src} alt={alt} loading="lazy" className="block aspect-[3/2] w-full object-cover" />
+      </picture>
+    </div>
+  );
+}
+
 export function AddToCalendarButton({
   title,
   location,

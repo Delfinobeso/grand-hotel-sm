@@ -3,9 +3,14 @@
 import { UtensilsCrossed, HandPlatter, Shirt, Mountain, Coffee, IceCream2, type LucideIcon } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL, GHSM_VENUES, SERVICE_HOURS } from "@/lib/hotel";
-import { SectionHeader, SectionLabel, IconBadge, Card, HoursTable, FloorBadge, StatusBadge, CallButton, NavigateButton, ImageBanner } from "@/components/ui";
+import { SectionHeader, SectionLabel, IconBadge, Card, HoursTable, FloorBadge, StatusBadge, CallButton, NavigateButton, ImageBanner, CardImage } from "@/components/ui";
 
 const VENUE_ICONS: LucideIcon[] = [Mountain, Coffee, IceCream2];
+const VENUE_IMAGES: Record<string, string> = {
+  laTerrazza: "/images/venue-laterrazza.webp",
+  caffeTitano: "/images/venue-caffetitano.webp",
+  cremeria: "/images/venue-cremeria.webp",
+};
 
 export function DiningSection({ t }: { t: HotelContent }) {
   return (
@@ -78,6 +83,7 @@ export function DiningSection({ t }: { t: HotelContent }) {
             const place = GHSM_VENUES.find((v) => v.id === venue.id);
             return (
               <Card key={venue.id} className="flex flex-col gap-3">
+                {VENUE_IMAGES[venue.id] && <CardImage src={VENUE_IMAGES[venue.id]} alt={venue.name} />}
                 <div className="flex items-start gap-3">
                   <IconBadge icon={VENUE_ICONS[i]} size={18} />
                   <div>
