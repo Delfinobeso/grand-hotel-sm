@@ -6,8 +6,8 @@ export const HOTEL = {
   addressLine2: "47890 San Marino",
   phone: "+378 0549 992400",
   phoneHref: "tel:+3780549992400",
-  lat: 43.933783,
-  lon: 12.448952,
+  lat: 43.933581,
+  lon: 12.449153,
 };
 
 export interface MapPin {
@@ -25,8 +25,8 @@ export const GHSM_VENUES: MapPin[] = [
   {
     id: "titanoSuites",
     name: "Titano Suites",
-    lat: 43.935832,
-    lon: 12.447008,
+    lat: 43.936049,
+    lon: 12.446947,
     phone: "+378 0549 991007",
     phoneHref: "tel:+3780549991007",
     walkMinutes: 5,
@@ -34,17 +34,17 @@ export const GHSM_VENUES: MapPin[] = [
   {
     id: "laTerrazza",
     name: "Ristorante La Terrazza",
-    lat: 43.936025,
-    lon: 12.446984,
+    lat: 43.9353,
+    lon: 12.4490,
     phone: "+378 0549 991007",
     phoneHref: "tel:+3780549991007",
-    walkMinutes: 5,
+    walkMinutes: 6,
   },
   {
     id: "caffeTitano",
     name: "Caffè Titano",
-    lat: 43.936063,
-    lon: 12.446703,
+    lat: 43.936071,
+    lon: 12.446717,
     phone: "+378 0549 992473",
     phoneHref: "tel:+3780549992473",
     walkMinutes: 5,
@@ -52,8 +52,8 @@ export const GHSM_VENUES: MapPin[] = [
   {
     id: "cremeria",
     name: "La Cremeria del Titano",
-    lat: 43.935983,
-    lon: 12.446764,
+    lat: 43.936024,
+    lon: 12.446753,
     phone: "+378 0549 992473",
     phoneHref: "tel:+3780549992473",
     walkMinutes: 5,
@@ -68,14 +68,14 @@ export interface PointOfInterest {
   walkMinutes: number;
 }
 
-/** San Marino landmarks worth visiting — coordinates from OpenStreetMap (centro storico). */
+/** San Marino landmarks worth visiting — coordinates verified via OpenStreetMap Nominatim. */
 export const POINTS_OF_INTEREST: PointOfInterest[] = [
-  { id: "palazzoPubblico", name: "Palazzo Pubblico", lat: 43.93601, lon: 12.4476, walkMinutes: 5 },
-  { id: "basilica", name: "Basilica del Santo", lat: 43.93577, lon: 12.44806, walkMinutes: 4 },
-  { id: "museoStato", name: "Museo di Stato", lat: 43.93553, lon: 12.44703, walkMinutes: 5 },
-  { id: "guaita", name: "Prima Torre · Rocca Guaita", lat: 43.93952, lon: 12.45248, walkMinutes: 12 },
-  { id: "cesta", name: "Seconda Torre · Rocca Cesta", lat: 43.94127, lon: 12.45596, walkMinutes: 15 },
-  { id: "funivia", name: "Funivia di San Marino", lat: 43.93729, lon: 12.44352, walkMinutes: 10 },
+  { id: "palazzoPubblico", name: "Palazzo Pubblico", lat: 43.936783, lon: 12.446273, walkMinutes: 5 },
+  { id: "basilica", name: "Basilica del Santo", lat: 43.937147, lon: 12.446694, walkMinutes: 5 },
+  { id: "museoStato", name: "Museo di Stato", lat: 43.935991, lon: 12.446556, walkMinutes: 5 },
+  { id: "guaita", name: "Prima Torre · Rocca Guaita", lat: 43.935215, lon: 12.449239, walkMinutes: 8 },
+  { id: "cesta", name: "Seconda Torre · Rocca Cesta", lat: 43.932623, lon: 12.451356, walkMinutes: 12 },
+  { id: "funivia", name: "Funivia di San Marino", lat: 43.939070, lon: 12.445616, walkMinutes: 10 },
 ];
 
 export interface Airport {

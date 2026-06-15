@@ -22,11 +22,17 @@ function createIcon(variant: Variant): L.DivIcon {
     });
   }
   const size = variant === "hotel" ? 18 : 14;
-  const background = variant === "hotel" ? "var(--color-accent)" : variant === "poi" ? "var(--color-accent-soft)" : "var(--color-surface)";
-  const radius = variant === "poi" ? "4px" : "50%";
+  // Distinct colors per category
+  const colors: Record<Variant, { bg: string; border: string; radius: string }> = {
+    hotel:   { bg: "#3b82f6", border: "#3b82f6", radius: "50%" },       // blue
+    venue:   { bg: "#f59e0b", border: "#f59e0b", radius: "50%" },       // amber
+    poi:     { bg: "#8b5cf6", border: "#8b5cf6", radius: "4px" },       // purple
+    user:    { bg: "#007AFF", border: "#007AFF", radius: "50%" },        // (not used here)
+  };
+  const c = colors[variant];
   return L.divIcon({
     className: "",
-    html: `<span style="display:block;width:${size}px;height:${size}px;border-radius:${radius};background:${background};border:2px solid var(--color-accent);box-shadow:0 1px 4px rgba(0,0,0,0.35)"></span>`,
+    html: `<span style="display:block;width:${size}px;height:${size}px;border-radius:${c.radius};background:${c.bg};border:2px solid ${c.border};box-shadow:0 1px 4px rgba(0,0,0,0.35)"></span>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
   });
