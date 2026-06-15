@@ -32,11 +32,20 @@ function channelColor(name: string) {
 }
 
 function ChannelLogo({ name }: { name: string }) {
+  // Smart abbreviation: extract channel number or meaningful letters
+  const num = name.match(/\d+/);
+  const abbr = num
+    ? num[0]
+    : name
+        .replace(/Rai\s?|TV\s?|Mediaset|Channel|Sky\s?|Italia\s?|Sport\s?/gi, "")
+        .replace(/[^a-zA-Z0-9]/g, "")
+        .slice(0, 3)
+        .toUpperCase();
   return (
     <span
       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[11px] font-bold ${channelColor(name)}`}
     >
-      {name.replace(/Rai\s?|TV|Mediaset|Channel|Sky\s?|Italia\s?/gi, "").slice(0, 3).toUpperCase()}
+      {abbr || name.slice(0, 3).toUpperCase()}
     </span>
   );
 }
