@@ -315,17 +315,17 @@ const it: HotelContent = {
       {
         id: "laTerrazza",
         name: "Ristorante La Terrazza",
-        body: "Ristorante panoramico, sospeso tra cielo e terra su una torre medievale di San Marino: cucina enogastronomica di alto livello con prodotti locali e una vista mozzafiato.",
+        body: "Cenare tra i merli di una Torre medievale, sospesi tra cielo e terra, con l'orizzonte che si apre a perdita d'occhio — La Terrazza è un'esperienza che pochi luoghi al mondo possono offrire. Cucina enogastronomica di alto livello con prodotti locali.",
       },
       {
         id: "caffeTitano",
         name: "Caffè Titano",
-        body: "Nel centro storico di San Marino, affacciato su una piazzetta medievale: il luogo ideale per una pausa.",
+        body: "Venendo a San Marino non si può non fermarsi qui: nel pieno Centro Storico, affacciato su una splendida piazzetta medievale, in uno degli angoli più suggestivi del borgo antico.",
       },
       {
         id: "cremeria",
         name: "La Cremeria del Titano",
-        body: "Gelateria artigianale accanto al Caffè Titano, aperta nei mesi caldi.",
+        body: "Proprio accanto al Caffè Titano. Aperta nei mesi più caldi, per una fresca e gustosa sosta accompagnata da un buon gelato artigianale.",
       },
     ],
   },
@@ -600,17 +600,17 @@ const en: HotelContent = {
       {
         id: "laTerrazza",
         name: "La Terrazza Restaurant",
-        body: "A panoramic restaurant suspended between sky and earth on a medieval tower of San Marino: high-level food-and-wine cuisine with local produce and breathtaking views.",
+        body: "Dining among the battlements of a medieval tower, suspended between sky and earth, with the horizon stretching as far as the eye can see — La Terrazza is an experience that few places in the world can offer. High-level food-and-wine cuisine with local produce.",
       },
       {
         id: "caffeTitano",
         name: "Caffè Titano",
-        body: "In the historic centre of San Marino, overlooking a medieval square: the ideal place for a break.",
+        body: "A visit to San Marino would not be complete without stopping here: in the heart of the historic centre, overlooking a charming medieval square, in one of the most picturesque corners of the old town.",
       },
       {
         id: "cremeria",
         name: "La Cremeria del Titano",
-        body: "An artisan ice-cream parlour next to Caffè Titano, open during the warmer months.",
+        body: "Right next to Caffè Titano. Open during the warmer months, the perfect place for a refreshing and delicious break with artisanal gelato.",
       },
     ],
   },
