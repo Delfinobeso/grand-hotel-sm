@@ -280,7 +280,7 @@ export function ImageBanner({ src, alt, className = "" }: { src: string; alt: st
           alt={alt}
           loading="lazy"
           className="block w-full object-cover"
-          style={{ aspectRatio: "1.618 / 1" }}
+          style={{ aspectRatio: "2.5 / 1" }}
         />
       </picture>
     </div>
