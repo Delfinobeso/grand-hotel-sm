@@ -75,7 +75,7 @@ export function RoomSection({ t }: { t: HotelContent }) {
               <p className="font-mono text-sm text-[var(--color-accent)]">{t.room.wifi.network}</p>
             </div>
           </div>
-          <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.room.wifi.body}</p>
+          <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.room.wifi.body}</p>
         </Card>
         <Card className="flex flex-col gap-3">
           <div className="flex items-center gap-3">

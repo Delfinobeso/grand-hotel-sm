@@ -270,7 +270,7 @@ const it: HotelContent = {
     wifiLabel: "Wi-Fi",
     wifi: {
       network: "GRANDHOTELRSM",
-      body: "Per connettersi, aprire le impostazioni Wi-Fi del dispositivo, selezionare la rete GRANDHOTELRSM e attendere la notifica di registrazione: toccarla per completare la connessione. Se non compare alcuna notifica, attendere qualche secondo e riprovare.",
+      body: "1. Apri Impostazioni → Wi-Fi\n2. Seleziona la rete GRANDHOTELRSM\n3. Tocca la notifica di registrazione\n\nSe non vedi la notifica, attendi qualche secondo. Nella directory in camera trovi gli screenshot passo-passo.",
     },
     tvLabel: "Canali TV",
     tvIntro: "La selezione di canali disponibili in camera:",
@@ -555,7 +555,7 @@ const en: HotelContent = {
     wifiLabel: "Wi-Fi",
     wifi: {
       network: "GRANDHOTELRSM",
-      body: "To connect, open your device's Wi-Fi settings, select the GRANDHOTELRSM network and wait for the registration notification: tap it to complete the connection. If no notification appears, wait a few seconds and try again.",
+      body: "1. Open Settings → Wi-Fi\n2. Select the GRANDHOTELRSM network\n3. Tap the registration notification\n\nIf you don't see the notification, wait a few seconds. Check the printed directory in your room for step-by-step screenshots.",
     },
     tvLabel: "TV Channels",
     tvIntro: "The channels available in your room:",
