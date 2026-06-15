@@ -128,7 +128,7 @@ export function RoomSection({ t }: { t: HotelContent }) {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </Card>
       </section>
     </div>
   );
