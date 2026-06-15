@@ -2,7 +2,7 @@
 
 import { Phone, HeartPulse, Lock, Wind, BellOff, Wifi, Tv, PawPrint } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
-import { SectionHeader, SectionLabel, AccordionItem, IconBadge, Card, ChipGrid } from "@/components/ui";
+import { SectionHeader, SectionLabel, AccordionItem, IconBadge, Card, ChipGrid, FloorBadge } from "@/components/ui";
 
 const SERVICE_ICONS = [Phone, HeartPulse, Lock, Wind, BellOff];
 
@@ -18,6 +18,11 @@ export function RoomSection({ t }: { t: HotelContent }) {
           {t.room.services.map((service, i) => (
             <AccordionItem key={service.title} icon={SERVICE_ICONS[i]} title={service.title} subtitle={service.subtitle}>
               <p>{service.body}</p>
+              {(i === 0 || i === 1) && (
+                <div className="mt-3">
+                  <FloorBadge>{i === 0 ? t.common.floorGround : t.common.floorThirdMessegue}</FloorBadge>
+                </div>
+              )}
             </AccordionItem>
           ))}
         </div>

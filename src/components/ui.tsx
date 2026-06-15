@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { motion, AnimatePresence, type Transition } from "framer-motion";
-import { ChevronDown, type LucideIcon } from "lucide-react";
+import { ChevronDown, Phone, MapPin, CalendarPlus, type LucideIcon } from "lucide-react";
 import type { HoursRow, MassageItem } from "@/lib/content";
+import { getServiceStatus, type ServiceHours, type StatusLabels } from "@/lib/hours";
+import { buildEventIcsUri, type EventDate } from "@/lib/ics";
 
 export const TRANSITION: Transition = { type: "tween", duration: 0.2, ease: "easeOut" };
 
@@ -164,5 +166,120 @@ export function QuoteBlock({ quote, author }: { quote: string; author: string })
       <p className="font-display text-lg italic leading-snug text-[var(--color-text)] lg:text-xl">&ldquo;{quote}&rdquo;</p>
       <footer className="mt-1 text-sm text-[var(--color-text-muted)]">— {author}</footer>
     </blockquote>
+  );
+}
+
+/* ── CONCIERGE: floor badge, live status, CTA buttons ── */
+
+export function FloorBadge({ children }: { children: ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-surface-muted)] px-2.5 py-1 text-xs font-medium text-[var(--color-text-secondary)]">
+      <MapPin size={12} strokeWidth={2} />
+      {children}
+    </span>
+  );
+}
+
+export function StatusBadge({ hours, labels }: { hours: ServiceHours; labels: StatusLabels }) {
+  const [status, setStatus] = useState<ReturnType<typeof getServiceStatus> | null>(null);
+
+  useEffect(() => {
+    const update = () => setStatus(getServiceStatus(hours));
+    update();
+    const interval = setInterval(update, 60_000);
+    return () => clearInterval(interval);
+  }, [hours]);
+
+  if (!status) {
+    return <span className="inline-block h-5 w-20 animate-pulse rounded-full bg-[var(--color-surface-muted)]" />;
+  }
+
+  if (status.status === "inactive") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-surface-muted)] px-2.5 py-1 text-xs font-medium text-[var(--color-text-muted)]">
+        <span className="h-1.5 w-1.5 rounded-full bg-current" />
+        {labels.onRequest}
+      </span>
+    );
+  }
+
+  const isOpen = status.status === "open";
+  const text = isOpen
+    ? status.time
+      ? `${labels.open} · ${labels.closesAt} ${status.time}`
+      : labels.open
+    : status.time
+      ? `${labels.closed} · ${labels.opensAt} ${status.time}`
+      : labels.closed;
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+        isOpen ? "bg-[var(--color-success-soft)] text-[var(--color-success)]" : "bg-[var(--color-danger-soft)] text-[var(--color-danger)]"
+      }`}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full bg-current ${isOpen ? "animate-pulse" : ""}`} />
+      {text}
+    </span>
+  );
+}
+
+const ctaBase =
+  "inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold transition-[transform,opacity] duration-150 ease-out active:scale-[0.97]";
+const ctaSolid = `${ctaBase} bg-[var(--color-accent)] text-[var(--color-on-accent)] hover:opacity-90`;
+const ctaOutline = `${ctaBase} bg-[var(--color-surface-muted)] text-[var(--color-text)] hover:bg-[var(--color-border)]`;
+
+export function CallButton({ href, label, variant = "solid" }: { href: string; label: string; variant?: "solid" | "outline" }) {
+  return (
+    <a href={href} className={variant === "solid" ? ctaSolid : ctaOutline}>
+      <Phone size={16} strokeWidth={1.75} />
+      {label}
+    </a>
+  );
+}
+
+export function mapsUrl(lat: number, lon: number, name: string): string {
+  return `https://maps.apple.com/?ll=${lat},${lon}&q=${encodeURIComponent(name)}`;
+}
+
+export function NavigateButton({
+  lat,
+  lon,
+  name,
+  label,
+  variant = "outline",
+}: {
+  lat: number;
+  lon: number;
+  name: string;
+  label: string;
+  variant?: "solid" | "outline";
+}) {
+  return (
+    <a href={mapsUrl(lat, lon, name)} target="_blank" rel="noopener noreferrer" className={variant === "solid" ? ctaSolid : ctaOutline}>
+      <MapPin size={16} strokeWidth={1.75} />
+      {label}
+    </a>
+  );
+}
+
+export function AddToCalendarButton({
+  title,
+  location,
+  dates,
+  label,
+}: {
+  title: string;
+  location: string;
+  dates: EventDate[];
+  label: string;
+}) {
+  const href = buildEventIcsUri(title, location, dates);
+  const fileName = `${title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.ics`;
+  return (
+    <a href={href} download={fileName} className={ctaOutline}>
+      <CalendarPlus size={16} strokeWidth={1.75} />
+      {label}
+    </a>
   );
 }

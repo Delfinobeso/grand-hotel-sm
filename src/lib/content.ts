@@ -1,3 +1,6 @@
+import type { StatusLabels } from "@/lib/hours";
+import type { EventDate } from "@/lib/ics";
+
 export type Lang = "it" | "en";
 
 export interface HoursRow {
@@ -27,6 +30,17 @@ export interface HotelContent {
   common: {
     receptionCta: string;
     languageLabel: string;
+    status: StatusLabels;
+    callLabel: string;
+    bookLabel: string;
+    navigateLabel: string;
+    openInMapsLabel: string;
+    addToCalendarLabel: string;
+    callValetLabel: string;
+    floorGround: string;
+    floorThird: string;
+    floorThirdMessegue: string;
+    floorBasement: string;
   };
   home: {
     eyebrow: string;
@@ -71,7 +85,7 @@ export interface HotelContent {
     laundry: { body: string; hours: string };
     groupLabel: string;
     groupIntro: string;
-    venues: { name: string; body: string }[];
+    venues: { id: string; name: string; body: string }[];
   };
   wellness: {
     label: string;
@@ -108,7 +122,9 @@ export interface HotelContent {
     groupLabel: string;
     group: { intro: string; titanoSuites: { name: string; body: string } };
     eventsLabel: string;
-    events: { name: string; date: string }[];
+    events: { name: string; date: string; dates?: EventDate[] }[];
+    outsideLabel: string;
+    outsideIntro: string;
     contactsLabel: string;
   };
   footer: string;
@@ -162,6 +178,23 @@ const it: HotelContent = {
   common: {
     receptionCta: "Chiama la Reception",
     languageLabel: "Lingua",
+    status: {
+      open: "Aperto",
+      closed: "Chiuso",
+      onRequest: "Su richiesta",
+      closesAt: "fino alle",
+      opensAt: "riapre alle",
+    },
+    callLabel: "Chiama",
+    bookLabel: "Prenota",
+    navigateLabel: "Naviga",
+    openInMapsLabel: "Apri in Mappe",
+    addToCalendarLabel: "Aggiungi al calendario",
+    callValetLabel: "Chiama il Valet",
+    floorGround: "Piano Terra",
+    floorThird: "3° piano",
+    floorThirdMessegue: "3° piano · Centro Mességué",
+    floorBasement: "-1 · Garage",
   },
   home: {
     eyebrow: "Benvenuti al",
@@ -281,14 +314,17 @@ const it: HotelContent = {
       "Il Grand Hotel San Marino fa parte di GHSM Group, che dal 1894 rappresenta l'ospitalità a San Marino. Ecco gli altri indirizzi del gruppo dove mangiare e bere.",
     venues: [
       {
+        id: "laTerrazza",
         name: "Ristorante La Terrazza",
         body: "Ristorante panoramico, sospeso tra cielo e terra su una torre medievale di San Marino: cucina enogastronomica di alto livello con prodotti locali e una vista mozzafiato.",
       },
       {
+        id: "caffeTitano",
         name: "Caffè Titano",
         body: "Nel centro storico di San Marino, affacciato su una piazzetta medievale: il luogo ideale per una pausa.",
       },
       {
+        id: "cremeria",
         name: "La Cremeria del Titano",
         body: "Gelateria artigianale accanto al Caffè Titano, aperta nei mesi caldi.",
       },
@@ -400,14 +436,21 @@ const it: HotelContent = {
     },
     eventsLabel: "Eventi a San Marino",
     events: [
-      { name: "Investitura dei Capitani Reggenti", date: "1 aprile e 1 ottobre" },
-      { name: "Festa Nazionale", date: "3 settembre" },
+      {
+        name: "Investitura dei Capitani Reggenti",
+        date: "1 aprile e 1 ottobre",
+        dates: [{ month: 4, day: 1 }, { month: 10, day: 1 }],
+      },
+      { name: "Festa Nazionale", date: "3 settembre", dates: [{ month: 9, day: 3 }] },
       { name: "SMIAF", date: "Prime settimane di agosto" },
       { name: "San Marino Comics", date: "Ultime settimane di agosto" },
       { name: "Rally Legend", date: "Metà ottobre" },
       { name: "MotoGP", date: "Inizio settembre" },
       { name: "Mercatini di Natale", date: "Periodo natalizio" },
     ],
+    outsideLabel: "Fuori dall'hotel",
+    outsideIntro:
+      "Gli altri indirizzi del gruppo GHSM, a pochi passi a piedi nel centro storico di San Marino.",
     contactsLabel: "Indirizzo e contatti",
   },
   footer: "Grand Hotel San Marino",
@@ -424,6 +467,23 @@ const en: HotelContent = {
   common: {
     receptionCta: "Call Reception",
     languageLabel: "Language",
+    status: {
+      open: "Open",
+      closed: "Closed",
+      onRequest: "On request",
+      closesAt: "until",
+      opensAt: "reopens at",
+    },
+    callLabel: "Call",
+    bookLabel: "Book",
+    navigateLabel: "Navigate",
+    openInMapsLabel: "Open in Maps",
+    addToCalendarLabel: "Add to calendar",
+    callValetLabel: "Call Valet",
+    floorGround: "Ground floor",
+    floorThird: "3rd floor",
+    floorThirdMessegue: "3rd floor · Mességué Centre",
+    floorBasement: "-1 · Garage",
   },
   home: {
     eyebrow: "Welcome to",
@@ -543,14 +603,17 @@ const en: HotelContent = {
       "The Grand Hotel San Marino is part of GHSM Group, representing hospitality in San Marino since 1894. Here are the other group venues for food and drink.",
     venues: [
       {
+        id: "laTerrazza",
         name: "La Terrazza Restaurant",
         body: "A panoramic restaurant suspended between sky and earth on a medieval tower of San Marino: high-level food-and-wine cuisine with local produce and breathtaking views.",
       },
       {
+        id: "caffeTitano",
         name: "Caffè Titano",
         body: "In the historic centre of San Marino, overlooking a medieval square: the ideal place for a break.",
       },
       {
+        id: "cremeria",
         name: "La Cremeria del Titano",
         body: "An artisan ice-cream parlour next to Caffè Titano, open during the warmer months.",
       },
@@ -662,14 +725,20 @@ const en: HotelContent = {
     },
     eventsLabel: "Events in San Marino",
     events: [
-      { name: "Investiture of the Captains Regent", date: "April 1 and October 1" },
-      { name: "National Day", date: "September 3" },
+      {
+        name: "Investiture of the Captains Regent",
+        date: "April 1 and October 1",
+        dates: [{ month: 4, day: 1 }, { month: 10, day: 1 }],
+      },
+      { name: "National Day", date: "September 3", dates: [{ month: 9, day: 3 }] },
       { name: "SMIAF", date: "First weeks of August" },
       { name: "San Marino Comics", date: "Last weeks of August" },
       { name: "Rally Legend", date: "Mid-October" },
       { name: "MotoGP", date: "Early September" },
       { name: "Christmas Markets", date: "Christmas season" },
     ],
+    outsideLabel: "Outside the hotel",
+    outsideIntro: "The other GHSM Group venues, just a short walk away in San Marino's historic centre.",
     contactsLabel: "Address & Contacts",
   },
   footer: "Grand Hotel San Marino",

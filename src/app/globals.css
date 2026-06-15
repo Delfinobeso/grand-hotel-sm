@@ -12,6 +12,10 @@
   --color-text-secondary: #5d6168;
   --color-text-muted: #9a9486;
   --color-border: rgba(9, 37, 69, 0.08);
+  --color-success: oklch(0.6 0.14 152);
+  --color-success-soft: oklch(0.6 0.14 152 / 0.12);
+  --color-danger: oklch(0.6 0.17 25);
+  --color-danger-soft: oklch(0.6 0.17 25 / 0.1);
 }
 
 [data-theme="dark"] {
@@ -25,6 +29,10 @@
   --color-text-secondary: #b7b2a8;
   --color-text-muted: #7d7a72;
   --color-border: rgba(255, 255, 255, 0.08);
+  --color-success: oklch(0.75 0.15 152);
+  --color-success-soft: oklch(0.75 0.15 152 / 0.16);
+  --color-danger: oklch(0.72 0.17 25);
+  --color-danger-soft: oklch(0.72 0.17 25 / 0.14);
 }
 
 * {
@@ -50,4 +58,23 @@ body {
 
 ::-webkit-scrollbar {
   display: none;
+}
+
+.leaflet-container {
+  background: var(--color-surface-muted);
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.leaflet-popup-content {
+  margin: 10px 14px;
+}
+
+.leaflet-popup-close-button {
+  color: var(--color-text-muted) !important;
 }

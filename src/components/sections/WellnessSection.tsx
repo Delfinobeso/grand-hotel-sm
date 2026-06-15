@@ -2,7 +2,8 @@
 
 import { HeartPulse, Dumbbell, Bike, Phone } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
-import { SectionHeader, SectionLabel, IconBadge, Card, QuoteBlock, PriceList } from "@/components/ui";
+import { HOTEL, SERVICE_HOURS } from "@/lib/hotel";
+import { SectionHeader, SectionLabel, IconBadge, Card, QuoteBlock, PriceList, FloorBadge, StatusBadge, CallButton } from "@/components/ui";
 
 export function WellnessSection({ t }: { t: HotelContent }) {
   return (
@@ -13,7 +14,13 @@ export function WellnessSection({ t }: { t: HotelContent }) {
       <section className="flex flex-col gap-2">
         <SectionLabel>{t.wellness.messegueLabel}</SectionLabel>
         <Card className="flex flex-col gap-3">
-          <IconBadge icon={HeartPulse} size={18} />
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <IconBadge icon={HeartPulse} size={18} />
+            <div className="flex flex-wrap items-center gap-2">
+              <FloorBadge>{t.common.floorThird}</FloorBadge>
+              <StatusBadge hours={SERVICE_HOURS.messegue} labels={t.common.status} />
+            </div>
+          </div>
           {t.wellness.messegue.paragraphs.map((p, i) => (
             <p key={i} className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
               {p}
@@ -24,6 +31,7 @@ export function WellnessSection({ t }: { t: HotelContent }) {
             <Phone size={16} strokeWidth={1.75} className="text-[var(--color-accent)]" />
             {t.wellness.messegue.callNote}
           </div>
+          <CallButton href={HOTEL.phoneHref} label={t.common.bookLabel} />
         </Card>
       </section>
 
@@ -37,11 +45,15 @@ export function WellnessSection({ t }: { t: HotelContent }) {
       {/* ── PALESTRA & BICI ── */}
       <section className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:gap-3">
         <Card className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
-            <IconBadge icon={Dumbbell} size={18} />
-            <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.wellness.gymLabel}</p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-3">
+              <IconBadge icon={Dumbbell} size={18} />
+              <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.wellness.gymLabel}</p>
+            </div>
+            <StatusBadge hours={SERVICE_HOURS.gym} labels={t.common.status} />
           </div>
           <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.wellness.gym.body}</p>
+          <FloorBadge>{t.common.floorThirdMessegue}</FloorBadge>
         </Card>
         <Card className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
