@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Phone, ChevronLeft } from "lucide-react";
+import { MessageCircle, Send, Phone, ChevronLeft } from "lucide-react";
 import { HOTEL } from "@/lib/hotel";
 
 interface Message {
@@ -23,29 +23,22 @@ const SUGGESTIONS_EN = [
   "How do I get to the historic center?",
 ];
 
-/** Tiene traccia dell'altezza della tastiera su iOS Safari via visualViewport. */
-function useKeyboardHeight(): number {
-  const [kb, setKb] = useState(0);
-
+/** Aggancia il pannello al visualViewport reale — non al layout viewport. */
+function useVisualViewport() {
+  const [rect, setRect] = useState({ top: 0, height: 0 });
   useEffect(() => {
     if (typeof window === "undefined" || !window.visualViewport) return;
     const vv = window.visualViewport;
-
-    const measure = () => {
-      // keyboard height = viewport bottom - visual viewport bottom
-      const h = window.innerHeight - vv.height;
-      setKb(Math.max(0, h));
-    };
-
-    vv.addEventListener("resize", measure);
-    vv.addEventListener("scroll", measure);
+    const sync = () => setRect({ top: vv.offsetTop, height: vv.height });
+    sync();
+    vv.addEventListener("resize", sync);
+    vv.addEventListener("scroll", sync);
     return () => {
-      vv.removeEventListener("resize", measure);
-      vv.removeEventListener("scroll", measure);
+      vv.removeEventListener("resize", sync);
+      vv.removeEventListener("scroll", sync);
     };
   }, []);
-
-  return kb;
+  return rect;
 }
 
 export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
@@ -54,7 +47,7 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const kbHeight = useKeyboardHeight();
+  const vv = useVisualViewport();
 
   const suggestions = lang === "it" ? SUGGESTIONS_IT : SUGGESTIONS_EN;
 
@@ -95,9 +88,21 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
     }
   };
 
+  /** Posizionamento mobile: agganciato al visualViewport. Desktop: invariato. */
+  const panelStyle: React.CSSProperties = vv.height
+    ? {
+        position: "fixed",
+        top: vv.top,
+        left: 0,
+        right: 0,
+        height: vv.height,
+        zIndex: 50,
+      }
+    : {};
+
   return (
     <>
-      {/* FAB — nascosto quando la chat è aperta */}
+      {/* FAB */}
       {!open && (
         <button
           onClick={() => setOpen(true)}
@@ -108,13 +113,13 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
         </button>
       )}
 
-      {/* Chat panel — si comprime sopra la tastiera */}
+      {/* Chat panel */}
       {open && (
         <div
-          className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)] lg:inset-auto lg:bottom-20 lg:right-4 lg:w-96 lg:max-h-[34rem] lg:rounded-2xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl"
-          style={{ paddingBottom: kbHeight > 0 ? `${kbHeight}px` : undefined }}
+          className="flex flex-col bg-[var(--color-bg)] lg:fixed lg:inset-auto lg:bottom-20 lg:right-4 lg:w-96 lg:max-h-[34rem] lg:rounded-2xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl lg:z-50"
+          style={panelStyle}
         >
-          {/* Header — dynamic island safe area */}
+          {/* Header */}
           <div className="flex shrink-0 items-center gap-3 border-b border-[var(--color-border)] px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3">
             <button
               onClick={() => setOpen(false)}
@@ -137,7 +142,7 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
             </a>
           </div>
 
-          {/* Messages — scroll interno, si comprime quando appare la tastiera */}
+          {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3" style={{ WebkitOverflowScrolling: "touch" }}>
             {messages.length === 0 && (
               <div className="space-y-3">
@@ -195,7 +200,6 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onFocus={() => {
-                  // Scroll ultimo messaggio in vista dopo che la tastiera si è aperta
                   setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 350);
                 }}
                 placeholder={lang === "it" ? "Scrivi un messaggio..." : "Type a message..."}
@@ -214,7 +218,7 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
         </div>
       )}
 
-      {/* Scrim — chiude al tap fuori */}
+      {/* Scrim */}
       {open && (
         <div
           className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden"
