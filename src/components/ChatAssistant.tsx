@@ -75,7 +75,7 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
       <button
         onClick={() => setOpen(!open)}
         aria-label={lang === "it" ? "Assistente chat" : "Chat assistant"}
-        className={`fixed bottom-[calc(7.5rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all duration-200 ease-out active:scale-95 lg:bottom-6 ${
+        className={`fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all duration-200 ease-out active:scale-95 lg:bottom-6 ${
           open
             ? "bg-[var(--color-surface)] text-[var(--color-text)]"
             : "bg-[var(--color-accent)] text-[var(--color-on-accent)]"

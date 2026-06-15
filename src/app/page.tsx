@@ -199,15 +199,6 @@ export default function Home() {
         </main>
       </div>
 
-      {/* ── FAB Reception (mobile) ── */}
-      <a
-        href={HOTEL.phoneHref}
-        aria-label={t.common.receptionCta}
-        className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-lg transition-transform duration-150 active:scale-95 lg:hidden"
-      >
-        <Phone size={22} strokeWidth={1.75} />
-      </a>
-
       {/* ── BOTTOM NAV (mobile/tablet) ── */}
       <nav className="sticky bottom-0 z-20 grid grid-cols-6 border-t border-[var(--color-border)] bg-[var(--color-bg)]/95 px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">
         {MAIN_TABS.map(({ key, icon: Icon }) => {
