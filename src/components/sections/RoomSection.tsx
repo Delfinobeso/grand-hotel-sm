@@ -39,6 +39,11 @@ export function RoomSection({ t }: { t: HotelContent }) {
     <div className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8">
       <SectionHeader title={t.room.label} intro={t.room.intro} />
 
+      {/* ── IMMAGINE CAMERA ── */}
+      <div className="-mx-5 overflow-hidden rounded-2xl md:mx-0 lg:rounded-3xl">
+        <img src="/images/room.webp" alt="Camera" className="aspect-[3/2] w-full object-cover" loading="lazy" />
+      </div>
+
       {/* ── SERVIZI IN CAMERA ── */}
       <section>
         <SectionLabel>{t.room.servicesLabel}</SectionLabel>
