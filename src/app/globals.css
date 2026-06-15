@@ -19,12 +19,12 @@
 }
 
 [data-theme="dark"] {
-  --color-bg: #0a1626;
-  --color-surface: #112038;
-  --color-surface-muted: #182c4c;
+  --color-bg: #111110;
+  --color-surface: #1c1c1a;
+  --color-surface-muted: #282824;
   --color-accent: #8db0e0;
   --color-accent-soft: rgba(141, 176, 224, 0.14);
-  --color-on-accent: #08131f;
+  --color-on-accent: #111110;
   --color-text: #f3efe6;
   --color-text-secondary: #b7b2a8;
   --color-text-muted: #7d7a72;

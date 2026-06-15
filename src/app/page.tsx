@@ -73,7 +73,7 @@ export default function Home() {
     localStorage.setItem("theme", next);
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", next === "dark" ? "#0a1626" : "#f6f4ef");
+      ?.setAttribute("content", next === "dark" ? "#111110" : "#f6f4ef");
   };
 
   const toggleLang = () => {
