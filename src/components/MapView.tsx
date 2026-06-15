@@ -4,42 +4,54 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import type { HotelContent } from "@/lib/content";
-import { HOTEL, GHSM_VENUES } from "@/lib/hotel";
+import { HOTEL, GHSM_VENUES, POINTS_OF_INTEREST } from "@/lib/hotel";
 import { NavigateButton } from "@/components/ui";
 
-function createIcon(highlight: boolean): L.DivIcon {
-  const size = highlight ? 18 : 14;
-  const background = highlight ? "var(--color-accent)" : "var(--color-surface)";
+type Variant = "hotel" | "venue" | "poi";
+
+function createIcon(variant: Variant): L.DivIcon {
+  const size = variant === "hotel" ? 18 : 14;
+  const background = variant === "hotel" ? "var(--color-accent)" : variant === "poi" ? "var(--color-accent-soft)" : "var(--color-surface)";
+  const radius = variant === "poi" ? "4px" : "50%";
   return L.divIcon({
     className: "",
-    html: `<span style="display:block;width:${size}px;height:${size}px;border-radius:50%;background:${background};border:2px solid var(--color-accent);box-shadow:0 1px 4px rgba(0,0,0,0.35)"></span>`,
+    html: `<span style="display:block;width:${size}px;height:${size}px;border-radius:${radius};background:${background};border:2px solid var(--color-accent);box-shadow:0 1px 4px rgba(0,0,0,0.35)"></span>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
   });
 }
 
 export default function MapView({ t }: { t: HotelContent }) {
-  const descriptions: Record<string, string> = {
-    titanoSuites: t.info.group.titanoSuites.body,
+  const venueDescriptions: Record<string, string> = {
+    titanoSuites: t.about.group.titanoSuites.body,
     ...Object.fromEntries(t.dining.venues.map((v) => [v.id, v.body])),
   };
+  const poiDescriptions: Record<string, string> = Object.fromEntries(t.info.pois.map((p) => [p.id, p.body]));
 
-  const points = [
+  const points: { id: string; name: string; lat: number; lon: number; body: string; variant: Variant }[] = [
     {
       id: "hotel",
       name: HOTEL.name,
       lat: HOTEL.lat,
       lon: HOTEL.lon,
       body: `${HOTEL.addressLine1}, ${HOTEL.addressLine2}`,
-      highlight: true,
+      variant: "hotel",
     },
     ...GHSM_VENUES.map((v) => ({
       id: v.id,
       name: v.name,
       lat: v.lat,
       lon: v.lon,
-      body: descriptions[v.id] ?? "",
-      highlight: false,
+      body: venueDescriptions[v.id] ?? "",
+      variant: "venue" as Variant,
+    })),
+    ...POINTS_OF_INTEREST.map((p) => ({
+      id: p.id,
+      name: p.name,
+      lat: p.lat,
+      lon: p.lon,
+      body: poiDescriptions[p.id] ?? "",
+      variant: "poi" as Variant,
     })),
   ];
 
@@ -50,7 +62,7 @@ export default function MapView({ t }: { t: HotelContent }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {points.map((p) => (
-        <Marker key={p.id} position={[p.lat, p.lon]} icon={createIcon(p.highlight)}>
+        <Marker key={p.id} position={[p.lat, p.lon]} icon={createIcon(p.variant)}>
           <Popup>
             <div className="flex flex-col gap-2 py-1">
               <div>

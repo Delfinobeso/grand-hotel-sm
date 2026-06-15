@@ -23,9 +23,11 @@ export interface HotelContent {
   nav: {
     home: string;
     room: string;
+    facility: string;
     dining: string;
     wellness: string;
     info: string;
+    about: string;
   };
   common: {
     receptionCta: string;
@@ -37,6 +39,7 @@ export interface HotelContent {
     openInMapsLabel: string;
     addToCalendarLabel: string;
     callValetLabel: string;
+    minWalk: string;
     floorGround: string;
     floorThird: string;
     floorThirdMessegue: string;
@@ -62,45 +65,19 @@ export interface HotelContent {
     intro: string;
     servicesLabel: string;
     services: { title: string; subtitle: string; body: string }[];
-    wifiLabel: string;
-    wifi: { network: string; body: string };
-    tvLabel: string;
-    tvIntro: string;
-    channels: {number: string, name: string, logo: string}[];
-    petsLabel: string;
-    pets: { body: string };
-  };
-  dining: {
-    label: string;
-    intro: string;
-    arengoLabel: string;
-    arengo: {
-      hours: HoursRow[];
-      paragraphs: string[];
-      reservation: string;
-    };
     roomServiceLabel: string;
     roomService: { body: string; hours: string; supplement: string };
     laundryLabel: string;
     laundry: { body: string; hours: string };
-    groupLabel: string;
-    groupIntro: string;
-    venues: { id: string; name: string; body: string }[];
+    wifiLabel: string;
+    wifi: { network: string; body: string };
+    tvLabel: string;
+    tvIntro: string;
+    channels: { number: string; name: string; logo: string }[];
+    petsLabel: string;
+    pets: { body: string };
   };
-  wellness: {
-    label: string;
-    intro: string;
-    messegueLabel: string;
-    messegue: { paragraphs: string[]; quote: string; quoteAuthor: string; callNote: string };
-    priceListLabel: string;
-    priceListNote: string;
-    massages: MassageItem[];
-    gymLabel: string;
-    gym: { body: string };
-    bikeLabel: string;
-    bike: { body: string };
-  };
-  info: {
+  facility: {
     label: string;
     intro: string;
     parkingLabel: string;
@@ -115,16 +92,58 @@ export interface HotelContent {
     card: { body: string };
     hairdresserLabel: string;
     hairdresser: { body: string };
-    airportsLabel: string;
-    airports: { list: string[]; note: string };
     meetingsLabel: string;
     meetings: { body: string };
+    gymBikeLabel: string;
+    gymLabel: string;
+    gym: { body: string };
+    bikeLabel: string;
+    bike: { body: string };
+  };
+  dining: {
+    label: string;
+    intro: string;
+    arengoLabel: string;
+    arengo: {
+      hours: HoursRow[];
+      paragraphs: string[];
+      reservation: string;
+    };
+    groupLabel: string;
+    groupIntro: string;
+    venues: { id: string; name: string; body: string }[];
+  };
+  wellness: {
+    label: string;
+    intro: string;
+    messegueLabel: string;
+    messegue: { paragraphs: string[]; quote: string; quoteAuthor: string; callNote: string };
+    priceListLabel: string;
+    priceListNote: string;
+    massages: MassageItem[];
+  };
+  info: {
+    label: string;
+    intro: string;
+    ghsmLabel: string;
+    poiLabel: string;
+    pois: { id: string; name: string; body: string }[];
+    airportsLabel: string;
+    airports: { list: string[]; note: string };
+    reachLabel: string;
+    reach: {
+      transit: { title: string; body: string };
+      taxi: { title: string; body: string };
+      walk: { title: string; body: string };
+    };
+  };
+  about: {
+    label: string;
+    intro: string;
     groupLabel: string;
     group: { intro: string; titanoSuites: { name: string; body: string } };
     eventsLabel: string;
     events: { name: string; date: string; dates?: EventDate[] }[];
-    outsideLabel: string;
-    outsideIntro: string;
     contactsLabel: string;
   };
   footer: string;
@@ -173,10 +192,12 @@ const TV_CHANNELS = [
 const it: HotelContent = {
   nav: {
     home: "Home",
-    room: "Servizi",
+    room: "Camera",
+    facility: "Hotel",
     dining: "Mangiare",
     wellness: "Benessere",
     info: "Dove",
+    about: "Info",
   },
   common: {
     receptionCta: "Chiama la Reception",
@@ -194,6 +215,7 @@ const it: HotelContent = {
     openInMapsLabel: "Apri in Mappe",
     addToCalendarLabel: "Aggiungi al calendario",
     callValetLabel: "Chiama il Valet",
+    minWalk: "min a piedi",
     floorGround: "Piano Terra",
     floorThird: "3° piano",
     floorThirdMessegue: "3° piano · Centro Mességué",
@@ -237,9 +259,9 @@ const it: HotelContent = {
     ],
   },
   room: {
-    label: "Camera",
-    intro: "Tutto ciò che serve per il massimo confort durante il soggiorno.",
-    servicesLabel: "Servizi in camera",
+    label: "Servizi in Camera",
+    intro: "Tutto il necessario per il massimo confort: reception, room service, lavanderia, Wi-Fi e canali TV.",
+    servicesLabel: "Contatti e comfort",
     services: [
       {
         title: "Reception e Room Service",
@@ -267,6 +289,17 @@ const it: HotelContent = {
         body: "Per non essere disturbati, appendere l'apposito cartoncino alla maniglia esterna della porta.",
       },
     ],
+    roomServiceLabel: "Room Service",
+    roomService: {
+      body: "Colazioni, snack e pasti possono essere serviti direttamente in camera.",
+      hours: "Tutti i giorni, 07:00 – 23:00",
+      supplement: "Supplemento di €6,00 per ordine.",
+    },
+    laundryLabel: "Lavanderia",
+    laundry: {
+      body: "Costi e tempi di lavorazione dipendono dal tipo di tessuto e di lavaggio richiesto. Il modulo per la richiesta si trova nell'armadio della camera.",
+      hours: "08:30 – 16:00",
+    },
     wifiLabel: "Wi-Fi",
     wifi: {
       network: "GRANDHOTELRSM",
@@ -280,9 +313,56 @@ const it: HotelContent = {
       body: "Gli animali di piccola taglia sono ammessi. È previsto un supplemento di €4,00 al giorno per la pulizia extra della camera.",
     },
   },
+  facility: {
+    label: "Servizi della Struttura",
+    intro: "Parcheggio, concierge, sale meeting e gli spazi della struttura — palestra e biciclette — per il vostro soggiorno a San Marino.",
+    parkingLabel: "Parcheggio",
+    garage: {
+      title: "Garage privato",
+      body: [
+        "€19,00 a notte.",
+        "Servizio valet dalle 7:00 alle 23:00: si consiglia di richiedere il veicolo con almeno 30 minuti di anticipo.",
+        "È disponibile una colonna di ricarica per veicoli elettrici, con supplemento.",
+      ],
+    },
+    publicParking: {
+      title: "Parcheggio pubblico",
+      body: "Biglietti a €4,00 al giorno disponibili in Reception, validi fino alle ore 12:00 del giorno successivo nelle strisce blu.",
+    },
+    conciergeLabel: "Concierge",
+    taxiLabel: "Taxi",
+    taxi: {
+      body: "Per prenotare un taxi, contattare il Ricevimento indicando data, ora, numero di persone, tipo di veicolo richiesto e destinazione.",
+    },
+    wakeUpLabel: "Sveglia",
+    wakeUp: {
+      body: "Per richiedere la sveglia, contattare il Ricevimento componendo il tasto 9.",
+    },
+    cardLabel: "TuttoSanMarino Card",
+    card: {
+      body: "La TuttoSanMarino Card offre sconti in musei, negozi e ristoranti convenzionati. La card può essere richiesta in Reception.",
+    },
+    hairdresserLabel: "Parrucchiere",
+    hairdresser: {
+      body: "Il Ricevimento è a disposizione per informazioni sui saloni di acconciatura nelle vicinanze.",
+    },
+    meetingsLabel: "Sale Meeting",
+    meetings: {
+      body: "Il Grand Hotel San Marino dispone di 5 sale meeting modulabili, per eventi da 2 a 200 persone, con supporti tecnologici e uno staff qualificato a disposizione per organizzare meeting su misura, colazioni e cene di lavoro, eventi privati, celebrazioni e banchetti.",
+    },
+    gymBikeLabel: "Palestra e bici",
+    gymLabel: "Palestra",
+    gym: {
+      body: "Una piccola palestra affacciata sulla Valle del Montefeltro, con attrezzi fitness di base, situata all'interno del Centro Mességué al 3° piano. Accesso libero, senza prenotazione, dalle 08:00 alle 20:00.",
+    },
+    bikeLabel: "In bicicletta",
+    bike: {
+      body: "San Marino offre percorsi stradali e off-road tra i 9 castelli della Repubblica, ideali per escursioni in bicicletta. Per il noleggio bici, chiedere informazioni al Ricevimento.",
+    },
+  },
   dining: {
     label: "Ristorante",
-    intro: "La cucina del Grand Hotel San Marino, il servizio in camera e gli altri locali del gruppo GHSM.",
+    intro: "La cucina del Grand Hotel San Marino e gli altri locali del gruppo GHSM.",
     arengoLabel: "Ristorante L'Arengo",
     arengo: {
       hours: [
@@ -296,17 +376,6 @@ const it: HotelContent = {
         "Su richiesta sono disponibili menu speciali ipocalorici o pensati per intolleranze alimentari e patologie particolari, grazie alla sinergia con il Centro Medico Mességué e all'utilizzo di materie prime di origine certificata.",
       ],
       reservation: "La prenotazione è gradita.",
-    },
-    roomServiceLabel: "Room Service",
-    roomService: {
-      body: "Colazioni, snack e pasti possono essere serviti direttamente in camera.",
-      hours: "Tutti i giorni, 07:00 – 23:00",
-      supplement: "Supplemento di €6,00 per ordine.",
-    },
-    laundryLabel: "Lavanderia",
-    laundry: {
-      body: "Costi e tempi di lavorazione dipendono dal tipo di tessuto e di lavaggio richiesto. Il modulo per la richiesta si trova nell'armadio della camera.",
-      hours: "08:30 – 16:00",
     },
     groupLabel: "Il gruppo GHSM",
     groupIntro:
@@ -331,7 +400,7 @@ const it: HotelContent = {
   },
   wellness: {
     label: "Benessere",
-    intro: "Il Centro Medico Maurice Mességué, il listino trattamenti, la palestra e le attività all'aria aperta.",
+    intro: "Il Centro Medico Maurice Mességué e il listino trattamenti per il vostro relax.",
     messegueLabel: "Centro Medico Maurice Mességué",
     messegue: {
       paragraphs: [
@@ -374,57 +443,68 @@ const it: HotelContent = {
       { name: "Manicure", variants: [{ price: "€38,00" }] },
       { name: "Pedicure", variants: [{ price: "€48,00" }] },
     ],
-    gymLabel: "Palestra",
-    gym: {
-      body: "Una piccola palestra affacciata sulla Valle del Montefeltro, con attrezzi fitness di base, situata all'interno del Centro Mességué al 3° piano. Accesso libero, senza prenotazione, dalle 08:00 alle 20:00.",
-    },
-    bikeLabel: "In bicicletta",
-    bike: {
-      body: "San Marino offre percorsi stradali e off-road tra i 9 castelli della Repubblica, ideali per escursioni in bicicletta. Per il noleggio bici, chiedere informazioni al Ricevimento.",
-    },
   },
   info: {
-    label: "Info",
-    intro: "Parcheggio, concierge e tutto ciò che serve per organizzare il soggiorno a San Marino.",
-    parkingLabel: "Parcheggio",
-    garage: {
-      title: "Garage privato",
-      body: [
-        "€19,00 a notte.",
-        "Servizio valet dalle 7:00 alle 23:00: si consiglia di richiedere il veicolo con almeno 30 minuti di anticipo.",
-        "È disponibile una colonna di ricarica per veicoli elettrici, con supplemento.",
-      ],
-    },
-    publicParking: {
-      title: "Parcheggio pubblico",
-      body: "Biglietti a €4,00 al giorno disponibili in Reception, validi fino alle ore 12:00 del giorno successivo nelle strisce blu.",
-    },
-    conciergeLabel: "Concierge",
-    taxiLabel: "Taxi",
-    taxi: {
-      body: "Per prenotare un taxi, contattare il Ricevimento indicando data, ora, numero di persone, tipo di veicolo richiesto e destinazione.",
-    },
-    wakeUpLabel: "Sveglia",
-    wakeUp: {
-      body: "Per richiedere la sveglia, contattare il Ricevimento componendo il tasto 9.",
-    },
-    cardLabel: "TuttoSanMarino Card",
-    card: {
-      body: "La TuttoSanMarino Card offre sconti in musei, negozi e ristoranti convenzionati. La card può essere richiesta in Reception.",
-    },
-    hairdresserLabel: "Parrucchiere",
-    hairdresser: {
-      body: "Il Ricevimento è a disposizione per informazioni sui saloni di acconciatura nelle vicinanze.",
-    },
+    label: "Dove",
+    intro: "La mappa della zona, gli indirizzi del gruppo GHSM, i luoghi da non perdere a San Marino e come muoversi in città.",
+    ghsmLabel: "Indirizzi GHSM nei dintorni",
+    poiLabel: "Da non perdere a San Marino",
+    pois: [
+      {
+        id: "palazzoPubblico",
+        name: "Palazzo Pubblico",
+        body: "Il palazzo del Governo, sede delle istituzioni della Repubblica, domina la centralissima Piazza della Libertà. È visitabile con un percorso che racconta la storia istituzionale di San Marino.",
+      },
+      {
+        id: "basilica",
+        name: "Basilica del Santo",
+        body: "In stile neoclassico, custodisce le reliquie di San Marino, il santo che ha dato origine alla Repubblica più antica del mondo.",
+      },
+      {
+        id: "museoStato",
+        name: "Museo di Stato",
+        body: "Raccoglie reperti archeologici, opere d'arte e testimonianze storiche della Repubblica, dalla preistoria all'età moderna.",
+      },
+      {
+        id: "guaita",
+        name: "Prima Torre · Rocca Guaita",
+        body: "La più antica e famosa delle Tre Torri, costruita nell'XI secolo. Dai camminamenti la vista si apre fino al mare Adriatico.",
+      },
+      {
+        id: "cesta",
+        name: "Seconda Torre · Rocca Cesta",
+        body: "Ospita il Museo delle Armi Antiche, con una collezione di armature e armi dal XII al XIX secolo.",
+      },
+      {
+        id: "funivia",
+        name: "Funivia di San Marino",
+        body: "Collega in pochi minuti il centro storico a Borgo Maggiore, con una vista panoramica sulla Valle del Montefeltro.",
+      },
+    ],
     airportsLabel: "Aeroporti",
     airports: {
       list: ["Rimini", "Ancona", "Forlì", "Bologna"],
       note: "Su richiesta è disponibile il servizio di noleggio auto con conducente.",
     },
-    meetingsLabel: "Meeting & Eventi",
-    meetings: {
-      body: "Il Grand Hotel San Marino dispone di 5 sale meeting modulabili, per eventi da 2 a 200 persone, con supporti tecnologici e uno staff qualificato a disposizione per organizzare meeting su misura, colazioni e cene di lavoro, eventi privati, celebrazioni e banchetti.",
+    reachLabel: "Come muoversi",
+    reach: {
+      transit: {
+        title: "Mezzi pubblici",
+        body: "Bonelli Bus collega San Marino alla stazione ferroviaria e all'aeroporto di Rimini con corse regolari durante il giorno.",
+      },
+      taxi: {
+        title: "Taxi",
+        body: "Per spostamenti verso aeroporti o altre località, il Ricevimento è a disposizione per prenotare un taxi o un servizio con conducente.",
+      },
+      walk: {
+        title: "A piedi",
+        body: "Il centro storico è pedonale e si raggiunge dall'hotel in pochi minuti, tra vicoli e scalinate caratteristiche: si consigliano scarpe comode.",
+      },
     },
+  },
+  about: {
+    label: "Informazioni",
+    intro: "Il gruppo GHSM, gli eventi in programma a San Marino e tutti i contatti del Grand Hotel.",
     groupLabel: "GHSM Group",
     group: {
       intro: "GHSM Group rappresenta l'ospitalità a San Marino dal 1894.",
@@ -447,9 +527,6 @@ const it: HotelContent = {
       { name: "MotoGP", date: "Inizio settembre" },
       { name: "Mercatini di Natale", date: "Periodo natalizio" },
     ],
-    outsideLabel: "Fuori dall'hotel",
-    outsideIntro:
-      "Gli altri indirizzi del gruppo GHSM, a pochi passi a piedi nel centro storico di San Marino.",
     contactsLabel: "Indirizzo e contatti",
   },
   footer: "Grand Hotel San Marino",
@@ -458,10 +535,12 @@ const it: HotelContent = {
 const en: HotelContent = {
   nav: {
     home: "Home",
-    room: "Services",
+    room: "Room",
+    facility: "Hotel",
     dining: "Food",
     wellness: "Wellness",
     info: "Explore",
+    about: "Info",
   },
   common: {
     receptionCta: "Call Reception",
@@ -479,6 +558,7 @@ const en: HotelContent = {
     openInMapsLabel: "Open in Maps",
     addToCalendarLabel: "Add to calendar",
     callValetLabel: "Call Valet",
+    minWalk: "min walk",
     floorGround: "Ground floor",
     floorThird: "3rd floor",
     floorThirdMessegue: "3rd floor · Mességué Centre",
@@ -522,9 +602,9 @@ const en: HotelContent = {
     ],
   },
   room: {
-    label: "Room",
-    intro: "Everything you need for maximum comfort during your stay.",
-    servicesLabel: "In-room services",
+    label: "In-Room Services",
+    intro: "Everything you need for maximum comfort: reception, room service, laundry, Wi-Fi and TV channels.",
+    servicesLabel: "Contacts & comfort",
     services: [
       {
         title: "Reception & Room Service",
@@ -552,6 +632,17 @@ const en: HotelContent = {
         body: "To avoid being disturbed, hang the Do Not Disturb card on the outside door handle.",
       },
     ],
+    roomServiceLabel: "Room Service",
+    roomService: {
+      body: "Breakfast, snacks and meals can be served directly in your room.",
+      hours: "Every day, 7:00 AM – 11:00 PM",
+      supplement: "€6.00 supplement per order.",
+    },
+    laundryLabel: "Laundry",
+    laundry: {
+      body: "Costs and turnaround times depend on the fabric and type of wash required. The request form can be found in the room wardrobe.",
+      hours: "8:30 AM – 4:00 PM",
+    },
     wifiLabel: "Wi-Fi",
     wifi: {
       network: "GRANDHOTELRSM",
@@ -565,9 +656,56 @@ const en: HotelContent = {
       body: "Small pets are welcome. A supplement of €4.00 per day applies for extra room cleaning.",
     },
   },
+  facility: {
+    label: "Hotel Facilities",
+    intro: "Parking, concierge, meeting rooms and the hotel's own facilities — gym and bikes — for your stay in San Marino.",
+    parkingLabel: "Parking",
+    garage: {
+      title: "Private garage",
+      body: [
+        "€19.00 per night.",
+        "Valet service from 7:00 AM to 11:00 PM: please request your vehicle at least 30 minutes in advance.",
+        "An electric vehicle charging station is available, with a supplement.",
+      ],
+    },
+    publicParking: {
+      title: "Public parking",
+      body: "Tickets at €4.00 per day are available at Reception, valid until 12:00 PM the following day in blue-line parking spaces.",
+    },
+    conciergeLabel: "Concierge",
+    taxiLabel: "Taxi",
+    taxi: {
+      body: "To book a taxi, contact Reception with the date, time, number of people, type of vehicle required and destination.",
+    },
+    wakeUpLabel: "Wake-up call",
+    wakeUp: {
+      body: "To request a wake-up call, contact Reception by dialling 9.",
+    },
+    cardLabel: "TuttoSanMarino Card",
+    card: {
+      body: "The TuttoSanMarino Card offers discounts at partner museums, shops and restaurants. The card can be requested at Reception.",
+    },
+    hairdresserLabel: "Hairdresser",
+    hairdresser: {
+      body: "Reception is available for information on nearby hairdressing salons.",
+    },
+    meetingsLabel: "Meeting Rooms",
+    meetings: {
+      body: "The Grand Hotel San Marino has 5 modular meeting rooms for events from 2 to 200 people, with technological support and a qualified staff available to organise tailor-made meetings, working breakfasts and dinners, private events, celebrations and banquets.",
+    },
+    gymBikeLabel: "Gym & bike",
+    gymLabel: "Gym",
+    gym: {
+      body: "A small gym overlooking the Montefeltro Valley, with basic fitness equipment, located inside the Mességué Centre on the 3rd floor. Free access, no booking required, from 8:00 AM to 8:00 PM.",
+    },
+    bikeLabel: "By bike",
+    bike: {
+      body: "San Marino offers road and off-road routes among the Republic's 9 castles, ideal for cycling excursions. For bike rental, please ask at Reception.",
+    },
+  },
   dining: {
     label: "Dining",
-    intro: "The cuisine of the Grand Hotel San Marino, room service and the other venues of the GHSM Group.",
+    intro: "The cuisine of the Grand Hotel San Marino and the other venues of the GHSM Group.",
     arengoLabel: "L'Arengo Restaurant",
     arengo: {
       hours: [
@@ -581,17 +719,6 @@ const en: HotelContent = {
         "Special low-calorie menus, or menus for food intolerances and specific medical conditions, are available on request, thanks to our synergy with the Mességué Medical Centre and the use of certified-origin ingredients.",
       ],
       reservation: "Reservations are recommended.",
-    },
-    roomServiceLabel: "Room Service",
-    roomService: {
-      body: "Breakfast, snacks and meals can be served directly in your room.",
-      hours: "Every day, 7:00 AM – 11:00 PM",
-      supplement: "€6.00 supplement per order.",
-    },
-    laundryLabel: "Laundry",
-    laundry: {
-      body: "Costs and turnaround times depend on the fabric and type of wash required. The request form can be found in the room wardrobe.",
-      hours: "8:30 AM – 4:00 PM",
     },
     groupLabel: "The GHSM Group",
     groupIntro:
@@ -616,7 +743,7 @@ const en: HotelContent = {
   },
   wellness: {
     label: "Wellness",
-    intro: "The Maurice Mességué Medical Centre, the treatment price list, the gym and outdoor activities.",
+    intro: "The Maurice Mességué Medical Centre and the treatment price list for your relaxation.",
     messegueLabel: "Maurice Mességué Medical Centre",
     messegue: {
       paragraphs: [
@@ -659,57 +786,68 @@ const en: HotelContent = {
       { name: "Manicure", variants: [{ price: "€38.00" }] },
       { name: "Pedicure", variants: [{ price: "€48.00" }] },
     ],
-    gymLabel: "Gym",
-    gym: {
-      body: "A small gym overlooking the Montefeltro Valley, with basic fitness equipment, located inside the Mességué Centre on the 3rd floor. Free access, no booking required, from 8:00 AM to 8:00 PM.",
-    },
-    bikeLabel: "By bike",
-    bike: {
-      body: "San Marino offers road and off-road routes among the Republic's 9 castles, ideal for cycling excursions. For bike rental, please ask at Reception.",
-    },
   },
   info: {
-    label: "Info",
-    intro: "Parking, concierge and everything you need to plan your stay in San Marino.",
-    parkingLabel: "Parking",
-    garage: {
-      title: "Private garage",
-      body: [
-        "€19.00 per night.",
-        "Valet service from 7:00 AM to 11:00 PM: please request your vehicle at least 30 minutes in advance.",
-        "An electric vehicle charging station is available, with a supplement.",
-      ],
-    },
-    publicParking: {
-      title: "Public parking",
-      body: "Tickets at €4.00 per day are available at Reception, valid until 12:00 PM the following day in blue-line parking spaces.",
-    },
-    conciergeLabel: "Concierge",
-    taxiLabel: "Taxi",
-    taxi: {
-      body: "To book a taxi, contact Reception with the date, time, number of people, type of vehicle required and destination.",
-    },
-    wakeUpLabel: "Wake-up call",
-    wakeUp: {
-      body: "To request a wake-up call, contact Reception by dialling 9.",
-    },
-    cardLabel: "TuttoSanMarino Card",
-    card: {
-      body: "The TuttoSanMarino Card offers discounts at partner museums, shops and restaurants. The card can be requested at Reception.",
-    },
-    hairdresserLabel: "Hairdresser",
-    hairdresser: {
-      body: "Reception is available for information on nearby hairdressing salons.",
-    },
+    label: "Explore",
+    intro: "The area map, GHSM Group addresses, must-see places in San Marino and how to get around.",
+    ghsmLabel: "GHSM Group nearby",
+    poiLabel: "Must-see in San Marino",
+    pois: [
+      {
+        id: "palazzoPubblico",
+        name: "Palazzo Pubblico",
+        body: "The Government Palace, seat of the Republic's institutions, overlooks the central Piazza della Libertà. A visitor route tells the story of San Marino's institutions.",
+      },
+      {
+        id: "basilica",
+        name: "Basilica del Santo",
+        body: "This neoclassical basilica holds the relics of Saint Marinus, who gave his name to the world's oldest republic.",
+      },
+      {
+        id: "museoStato",
+        name: "State Museum",
+        body: "Home to archaeological finds, artworks and historical artefacts of the Republic, from prehistory to modern times.",
+      },
+      {
+        id: "guaita",
+        name: "First Tower · Guaita Fortress",
+        body: "The oldest and most iconic of the Three Towers, built in the 11th century. Its walkways offer views all the way to the Adriatic Sea.",
+      },
+      {
+        id: "cesta",
+        name: "Second Tower · Cesta Fortress",
+        body: "Home to the Museum of Ancient Weapons, with a collection of armour and arms from the 12th to the 19th century.",
+      },
+      {
+        id: "funivia",
+        name: "San Marino Cable Car",
+        body: "Connects the historic centre to Borgo Maggiore in just a few minutes, with panoramic views over the Montefeltro Valley.",
+      },
+    ],
     airportsLabel: "Airports",
     airports: {
       list: ["Rimini", "Ancona", "Forlì", "Bologna"],
       note: "A chauffeur-driven car rental service is available on request.",
     },
-    meetingsLabel: "Meetings & Events",
-    meetings: {
-      body: "The Grand Hotel San Marino has 5 modular meeting rooms for events from 2 to 200 people, with technological support and a qualified staff available to organise tailor-made meetings, working breakfasts and dinners, private events, celebrations and banquets.",
+    reachLabel: "Getting around",
+    reach: {
+      transit: {
+        title: "Public transport",
+        body: "Bonelli Bus connects San Marino to Rimini's train station and airport with regular daytime services.",
+      },
+      taxi: {
+        title: "Taxi",
+        body: "For trips to airports or other destinations, Reception is happy to book a taxi or chauffeur service for you.",
+      },
+      walk: {
+        title: "On foot",
+        body: "The historic centre is pedestrian-only and just a few minutes from the hotel, through charming lanes and stairways: comfortable shoes are recommended.",
+      },
     },
+  },
+  about: {
+    label: "Information",
+    intro: "The GHSM Group, upcoming events in San Marino, and all the Grand Hotel's contact details.",
     groupLabel: "GHSM Group",
     group: {
       intro: "GHSM Group has represented hospitality in San Marino since 1894.",
@@ -732,8 +870,6 @@ const en: HotelContent = {
       { name: "MotoGP", date: "Early September" },
       { name: "Christmas Markets", date: "Christmas season" },
     ],
-    outsideLabel: "Outside the hotel",
-    outsideIntro: "The other GHSM Group venues, just a short walk away in San Marino's historic centre.",
     contactsLabel: "Address & Contacts",
   },
   footer: "Grand Hotel San Marino",

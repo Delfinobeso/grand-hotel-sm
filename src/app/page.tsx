@@ -9,27 +9,33 @@ import {
   Languages,
   Home as HomeIcon,
   BedDouble,
+  ConciergeBell,
   UtensilsCrossed,
   Sparkles,
   MapPin as MapIcon,
+  Info as InfoIcon,
   type LucideIcon,
 } from "lucide-react";
 import { content, type Lang, type HotelContent } from "@/lib/content";
 import { HOTEL } from "@/lib/hotel";
 import { HomeSection } from "@/components/sections/HomeSection";
 import { RoomSection } from "@/components/sections/RoomSection";
+import { FacilitySection } from "@/components/sections/FacilitySection";
 import { DiningSection } from "@/components/sections/DiningSection";
 import { WellnessSection } from "@/components/sections/WellnessSection";
 import { InfoSection } from "@/components/sections/InfoSection";
+import { AboutSection } from "@/components/sections/AboutSection";
 
-type TabKey = "home" | "room" | "dining" | "wellness" | "info";
+type TabKey = "home" | "room" | "facility" | "dining" | "wellness" | "info" | "about";
 
 const TABS: { key: TabKey; icon: LucideIcon }[] = [
   { key: "home", icon: HomeIcon },
   { key: "room", icon: BedDouble },
+  { key: "facility", icon: ConciergeBell },
   { key: "dining", icon: UtensilsCrossed },
   { key: "wellness", icon: Sparkles },
   { key: "info", icon: MapIcon },
+  { key: "about", icon: InfoIcon },
 ];
 
 function ReceptionButton({ t }: { t: HotelContent }) {
@@ -88,17 +94,21 @@ export default function Home() {
   const navLabels: Record<TabKey, string> = {
     home: t.nav.home,
     room: t.nav.room,
+    facility: t.nav.facility,
     dining: t.nav.dining,
     wellness: t.nav.wellness,
     info: t.nav.info,
+    about: t.nav.about,
   };
 
   const sections: Record<TabKey, React.ReactNode> = {
     home: <HomeSection t={t} />,
     room: <RoomSection t={t} />,
+    facility: <FacilitySection t={t} />,
     dining: <DiningSection t={t} />,
     wellness: <WellnessSection t={t} />,
     info: <InfoSection t={t} />,
+    about: <AboutSection t={t} />,
   };
 
   return (
@@ -190,7 +200,7 @@ export default function Home() {
       </a>
 
       {/* ── BOTTOM NAV (mobile/tablet) ── */}
-      <nav className="sticky bottom-0 z-20 grid grid-cols-5 border-t border-[var(--color-border)] bg-[var(--color-bg)]/95 px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">
+      <nav className="sticky bottom-0 z-20 grid grid-cols-7 border-t border-[var(--color-border)] bg-[var(--color-bg)]/95 px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">
         {TABS.map(({ key, icon: Icon }) => {
           const active = activeTab === key;
           return (

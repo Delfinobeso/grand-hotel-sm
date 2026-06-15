@@ -1,9 +1,9 @@
 "use client";
 
-import { UtensilsCrossed, HandPlatter, Shirt, Mountain, Coffee, IceCream2, type LucideIcon } from "lucide-react";
+import { UtensilsCrossed, Mountain, Coffee, IceCream2, type LucideIcon } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL, GHSM_VENUES, SERVICE_HOURS } from "@/lib/hotel";
-import { SectionHeader, SectionLabel, IconBadge, Card, HoursTable, FloorBadge, StatusBadge, CallButton, NavigateButton, ImageBanner, CardImage } from "@/components/ui";
+import { SectionHeader, SectionLabel, IconBadge, Card, HoursTable, FloorBadge, StatusBadge, CallButton, NavigateButton, CardImage } from "@/components/ui";
 
 const VENUE_ICONS: LucideIcon[] = [Mountain, Coffee, IceCream2];
 const VENUE_IMAGES: Record<string, string> = {
@@ -40,38 +40,6 @@ export function DiningSection({ t }: { t: HotelContent }) {
           </div>
         </Card>
         <HoursTable rows={t.dining.arengo.hours} />
-      </section>
-
-      {/* ── ROOM SERVICE & LAVANDERIA ── */}
-      <section className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:gap-3">
-        <Card className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-3">
-              <IconBadge icon={HandPlatter} size={18} />
-              <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.dining.roomServiceLabel}</p>
-            </div>
-            <StatusBadge hours={SERVICE_HOURS.roomService} labels={t.common.status} />
-          </div>
-          <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.dining.roomService.body}</p>
-          <div className="flex flex-col gap-1 border-t border-[var(--color-border)] pt-3 text-sm">
-            <span className="font-medium text-[var(--color-text)]">{t.dining.roomService.hours}</span>
-            <span className="text-[var(--color-text-muted)]">{t.dining.roomService.supplement}</span>
-          </div>
-          <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} />
-        </Card>
-        <Card className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-3">
-              <IconBadge icon={Shirt} size={18} />
-              <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.dining.laundryLabel}</p>
-            </div>
-            <StatusBadge hours={SERVICE_HOURS.laundry} labels={t.common.status} />
-          </div>
-          <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.dining.laundry.body}</p>
-          <div className="border-t border-[var(--color-border)] pt-3 text-sm font-medium text-[var(--color-text)]">
-            {t.dining.laundry.hours}
-          </div>
-        </Card>
       </section>
 
       {/* ── GHSM GROUP ── */}

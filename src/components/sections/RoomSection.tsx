@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Phone, HeartPulse, Lock, Wind, BellOff, Wifi, Tv, PawPrint, ChevronDown } from "lucide-react";
+import { Phone, HeartPulse, Lock, Wind, BellOff, HandPlatter, Shirt, Wifi, Tv, PawPrint, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { HotelContent } from "@/lib/content";
-import { HOTEL } from "@/lib/hotel";
-import { SectionHeader, SectionLabel, AccordionItem, IconBadge, Card, FloorBadge, CallButton, ImageBanner } from "@/components/ui";
+import { HOTEL, SERVICE_HOURS } from "@/lib/hotel";
+import { SectionHeader, SectionLabel, AccordionItem, IconBadge, Card, FloorBadge, StatusBadge, CallButton, ImageBanner } from "@/components/ui";
 import { TRANSITION } from "@/components/ui";
 
 const SERVICE_ICONS = [Phone, HeartPulse, Lock, Wind, BellOff];
@@ -93,6 +93,38 @@ export function RoomSection({ t }: { t: HotelContent }) {
             </AccordionItem>
           ))}
         </div>
+      </section>
+
+      {/* ── ROOM SERVICE & LAVANDERIA ── */}
+      <section className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:gap-3">
+        <Card className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-3">
+              <IconBadge icon={HandPlatter} size={18} />
+              <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.room.roomServiceLabel}</p>
+            </div>
+            <StatusBadge hours={SERVICE_HOURS.roomService} labels={t.common.status} />
+          </div>
+          <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.room.roomService.body}</p>
+          <div className="flex flex-col gap-1 border-t border-[var(--color-border)] pt-3 text-sm">
+            <span className="font-medium text-[var(--color-text)]">{t.room.roomService.hours}</span>
+            <span className="text-[var(--color-text-muted)]">{t.room.roomService.supplement}</span>
+          </div>
+          <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} />
+        </Card>
+        <Card className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-3">
+              <IconBadge icon={Shirt} size={18} />
+              <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.room.laundryLabel}</p>
+            </div>
+            <StatusBadge hours={SERVICE_HOURS.laundry} labels={t.common.status} />
+          </div>
+          <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.room.laundry.body}</p>
+          <div className="border-t border-[var(--color-border)] pt-3 text-sm font-medium text-[var(--color-text)]">
+            {t.room.laundry.hours}
+          </div>
+        </Card>
       </section>
 
       {/* ── WI-FI & ANIMALI ── */}
