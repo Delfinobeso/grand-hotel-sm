@@ -1,13 +1,41 @@
 "use client";
 
-import { Phone, HeartPulse, Lock, Wind, BellOff, Wifi, Tv, PawPrint } from "lucide-react";
+import { useState } from "react";
+import { Phone, HeartPulse, Lock, Wind, BellOff, Wifi, Tv, PawPrint, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL } from "@/lib/hotel";
-import { SectionHeader, SectionLabel, AccordionItem, IconBadge, Card, ChipGrid, FloorBadge, CallButton, ImageBanner } from "@/components/ui";
+import { SectionHeader, SectionLabel, AccordionItem, IconBadge, Card, FloorBadge, CallButton, ImageBanner } from "@/components/ui";
+import { TRANSITION } from "@/components/ui";
 
 const SERVICE_ICONS = [Phone, HeartPulse, Lock, Wind, BellOff];
 
+function ChannelLogo({ src, name }: { src: string; name: string }) {
+  const [error, setError] = useState(false);
+
+  if (error) {
+    return (
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[var(--color-surface-muted)] text-[11px] font-bold text-[var(--color-text-muted)]">
+        {name.slice(0, 2).toUpperCase()}
+      </span>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={name}
+      loading="lazy"
+      onError={() => setError(true)}
+      className="h-8 w-8 shrink-0 rounded object-contain"
+      style={{ filter: "var(--channel-logo-filter, none)" }}
+    />
+  );
+}
+
 export function RoomSection({ t }: { t: HotelContent }) {
+  const [channelsOpen, setChannelsOpen] = useState(false);
+
   return (
     <div className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8">
       <ImageBanner src="/images/room.webp" alt={t.room.label} />
@@ -64,12 +92,54 @@ export function RoomSection({ t }: { t: HotelContent }) {
       {/* ── CANALI TV ── */}
       <section>
         <SectionLabel>{t.room.tvLabel}</SectionLabel>
-        <Card className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
+        <Card>
+          <button
+            onClick={() => setChannelsOpen(!channelsOpen)}
+            aria-expanded={channelsOpen}
+            className="flex w-full items-center gap-3 text-left transition-colors duration-150"
+          >
             <IconBadge icon={Tv} size={18} />
-            <p className="text-sm text-[var(--color-text-secondary)]">{t.room.tvIntro}</p>
-          </div>
-          <ChipGrid items={t.room.channels} />
+            <span className="min-w-0 flex-1">
+              <span className="block text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.room.tvLabel}</span>
+              <span className="block text-sm text-[var(--color-text-secondary)]">{t.room.tvIntro}</span>
+            </span>
+            <motion.span
+              animate={{ rotate: channelsOpen ? 180 : 0 }}
+              transition={TRANSITION}
+              className="shrink-0 text-[var(--color-text-muted)]"
+            >
+              <ChevronDown size={18} strokeWidth={1.75} />
+            </motion.span>
+          </button>
+
+          <AnimatePresence initial={false}>
+            {channelsOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={TRANSITION}
+                className="overflow-hidden"
+              >
+                <div className="mt-3 border-t border-[var(--color-border)] pt-3">
+                  <div className="flex flex-col gap-0">
+                    {t.room.channels.map((ch, i) => (
+                      <div
+                        key={ch.number}
+                        className={`flex items-center gap-3 py-2.5 ${i !== 0 ? "border-t border-[var(--color-border)]" : ""}`}
+                      >
+                        <span className="flex h-6 w-8 shrink-0 items-center justify-center rounded bg-[var(--color-surface-muted)] text-xs font-bold tabular-nums text-[var(--color-text-muted)]">
+                          {ch.number}
+                        </span>
+                        <ChannelLogo src={ch.logo} name={ch.name} />
+                        <span className="text-sm font-medium text-[var(--color-text)]">{ch.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </Card>
       </section>
     </div>

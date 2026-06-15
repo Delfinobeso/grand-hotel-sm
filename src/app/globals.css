@@ -33,6 +33,7 @@
   --color-success-soft: oklch(0.75 0.15 152 / 0.16);
   --color-danger: oklch(0.72 0.17 25);
   --color-danger-soft: oklch(0.72 0.17 25 / 0.14);
+  --channel-logo-filter: invert(0.85);
 }
 
 * {
