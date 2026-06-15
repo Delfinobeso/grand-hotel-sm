@@ -23,12 +23,38 @@ const SUGGESTIONS_EN = [
   "How do I get to the historic center?",
 ];
 
+/** Tiene traccia dell'altezza della tastiera su iOS Safari via visualViewport. */
+function useKeyboardHeight(): number {
+  const [kb, setKb] = useState(0);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.visualViewport) return;
+    const vv = window.visualViewport;
+
+    const measure = () => {
+      // keyboard height = viewport bottom - visual viewport bottom
+      const h = window.innerHeight - vv.height;
+      setKb(Math.max(0, h));
+    };
+
+    vv.addEventListener("resize", measure);
+    vv.addEventListener("scroll", measure);
+    return () => {
+      vv.removeEventListener("resize", measure);
+      vv.removeEventListener("scroll", measure);
+    };
+  }, []);
+
+  return kb;
+}
+
 export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const kbHeight = useKeyboardHeight();
 
   const suggestions = lang === "it" ? SUGGESTIONS_IT : SUGGESTIONS_EN;
 
@@ -82,9 +108,12 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
         </button>
       )}
 
-      {/* Chat fullscreen panel — sopra tutto, safe area iPhone 17 Pro */}
+      {/* Chat panel — si comprime sopra la tastiera */}
       {open && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)] lg:inset-auto lg:bottom-20 lg:right-4 lg:w-96 lg:max-h-[34rem] lg:rounded-2xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)] lg:inset-auto lg:bottom-20 lg:right-4 lg:w-96 lg:max-h-[34rem] lg:rounded-2xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl"
+          style={{ paddingBottom: kbHeight > 0 ? `${kbHeight}px` : undefined }}
+        >
           {/* Header — dynamic island safe area */}
           <div className="flex shrink-0 items-center gap-3 border-b border-[var(--color-border)] px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3">
             <button
@@ -108,8 +137,8 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
             </a>
           </div>
 
-          {/* Messages — scroll interno */}
-          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+          {/* Messages — scroll interno, si comprime quando appare la tastiera */}
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3" style={{ WebkitOverflowScrolling: "touch" }}>
             {messages.length === 0 && (
               <div className="space-y-3">
                 <p className="text-sm text-[var(--color-text-secondary)]">
@@ -157,7 +186,7 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
             <div ref={bottomRef} />
           </div>
 
-          {/* Input — home indicator safe area */}
+          {/* Input */}
           <div className="shrink-0 border-t border-[var(--color-border)] px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             <div className="flex items-center gap-2">
               <input
@@ -165,6 +194,10 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
+                onFocus={() => {
+                  // Scroll ultimo messaggio in vista dopo che la tastiera si è aperta
+                  setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 350);
+                }}
                 placeholder={lang === "it" ? "Scrivi un messaggio..." : "Type a message..."}
                 className="flex-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2.5 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] outline-none focus:border-[var(--color-accent)]"
                 autoFocus
@@ -179,6 +212,14 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Scrim — chiude al tap fuori */}
+      {open && (
+        <div
+          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden"
+          onClick={() => setOpen(false)}
+        />
       )}
     </>
   );
