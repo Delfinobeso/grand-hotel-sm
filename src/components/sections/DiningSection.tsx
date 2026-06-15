@@ -15,13 +15,13 @@ const VENUE_IMAGES: Record<string, string> = {
 export function DiningSection({ t }: { t: HotelContent }) {
   return (
     <div className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8">
-      <ImageBanner src="/images/dining.webp" alt={t.dining.label} />
       <SectionHeader title={t.dining.label} intro={t.dining.intro} />
 
       {/* ── RISTORANTE L'ARENGO ── */}
       <section className="flex flex-col gap-2">
         <SectionLabel>{t.dining.arengoLabel}</SectionLabel>
         <Card className="flex flex-col gap-3">
+          <CardImage src="/images/restaurant.webp" alt={t.dining.arengoLabel} />
           <div className="flex flex-wrap items-center justify-between gap-2">
             <IconBadge icon={UtensilsCrossed} size={18} />
             <div className="flex flex-wrap items-center gap-2">
