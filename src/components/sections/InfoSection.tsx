@@ -140,9 +140,14 @@ export function InfoSection({ t }: { t: HotelContent }) {
       {/* ── MEETING & EVENTI ── */}
       <section>
         <SectionLabel>{t.info.meetingsLabel}</SectionLabel>
-        <Card className="flex items-start gap-3">
-          <IconBadge icon={Users} size={18} />
-          <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.info.meetings.body}</p>
+        <Card className="flex flex-col gap-3">
+          <div className="-mx-4 -mt-4 mb-2 overflow-hidden rounded-t-2xl lg:-mx-5 lg:-mt-5">
+            <img src="/images/meeting.webp" alt="Sale Meeting" className="aspect-[3/2] w-full object-cover" loading="lazy" />
+          </div>
+          <div className="flex items-start gap-3">
+            <IconBadge icon={Users} size={18} />
+            <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.info.meetings.body}</p>
+          </div>
         </Card>
       </section>
 

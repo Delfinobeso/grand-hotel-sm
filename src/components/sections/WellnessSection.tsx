@@ -14,6 +14,9 @@ export function WellnessSection({ t }: { t: HotelContent }) {
       <section className="flex flex-col gap-2">
         <SectionLabel>{t.wellness.messegueLabel}</SectionLabel>
         <Card className="flex flex-col gap-3">
+          <div className="-mx-4 -mt-4 mb-2 overflow-hidden rounded-t-2xl lg:-mx-5 lg:-mt-5">
+            <img src="/images/terrace.webp" alt="Terrazza" className="aspect-[4/3] w-full object-cover" loading="lazy" />
+          </div>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <IconBadge icon={HeartPulse} size={18} />
             <div className="flex flex-wrap items-center gap-2">
