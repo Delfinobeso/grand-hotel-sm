@@ -461,7 +461,7 @@ const en: HotelContent = {
     room: "Services",
     dining: "Food",
     wellness: "Wellness",
-    info: "Dove",
+    info: "Explore",
   },
   common: {
     receptionCta: "Call Reception",
@@ -498,20 +498,16 @@ const en: HotelContent = {
     highlightsLabel: "Quick actions",
     highlights: [
       {
-        title: "60 Rooms & Suites",
-        body: "Overlooking the Montefeltro Valley, in an ideal location for cycling excursions and walks.",
+        title: "Wi-Fi",
+        body: "GRANDHOTELRSM network — select it, wait for the notification, and connect for free throughout the hotel.",
       },
       {
-        title: "5 Meeting Rooms",
-        body: "For events from 2 to 200 people, with technological support and dedicated staff.",
+        title: "Reception",
+        body: "Open 24 hours a day. Dial 9 from your room phone for any request.",
       },
       {
-        title: "Maurice Mességué Medical Centre",
-        body: "An Italian benchmark for over 30 years for health, weight-loss and wellness holidays.",
-      },
-      {
-        title: "La Terrazza Restaurant",
-        body: "High-level food-and-wine cuisine with local produce and breathtaking views.",
+        title: "Breakfast",
+        body: "Served at Ristorante L'Arengo from 7:00 to 10:00 AM. Room service available with a €6.00 supplement.",
       },
     ],
     hoursLabel: "Service hours",
