@@ -3,11 +3,12 @@
 import { HeartPulse, Dumbbell, Bike, Phone } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL, SERVICE_HOURS } from "@/lib/hotel";
-import { SectionHeader, SectionLabel, IconBadge, Card, QuoteBlock, PriceList, FloorBadge, StatusBadge, CallButton } from "@/components/ui";
+import { SectionHeader, SectionLabel, IconBadge, Card, QuoteBlock, PriceList, FloorBadge, StatusBadge, CallButton, ImageBanner } from "@/components/ui";
 
 export function WellnessSection({ t }: { t: HotelContent }) {
   return (
     <div className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8">
+      <ImageBanner src="/images/wellness.webp" alt={t.wellness.label} />
       <SectionHeader title={t.wellness.label} intro={t.wellness.intro} />
 
       {/* ── CENTRO MESSÉGUÉ ── */}

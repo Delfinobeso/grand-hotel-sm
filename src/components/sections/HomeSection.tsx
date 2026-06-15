@@ -1,8 +1,8 @@
 "use client";
 
-import { BedDouble, Users, HeartPulse, UtensilsCrossed, Clock, Wifi, Phone, Coffee, ArrowRight } from "lucide-react";
+import { Clock, Wifi, Phone, Coffee } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
-import { SectionLabel, HighlightCard, HoursTable } from "@/components/ui";
+import { SectionLabel, HoursTable, ImageBanner } from "@/components/ui";
 import { HOTEL } from "@/lib/hotel";
 
 const HIGHLIGHT_ICONS = [Wifi, Phone, Coffee];
@@ -10,6 +10,7 @@ const HIGHLIGHT_ICONS = [Wifi, Phone, Coffee];
 export function HomeSection({ t }: { t: HotelContent }) {
   return (
     <div className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8">
+      <ImageBanner src="/images/home.webp" alt={t.home.welcomeTitle} />
       {/* ── STAY CARD ── */}
       <section className="rounded-3xl bg-[var(--color-accent)] px-5 py-5 text-[var(--color-on-accent)] lg:px-6 lg:py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] opacity-60">{t.home.stayLabel}</p>

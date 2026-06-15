@@ -3,13 +3,14 @@
 import { Phone, HeartPulse, Lock, Wind, BellOff, Wifi, Tv, PawPrint } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL } from "@/lib/hotel";
-import { SectionHeader, SectionLabel, AccordionItem, IconBadge, Card, ChipGrid, FloorBadge, CallButton } from "@/components/ui";
+import { SectionHeader, SectionLabel, AccordionItem, IconBadge, Card, ChipGrid, FloorBadge, CallButton, ImageBanner } from "@/components/ui";
 
 const SERVICE_ICONS = [Phone, HeartPulse, Lock, Wind, BellOff];
 
 export function RoomSection({ t }: { t: HotelContent }) {
   return (
     <div className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8">
+      <ImageBanner src="/images/room.webp" alt={t.room.label} />
       <SectionHeader title={t.room.label} intro={t.room.intro} />
 
       {/* ── SERVIZI IN CAMERA ── */}

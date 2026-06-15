@@ -3,13 +3,14 @@
 import { UtensilsCrossed, HandPlatter, Shirt, Mountain, Coffee, IceCream2, type LucideIcon } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL, GHSM_VENUES, SERVICE_HOURS } from "@/lib/hotel";
-import { SectionHeader, SectionLabel, IconBadge, Card, HoursTable, FloorBadge, StatusBadge, CallButton, NavigateButton } from "@/components/ui";
+import { SectionHeader, SectionLabel, IconBadge, Card, HoursTable, FloorBadge, StatusBadge, CallButton, NavigateButton, ImageBanner } from "@/components/ui";
 
 const VENUE_ICONS: LucideIcon[] = [Mountain, Coffee, IceCream2];
 
 export function DiningSection({ t }: { t: HotelContent }) {
   return (
     <div className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8">
+      <ImageBanner src="/images/dining.webp" alt={t.dining.label} />
       <SectionHeader title={t.dining.label} intro={t.dining.intro} />
 
       {/* ── RISTORANTE L'ARENGO ── */}

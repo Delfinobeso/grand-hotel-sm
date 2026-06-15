@@ -266,6 +266,27 @@ export function NavigateButton({
   );
 }
 
+/* ── IMMAGINI ── */
+
+export function ImageBanner({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
+  const base = src.replace(/\.webp$/, "");
+  const sm = `${base}-sm.webp`;
+  return (
+    <div className={`overflow-hidden rounded-2xl bg-[var(--color-surface-muted)] ${className}`}>
+      <picture>
+        <source srcSet={sm} media="(max-width: 640px)" />
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          className="block w-full object-cover"
+          style={{ aspectRatio: "1.618 / 1" }}
+        />
+      </picture>
+    </div>
+  );
+}
+
 export function AddToCalendarButton({
   title,
   location,

@@ -27,6 +27,7 @@ import {
   CallButton,
   NavigateButton,
   AddToCalendarButton,
+  ImageBanner,
 } from "@/components/ui";
 
 const MapView = dynamic(() => import("@/components/MapView"), {
@@ -37,6 +38,7 @@ const MapView = dynamic(() => import("@/components/MapView"), {
 export function InfoSection({ t }: { t: HotelContent }) {
   return (
     <div className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8">
+      <ImageBanner src="/images/info.webp" alt={t.info.label} />
       <SectionHeader title={t.info.label} intro={t.info.intro} />
 
       {/* ── PARCHEGGIO ── */}
