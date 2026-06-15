@@ -170,10 +170,10 @@ const TV_CHANNELS = [
 const it: HotelContent = {
   nav: {
     home: "Home",
-    room: "Camera",
-    dining: "Ristorante",
+    room: "Servizi",
+    dining: "Mangiare",
     wellness: "Benessere",
-    info: "Info",
+    info: "Dove",
   },
   common: {
     receptionCta: "Chiama la Reception",
@@ -207,23 +207,19 @@ const it: HotelContent = {
     checkIn: { label: "Check-in", value: "Dalle ore 14:00" },
     checkOut: { label: "Check-out", value: "Entro le ore 11:00" },
     lateCheckout: "Late check-out su disponibilità, con supplemento.",
-    highlightsLabel: "In breve",
+    highlightsLabel: "Azioni rapide",
     highlights: [
       {
-        title: "60 Camere e Suite",
-        body: "Vista sulla Valle del Montefeltro, posizione ideale per escursioni in bici e passeggiate.",
+        title: "Wi-Fi",
+        body: "Rete GRANDHOTELRSM — seleziona la rete, attendi la notifica e connettiti gratuitamente in tutto l'hotel.",
       },
       {
-        title: "5 Sale Meeting",
-        body: "Per eventi da 2 a 200 persone, con supporti tecnologici e staff dedicato.",
+        title: "Reception",
+        body: "Aperta 24 ore su 24. Componi il tasto 9 dal telefono in camera per qualsiasi necessità.",
       },
       {
-        title: "Centro Medico Maurice Mességué",
-        body: "Punto di riferimento italiano da oltre 30 anni per salute, dimagrimento e vacanze benessere.",
-      },
-      {
-        title: "Ristorante La Terrazza",
-        body: "Cucina enogastronomica di alto livello con prodotti locali e vista mozzafiato.",
+        title: "Colazione",
+        body: "Servita al Ristorante L'Arengo dalle 07:00 alle 10:00. Room service disponibile con supplemento di €6,00.",
       },
     ],
     hoursLabel: "Orari dei servizi",
@@ -459,10 +455,10 @@ const it: HotelContent = {
 const en: HotelContent = {
   nav: {
     home: "Home",
-    room: "Room",
-    dining: "Dining",
+    room: "Services",
+    dining: "Food",
     wellness: "Wellness",
-    info: "Info",
+    info: "Dove",
   },
   common: {
     receptionCta: "Call Reception",
@@ -496,7 +492,7 @@ const en: HotelContent = {
     checkIn: { label: "Check-in", value: "From 2:00 PM" },
     checkOut: { label: "Check-out", value: "By 11:00 AM" },
     lateCheckout: "Late check-out subject to availability, with a supplement.",
-    highlightsLabel: "At a glance",
+    highlightsLabel: "Quick actions",
     highlights: [
       {
         title: "60 Rooms & Suites",

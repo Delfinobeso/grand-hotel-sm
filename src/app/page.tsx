@@ -11,7 +11,7 @@ import {
   BedDouble,
   UtensilsCrossed,
   Sparkles,
-  Info as InfoIcon,
+  MapPin as MapIcon,
   type LucideIcon,
 } from "lucide-react";
 import { content, type Lang, type HotelContent } from "@/lib/content";
@@ -29,7 +29,7 @@ const TABS: { key: TabKey; icon: LucideIcon }[] = [
   { key: "room", icon: BedDouble },
   { key: "dining", icon: UtensilsCrossed },
   { key: "wellness", icon: Sparkles },
-  { key: "info", icon: InfoIcon },
+  { key: "info", icon: MapIcon },
 ];
 
 function ReceptionButton({ t }: { t: HotelContent }) {
@@ -118,11 +118,11 @@ export default function Home() {
                 </span>
               </h1>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 flex-col items-end gap-2 sm:flex-row sm:items-center">
               <button
                 onClick={toggleLang}
                 aria-label={t.common.languageLabel}
-                className="flex h-11 items-center gap-1.5 rounded-full bg-[var(--color-surface-muted)] px-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-text)] transition-all duration-200 ease-out hover:bg-[var(--color-border)] active:scale-90"
+                className="flex h-11 items-center gap-1.5 rounded-full bg-[var(--color-surface-muted)] px-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-text)] transition-all duration-200 ease-out hover:bg-[var(--color-border)] active:scale-90 w-full justify-center sm:w-auto"
               >
                 <Languages size={16} strokeWidth={1.75} />
                 {lang}
@@ -130,9 +130,10 @@ export default function Home() {
               <button
                 onClick={toggleTheme}
                 aria-label="Cambia tema"
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-surface-muted)] text-[var(--color-text)] transition-all duration-200 ease-out hover:scale-105 hover:bg-[var(--color-border)] active:scale-90"
+                className="flex h-11 w-full items-center justify-center gap-1.5 rounded-full bg-[var(--color-surface-muted)] px-3 text-xs font-medium text-[var(--color-text)] transition-all duration-200 ease-out hover:scale-105 hover:bg-[var(--color-border)] active:scale-90 sm:w-auto"
               >
-                {theme === "light" ? <Moon size={18} strokeWidth={1.75} /> : <Sun size={18} strokeWidth={1.75} />}
+                {theme === "light" ? <Moon size={16} strokeWidth={1.75} /> : <Sun size={16} strokeWidth={1.75} />}
+                <span className="sm:hidden">{theme === "light" ? "Dark" : "Light"}</span>
               </button>
             </div>
           </div>
