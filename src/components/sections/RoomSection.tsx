@@ -10,26 +10,34 @@ import { TRANSITION } from "@/components/ui";
 
 const SERVICE_ICONS = [Phone, HeartPulse, Lock, Wind, BellOff];
 
-function ChannelLogo({ src, name }: { src: string; name: string }) {
-  const [error, setError] = useState(false);
+const CHANNEL_COLORS = [
+  "bg-[#1a73e8] text-white",     // blue
+  "bg-[#e37400] text-white",     // orange
+  "bg-[#0d904f] text-white",     // green
+  "bg-[#c5221f] text-white",     // red
+  "bg-[#9334e6] text-white",     // purple
+  "bg-[#188038] text-white",     // dark green
+  "bg-[#d93025] text-white",     // dark red
+  "bg-[#1967d2] text-white",     // royal blue
+  "bg-[#f9ab00] text-black",     // yellow
+  "bg-[#129eaf] text-white",     // teal
+  "bg-[#e52592] text-white",     // pink
+  "bg-[#5f6368] text-white",     // grey
+];
 
-  if (error) {
-    return (
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[var(--color-surface-muted)] text-[11px] font-bold text-[var(--color-text-muted)]">
-        {name.slice(0, 2).toUpperCase()}
-      </span>
-    );
-  }
+function channelColor(name: string) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return CHANNEL_COLORS[Math.abs(hash) % CHANNEL_COLORS.length];
+}
 
+function ChannelLogo({ name }: { name: string }) {
   return (
-    <img
-      src={src}
-      alt={name}
-      loading="lazy"
-      onError={() => setError(true)}
-      className="h-8 w-8 shrink-0 rounded object-contain"
-      style={{ filter: "var(--channel-logo-filter, none)" }}
-    />
+    <span
+      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[11px] font-bold ${channelColor(name)}`}
+    >
+      {name.replace(/Rai\s?|TV|Mediaset|Channel|Sky\s?|Italia\s?/gi, "").slice(0, 3).toUpperCase()}
+    </span>
   );
 }
 
@@ -131,7 +139,7 @@ export function RoomSection({ t }: { t: HotelContent }) {
                         <span className="flex h-6 w-8 shrink-0 items-center justify-center rounded bg-[var(--color-surface-muted)] text-xs font-bold tabular-nums text-[var(--color-text-muted)]">
                           {ch.number}
                         </span>
-                        <ChannelLogo src={ch.logo} name={ch.name} />
+                        <ChannelLogo name={ch.name} />
                         <span className="text-sm font-medium text-[var(--color-text)]">{ch.name}</span>
                       </div>
                     ))}
