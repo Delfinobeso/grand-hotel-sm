@@ -109,11 +109,11 @@ export default function Home() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent)]">{t.home.eyebrow}</p>
-              <h1 className="mt-1 flex items-baseline gap-2 leading-none">
-                <span className="text-2xl font-extrabold tracking-tight text-[var(--color-text)] lg:text-3xl">
+              <h1 className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1 leading-tight">
+                <span className="whitespace-nowrap text-2xl font-extrabold tracking-tight text-[var(--color-text)] lg:text-3xl">
                   {t.home.titleMain}
                 </span>
-                <span className="font-display text-xl italic text-[var(--color-accent)] lg:text-2xl">
+                <span className="whitespace-nowrap font-display text-xl italic text-[var(--color-accent)] lg:text-2xl">
                   {t.home.titleAccent}
                 </span>
               </h1>
@@ -171,7 +171,7 @@ export default function Home() {
         </header>
 
         {/* ── CONTENT ── */}
-        <main className="flex-1 px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:py-0 lg:pb-0">
+        <main className="flex-1 px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:pt-6 lg:pb-0">
           {sections[activeTab]}
           <p className="mt-8 text-center text-xs text-[var(--color-text-muted)]">
             {t.footer} · © {new Date().getFullYear()}

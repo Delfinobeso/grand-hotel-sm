@@ -2,7 +2,8 @@
 
 import { Phone, HeartPulse, Lock, Wind, BellOff, Wifi, Tv, PawPrint } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
-import { SectionHeader, SectionLabel, AccordionItem, IconBadge, Card, ChipGrid, FloorBadge } from "@/components/ui";
+import { HOTEL } from "@/lib/hotel";
+import { SectionHeader, SectionLabel, AccordionItem, IconBadge, Card, ChipGrid, FloorBadge, CallButton } from "@/components/ui";
 
 const SERVICE_ICONS = [Phone, HeartPulse, Lock, Wind, BellOff];
 
@@ -16,13 +17,20 @@ export function RoomSection({ t }: { t: HotelContent }) {
         <SectionLabel>{t.room.servicesLabel}</SectionLabel>
         <div className="flex flex-col gap-2">
           {t.room.services.map((service, i) => (
-            <AccordionItem key={service.title} icon={SERVICE_ICONS[i]} title={service.title} subtitle={service.subtitle}>
+            <AccordionItem
+              key={service.title}
+              icon={SERVICE_ICONS[i]}
+              title={service.title}
+              subtitle={service.subtitle}
+              badge={
+                i === 0 ? (
+                  <FloorBadge>{t.common.floorGround}</FloorBadge>
+                ) : i === 1 ? (
+                  <FloorBadge>{t.common.floorThirdMessegue}</FloorBadge>
+                ) : undefined
+              }
+            >
               <p>{service.body}</p>
-              {(i === 0 || i === 1) && (
-                <div className="mt-3">
-                  <FloorBadge>{i === 0 ? t.common.floorGround : t.common.floorThirdMessegue}</FloorBadge>
-                </div>
-              )}
             </AccordionItem>
           ))}
         </div>
@@ -46,6 +54,9 @@ export function RoomSection({ t }: { t: HotelContent }) {
             <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.room.petsLabel}</p>
           </div>
           <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.room.pets.body}</p>
+          <div>
+            <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" />
+          </div>
         </Card>
       </section>
 

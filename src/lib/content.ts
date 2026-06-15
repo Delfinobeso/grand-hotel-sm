@@ -259,7 +259,7 @@ const it: HotelContent = {
       },
       {
         title: "Aria condizionata",
-        subtitle: "Regolabile",
+        subtitle: "Pannello in camera",
         body: "Il climatizzatore è regolabile dal pannello in camera. Si disattiva automaticamente aprendo la finestra.",
       },
       {
@@ -548,7 +548,7 @@ const en: HotelContent = {
       },
       {
         title: "Air conditioning",
-        subtitle: "Adjustable",
+        subtitle: "Panel in room",
         body: "The air conditioning can be adjusted from the panel in the room. It switches off automatically when the window is opened.",
       },
       {

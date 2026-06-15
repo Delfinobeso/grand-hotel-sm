@@ -42,11 +42,13 @@ export function AccordionItem({
   icon,
   title,
   subtitle,
+  badge,
   children,
 }: {
   icon: LucideIcon;
   title: string;
   subtitle?: string;
+  badge?: ReactNode;
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -62,6 +64,7 @@ export function AccordionItem({
         <span className="min-w-0 flex-1">
           <span className="block text-base font-semibold text-[var(--color-text)] lg:text-lg">{title}</span>
           {subtitle && <span className="block text-sm text-[var(--color-text-secondary)]">{subtitle}</span>}
+          {badge && <span className="mt-1.5 block">{badge}</span>}
         </span>
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
