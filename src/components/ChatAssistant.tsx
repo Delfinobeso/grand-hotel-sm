@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Phone } from "lucide-react";
+import { MessageCircle, X, Send, Phone, ChevronLeft } from "lucide-react";
 import { HOTEL } from "@/lib/hotel";
 
 interface Message {
@@ -71,45 +71,47 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
 
   return (
     <>
-      {/* FAB */}
-      <button
-        onClick={() => setOpen(!open)}
-        aria-label={lang === "it" ? "Assistente chat" : "Chat assistant"}
-        className={`fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all duration-200 ease-out active:scale-95 lg:bottom-6 ${
-          open
-            ? "bg-[var(--color-surface)] text-[var(--color-text)]"
-            : "bg-[var(--color-accent)] text-[var(--color-on-accent)]"
-        }`}
-      >
-        {open ? <X size={22} strokeWidth={1.75} /> : <MessageCircle size={22} strokeWidth={1.75} />}
-      </button>
+      {/* FAB — nascosto quando la chat è aperta */}
+      {!open && (
+        <button
+          onClick={() => setOpen(true)}
+          aria-label={lang === "it" ? "Assistente chat" : "Chat assistant"}
+          className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-lg transition-all duration-200 ease-out active:scale-95 lg:bottom-6"
+        >
+          <MessageCircle size={22} strokeWidth={1.75} />
+        </button>
+      )}
 
-      {/* Chat panel */}
+      {/* Chat fullscreen panel — sopra tutto, safe area iPhone 17 Pro */}
       {open && (
-        <div className="fixed inset-0 z-40 flex flex-col lg:inset-auto lg:bottom-20 lg:right-4 lg:w-96 lg:max-h-[32rem] lg:rounded-2xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl bg-[var(--color-bg)]">
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
-            <div>
+        <div className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)] lg:inset-auto lg:bottom-20 lg:right-4 lg:w-96 lg:max-h-[34rem] lg:rounded-2xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl">
+          {/* Header — dynamic island safe area */}
+          <div className="flex shrink-0 items-center gap-3 border-b border-[var(--color-border)] px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3">
+            <button
+              onClick={() => setOpen(false)}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)] -ml-1"
+            >
+              <ChevronLeft size={18} strokeWidth={2} />
+            </button>
+            <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[var(--color-text)]">
                 {lang === "it" ? "Assistente" : "Assistant"}
               </p>
               <p className="text-xs text-[var(--color-text-muted)]">Grand Hotel San Marino</p>
             </div>
-            <div className="flex items-center gap-1">
-              <a
-                href={HOTEL.phoneHref}
-                className="flex h-9 items-center gap-1.5 rounded-full bg-[var(--color-accent)] px-3 text-xs font-semibold text-[var(--color-on-accent)]"
-              >
-                <Phone size={14} strokeWidth={1.75} />
-                <span className="hidden sm:inline">{lang === "it" ? "Reception" : "Reception"}</span>
-              </a>
-            </div>
+            <a
+              href={HOTEL.phoneHref}
+              className="flex shrink-0 h-9 items-center gap-1.5 rounded-full bg-[var(--color-accent)] px-3 text-xs font-semibold text-[var(--color-on-accent)]"
+            >
+              <Phone size={14} strokeWidth={1.75} />
+              <span className="hidden sm:inline">{lang === "it" ? "Reception" : "Reception"}</span>
+            </a>
           </div>
 
-          {/* Messages */}
+          {/* Messages — scroll interno */}
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
             {messages.length === 0 && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <p className="text-sm text-[var(--color-text-secondary)]">
                   {lang === "it"
                     ? "👋 Buongiorno! Sono l'assistente del Grand Hotel. Come posso aiutarla?"
@@ -155,8 +157,8 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
             <div ref={bottomRef} />
           </div>
 
-          {/* Input */}
-          <div className="border-t border-[var(--color-border)] p-3">
+          {/* Input — home indicator safe area */}
+          <div className="shrink-0 border-t border-[var(--color-border)] px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             <div className="flex items-center gap-2">
               <input
                 type="text"
@@ -165,6 +167,7 @@ export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
                 onKeyDown={handleKeyDown}
                 placeholder={lang === "it" ? "Scrivi un messaggio..." : "Type a message..."}
                 className="flex-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2.5 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] outline-none focus:border-[var(--color-accent)]"
+                autoFocus
               />
               <button
                 onClick={() => send(input)}
