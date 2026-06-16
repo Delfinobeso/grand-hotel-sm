@@ -58,22 +58,23 @@ export function HomeSection({
       {/* ── AZIONI RAPIDE (scroll orizzontale) ── */}
       <section>
         <SectionLabel>{t.home.highlightsLabel}</SectionLabel>
-        <div
-          className="overflow-x-auto -mx-5 sm:-mx-6 lg:mx-0"
-          style={{ scrollbarWidth: "none" }}
-        >
-          <div className="flex gap-3 px-5 pb-2 sm:px-6 lg:px-0">
+        {/* strip edge-to-edge con sfondo che segnala lo scroll */}
+        <div className="-mx-5 sm:-mx-6 lg:mx-0 rounded-2xl bg-[var(--color-surface-muted)] overflow-hidden">
+          <div
+            className="flex gap-2.5 overflow-x-auto snap-x snap-mandatory px-4 py-3.5 sm:px-5"
+            style={{ scrollbarWidth: "none" }}
+          >
             {QUICK_ACTIONS.map((action) => {
               const Icon = action.icon;
               const label = action.getLabel(t);
               const tileClass =
-                "flex flex-col items-center gap-2.5 rounded-2xl bg-[var(--color-surface)] px-3 py-3.5 min-w-[76px] transition-all duration-150 hover:bg-[var(--color-surface-muted)] active:scale-[0.95]";
+                "flex shrink-0 flex-col items-center justify-center gap-2 w-[84px] aspect-square rounded-2xl bg-[var(--color-surface)] snap-start transition-all duration-150 hover:bg-[var(--color-surface)] active:scale-[0.93] shadow-sm";
               const inner = (
                 <>
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
-                    <Icon size={18} strokeWidth={1.75} />
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
+                    <Icon size={20} strokeWidth={1.75} />
                   </span>
-                  <span className="w-full text-center text-[11px] font-medium leading-tight text-[var(--color-text)]">
+                  <span className="w-full px-1 text-center text-[10px] font-semibold leading-tight text-[var(--color-text)]">
                     {label}
                   </span>
                 </>
