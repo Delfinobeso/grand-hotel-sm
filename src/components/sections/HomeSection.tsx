@@ -143,7 +143,7 @@ export function HomeSection({
         </div>
 
         {/* Strip con sfondo chiaro — edge-to-edge su mobile */}
-        <div className="-mx-5 sm:-mx-6 lg:mx-0 bg-[var(--color-surface)]">
+        <div className="-mx-5 sm:-mx-6 lg:mx-0">
           {/* scroll-pl-5: dice allo snap di rispettare il padding sx */}
           <div
             className="overflow-x-auto snap-x snap-mandatory scroll-pl-5 sm:scroll-pl-6 lg:scroll-pl-2"
