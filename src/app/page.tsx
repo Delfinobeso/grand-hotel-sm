@@ -47,6 +47,7 @@ export default function Home() {
   const [lang, setLang] = useState<Lang>("it");
   const [activeTab, setActiveTab] = useState<TabKey>("home");
   const [serviceView, setServiceView] = useState<ServiceId | null>(null);
+  const [navFromHome, setNavFromHome] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
 
   // One-time sync from localStorage after mount: the inline THEME_SCRIPT in layout.tsx
@@ -94,12 +95,24 @@ export default function Home() {
 
   const handleNavigateFromHome = (tab: "services" | "map" | "info", service?: ServiceId) => {
     setActiveTab(tab);
-    if (service !== undefined) setServiceView(service);
+    if (service !== undefined) {
+      setServiceView(service);
+      setNavFromHome(true);
+    }
+  };
+
+  const handleSubViewChange = (v: ServiceId | null) => {
+    if (v === null && navFromHome) {
+      // back dal servizio → torna alla Home
+      setActiveTab("home");
+      setNavFromHome(false);
+    }
+    setServiceView(v);
   };
 
   const sections: Record<TabKey, React.ReactNode> = {
     home:     <HomeSection t={t} onNavigate={handleNavigateFromHome} onOpenChat={() => setChatOpen(true)} />,
-    services: <DirectorySection t={t} subView={serviceView} onSubViewChange={setServiceView} />,
+    services: <DirectorySection t={t} subView={serviceView} onSubViewChange={handleSubViewChange} />,
     map:      <InfoSection t={t} />,
     info:     <AboutSection t={t} />,
   };
@@ -146,7 +159,7 @@ export default function Home() {
               return (
                 <button
                   key={key}
-                  onClick={() => setActiveTab(key)}
+                  onClick={() => { setActiveTab(key); if (key !== "services") setNavFromHome(false); else { setNavFromHome(false); setServiceView(null); } }}
                   className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-150 ${
                     active
                       ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
@@ -188,7 +201,7 @@ export default function Home() {
           return (
             <button
               key={key}
-              onClick={() => setActiveTab(key)}
+              onClick={() => { setActiveTab(key); if (key !== "services") setNavFromHome(false); else { setNavFromHome(false); setServiceView(null); } }}
               aria-current={active}
               className={`flex flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors duration-150 ${
                 active ? "text-[var(--color-accent)]" : "text-[var(--color-text-muted)]"
