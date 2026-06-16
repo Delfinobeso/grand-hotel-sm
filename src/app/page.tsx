@@ -16,7 +16,7 @@ import {
 import { content, type Lang, type HotelContent } from "@/lib/content";
 import { HOTEL } from "@/lib/hotel";
 import { HomeSection } from "@/components/sections/HomeSection";
-import { DirectorySection } from "@/components/sections/DirectorySection";
+import { DirectorySection, type ServiceId } from "@/components/sections/DirectorySection";
 import { InfoSection } from "@/components/sections/InfoSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import ChatAssistant from "@/components/ChatAssistant";
@@ -46,6 +46,7 @@ export default function Home() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [lang, setLang] = useState<Lang>("it");
   const [activeTab, setActiveTab] = useState<TabKey>("home");
+  const [serviceView, setServiceView] = useState<ServiceId | null>(null);
 
   // One-time sync from localStorage after mount: the inline THEME_SCRIPT in layout.tsx
   // already applied data-theme/lang to <html> before paint, so this only updates the
@@ -90,9 +91,14 @@ export default function Home() {
     info:     t.nav.info,
   };
 
+  const handleNavigateFromHome = (tab: "services" | "map" | "info", service?: ServiceId) => {
+    setActiveTab(tab);
+    if (service !== undefined) setServiceView(service);
+  };
+
   const sections: Record<TabKey, React.ReactNode> = {
-    home:     <HomeSection t={t} />,
-    services: <DirectorySection t={t} />,
+    home:     <HomeSection t={t} onNavigate={handleNavigateFromHome} />,
+    services: <DirectorySection t={t} subView={serviceView} onSubViewChange={setServiceView} />,
     map:      <InfoSection t={t} />,
     info:     <AboutSection t={t} />,
   };

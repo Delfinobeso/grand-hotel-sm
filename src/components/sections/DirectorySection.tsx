@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import {
   ArrowLeft,
   BedDouble,
@@ -19,10 +19,10 @@ import { DiningSection } from "./DiningSection";
 import { WellnessSection } from "./WellnessSection";
 import { FacilitySection } from "./FacilitySection";
 
-type SubView = "room" | "dining" | "wellness" | "facility";
+export type ServiceId = "room" | "dining" | "wellness" | "facility";
 
 interface Tile {
-  id: SubView;
+  id: ServiceId;
   icon: LucideIcon;
   label: (t: HotelContent) => string;
   hours?: keyof typeof SERVICE_HOURS;
@@ -35,21 +35,27 @@ const TILES: Tile[] = [
   { id: "facility", icon: ConciergeBell,   label: (t) => t.facility.label },
 ];
 
-const SECTIONS: Record<SubView, (t: HotelContent) => ReactNode> = {
+const SECTIONS: Record<ServiceId, (t: HotelContent) => ReactNode> = {
   room:     (t) => <RoomSection t={t} />,
   dining:   (t) => <DiningSection t={t} />,
   wellness: (t) => <WellnessSection t={t} />,
   facility: (t) => <FacilitySection t={t} />,
 };
 
-export function DirectorySection({ t }: { t: HotelContent }) {
-  const [subView, setSubView] = useState<SubView | null>(null);
-
+export function DirectorySection({
+  t,
+  subView,
+  onSubViewChange,
+}: {
+  t: HotelContent;
+  subView: ServiceId | null;
+  onSubViewChange: (v: ServiceId | null) => void;
+}) {
   if (subView !== null) {
     return (
       <div className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8">
         <button
-          onClick={() => setSubView(null)}
+          onClick={() => onSubViewChange(null)}
           className="flex items-center gap-2 self-start rounded-xl bg-[var(--color-surface)] px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-surface-muted)] active:scale-95"
         >
           <ArrowLeft size={16} strokeWidth={1.75} />
@@ -75,7 +81,7 @@ export function DirectorySection({ t }: { t: HotelContent }) {
           {TILES.map((tile) => (
             <button
               key={tile.id}
-              onClick={() => setSubView(tile.id)}
+              onClick={() => onSubViewChange(tile.id)}
               className="group flex flex-col items-start gap-4 rounded-2xl bg-[var(--color-surface)] p-4 text-left transition-all duration-200 hover:bg-[var(--color-surface-muted)] active:scale-[0.98] lg:p-5"
             >
               <IconBadge icon={tile.icon} size={20} />

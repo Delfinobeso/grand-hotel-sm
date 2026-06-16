@@ -1,70 +1,126 @@
 "use client";
 
-import { Clock, Wifi, Phone, Coffee } from "lucide-react";
+import {
+  Clock,
+  Phone,
+  Wifi,
+  HandPlatter,
+  UtensilsCrossed,
+  Sparkles,
+  ConciergeBell,
+  MapPin,
+  type LucideIcon,
+} from "lucide-react";
 import type { HotelContent } from "@/lib/content";
 import { SectionLabel, HoursTable } from "@/components/ui";
 import { HOTEL } from "@/lib/hotel";
+import type { ServiceId } from "./DirectorySection";
 
-const HIGHLIGHT_ICONS = [Wifi, Phone, Coffee];
+type NavTarget =
+  | { kind: "link"; href: string }
+  | { kind: "tab"; tab: "services" | "map" | "info"; service?: ServiceId };
 
-export function HomeSection({ t }: { t: HotelContent }) {
+interface QuickAction {
+  icon: LucideIcon;
+  getLabel: (t: HotelContent) => string;
+  target: NavTarget;
+}
+
+const QUICK_ACTIONS: QuickAction[] = [
+  { icon: Phone,           getLabel: (t) => t.home.highlights[1].title, target: { kind: "link", href: HOTEL.phoneHref } },
+  { icon: HandPlatter,     getLabel: (t) => t.room.roomServiceLabel,    target: { kind: "tab", tab: "services", service: "room" } },
+  { icon: Wifi,            getLabel: (t) => t.room.wifiLabel,           target: { kind: "tab", tab: "services", service: "room" } },
+  { icon: UtensilsCrossed, getLabel: (t) => t.dining.label,            target: { kind: "tab", tab: "services", service: "dining" } },
+  { icon: Sparkles,        getLabel: (t) => t.wellness.label,           target: { kind: "tab", tab: "services", service: "wellness" } },
+  { icon: ConciergeBell,   getLabel: (t) => t.facility.label,          target: { kind: "tab", tab: "services", service: "facility" } },
+  { icon: MapPin,          getLabel: (t) => t.nav.map,                  target: { kind: "tab", tab: "map" } },
+];
+
+export function HomeSection({
+  t,
+  onNavigate,
+}: {
+  t: HotelContent;
+  onNavigate: (tab: "services" | "map" | "info", service?: ServiceId) => void;
+}) {
   return (
-    <div className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8">
-      {/* ── HERO ── */}
-      <section className="relative overflow-hidden rounded-3xl lg:rounded-[2rem]">
+    <div className="flex flex-col gap-6 md:gap-5 lg:gap-6 xl:gap-8">
+      {/* ── HERO (immagine pulita, nessun testo) ── */}
+      <section className="overflow-hidden rounded-3xl lg:rounded-[2rem]">
         <img
           src="/images/hero.webp"
-          alt="San Marino"
-          className="absolute inset-0 h-full w-full object-cover"
+          alt={HOTEL.name}
+          className="h-52 w-full object-cover sm:h-60 md:h-72 lg:h-80"
           loading="eager"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-accent)]/95 via-[var(--color-accent)]/60 to-transparent" />
-        <div className="relative px-5 pb-6 pt-28 text-[var(--color-on-accent)] lg:px-7 lg:pb-8 lg:pt-36">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] opacity-60">{t.home.stayLabel}</p>
-          <p className="mt-2 text-xl font-bold leading-snug lg:text-2xl">{t.home.welcomeTitle}</p>
-          <p className="mt-2 text-sm leading-relaxed opacity-90 lg:text-base">{t.home.welcomeBody}</p>
-          <div className="mt-4 flex flex-col gap-2 border-t border-white/15 pt-4 text-sm opacity-90 sm:flex-row sm:items-center sm:gap-6">
-            <span className="flex items-center gap-2">
-              <Clock size={16} strokeWidth={1.75} />
-              {t.home.checkIn.label}: {t.home.checkIn.value}
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock size={16} strokeWidth={1.75} />
-              {t.home.checkOut.label}: {t.home.checkOut.value}
-            </span>
+      </section>
+
+      {/* ── AZIONI RAPIDE (scroll orizzontale) ── */}
+      <section>
+        <SectionLabel>{t.home.highlightsLabel}</SectionLabel>
+        <div
+          className="overflow-x-auto -mx-5 sm:-mx-6 lg:mx-0"
+          style={{ scrollbarWidth: "none" }}
+        >
+          <div className="flex gap-3 px-5 pb-2 sm:px-6 lg:px-0">
+            {QUICK_ACTIONS.map((action) => {
+              const Icon = action.icon;
+              const label = action.getLabel(t);
+              const tileClass =
+                "flex flex-col items-center gap-2.5 rounded-2xl bg-[var(--color-surface)] px-3 py-3.5 min-w-[76px] transition-all duration-150 hover:bg-[var(--color-surface-muted)] active:scale-[0.95]";
+              const inner = (
+                <>
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
+                    <Icon size={18} strokeWidth={1.75} />
+                  </span>
+                  <span className="w-full text-center text-[11px] font-medium leading-tight text-[var(--color-text)]">
+                    {label}
+                  </span>
+                </>
+              );
+
+              if (action.target.kind === "link") {
+                return (
+                  <a key={label} href={action.target.href} className={tileClass}>
+                    {inner}
+                  </a>
+                );
+              }
+              const { tab, service } = action.target;
+              return (
+                <button key={label} onClick={() => onNavigate(tab, service)} className={tileClass}>
+                  {inner}
+                </button>
+              );
+            })}
           </div>
-          <p className="mt-2 text-xs opacity-60">{t.home.lateCheckout}</p>
         </div>
       </section>
 
-      {/* ── AZIONI RAPIDE ── */}
-      <section>
-        <SectionLabel>{t.home.highlightsLabel}</SectionLabel>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 lg:gap-3">
-          {t.home.highlights.map((highlight, i) => (
-            <div key={highlight.title} className="group flex flex-col gap-3 rounded-2xl bg-[var(--color-surface)] p-4 transition-all duration-200 hover:bg-[var(--color-surface-muted)] lg:p-5">
-              <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)] lg:h-12 lg:w-12">
-                  {(() => {
-                    const Icon = HIGHLIGHT_ICONS[i];
-                    return <Icon size={20} strokeWidth={1.75} />;
-                  })()}
-                </span>
-                <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{highlight.title}</p>
-              </div>
-              <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{highlight.body}</p>
-              {i === 1 && (
-                <a
-                  href={HOTEL.phoneHref}
-                  className="mt-1 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[var(--color-accent)] px-4 text-sm font-semibold text-[var(--color-on-accent)] transition-[transform,opacity] duration-200 ease-out hover:opacity-90 active:scale-[0.97]"
-                >
-                  <Phone size={16} strokeWidth={1.75} />
-                  {t.common.receptionCta}
-                </a>
-              )}
-            </div>
-          ))}
+      {/* ── BENVENUTO ── */}
+      <section className="px-1">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent)]">
+          {t.home.stayLabel}
+        </p>
+        <p className="mt-1.5 text-xl font-bold leading-snug text-[var(--color-text)] lg:text-2xl">
+          {t.home.welcomeTitle}
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--color-text-secondary)] lg:text-base">
+          {t.home.welcomeBody}
+        </p>
+        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-[var(--color-border)] pt-4 text-sm text-[var(--color-text-secondary)]">
+          <span className="flex items-center gap-2">
+            <Clock size={14} strokeWidth={1.75} className="shrink-0 text-[var(--color-accent)]" />
+            {t.home.checkIn.label}:&nbsp;
+            <strong className="font-semibold text-[var(--color-text)]">{t.home.checkIn.value}</strong>
+          </span>
+          <span className="flex items-center gap-2">
+            <Clock size={14} strokeWidth={1.75} className="shrink-0 text-[var(--color-accent)]" />
+            {t.home.checkOut.label}:&nbsp;
+            <strong className="font-semibold text-[var(--color-text)]">{t.home.checkOut.value}</strong>
+          </span>
         </div>
+        <p className="mt-1.5 text-xs text-[var(--color-text-muted)]">{t.home.lateCheckout}</p>
       </section>
 
       {/* ── ORARI DEI SERVIZI ── */}
