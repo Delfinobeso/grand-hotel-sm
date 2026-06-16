@@ -142,17 +142,19 @@ export function HomeSection({
           </button>
         </div>
 
-        {/* Strip con sfondo distinto — edge-to-edge su mobile */}
-        <div className="-mx-5 sm:-mx-6 lg:mx-0 bg-[var(--color-surface-muted)]">
+        {/* Strip con sfondo chiaro — edge-to-edge su mobile */}
+        <div className="-mx-5 sm:-mx-6 lg:mx-0 bg-[var(--color-surface)]">
           <div
-            className="flex gap-2.5 overflow-x-auto snap-x snap-mandatory px-5 py-3.5 sm:px-6 lg:px-2"
+            className="flex gap-2.5 overflow-x-auto snap-x snap-mandatory py-3.5"
             style={{ scrollbarWidth: "none" }}
           >
+            {/* spacer sinistro per garantire padding indipendente dall'overflow */}
+            <div className="shrink-0 w-5 sm:w-6 lg:w-2" />
             {QUICK_ACTIONS.map((action) => {
               const Icon = action.icon;
               const label = action.getLabel(t);
               const tileClass =
-                "flex shrink-0 flex-col items-center justify-center gap-2 w-[84px] aspect-square rounded-2xl bg-[var(--color-surface)] snap-start transition-all duration-150 active:scale-[0.93] shadow-sm";
+                "flex shrink-0 flex-col items-center justify-center gap-2 w-[84px] aspect-square rounded-2xl bg-[var(--color-surface-muted)] snap-start transition-all duration-150 active:scale-[0.93] shadow-sm";
               const inner = (
                 <>
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
@@ -178,6 +180,8 @@ export function HomeSection({
                 </button>
               );
             })}
+            {/* spacer destro */}
+            <div className="shrink-0 w-5 sm:w-6 lg:w-2" />
           </div>
         </div>
       </section>
