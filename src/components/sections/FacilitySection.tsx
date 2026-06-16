@@ -7,7 +7,6 @@ import {
   AlarmClock,
   TicketPercent,
   Scissors,
-  Users,
   Dumbbell,
   Bike,
 } from "lucide-react";
@@ -66,6 +65,7 @@ export function FacilitySection({ t }: { t: HotelContent }) {
               <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.facility.taxiLabel}</p>
             </div>
             <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.facility.taxi.body}</p>
+            <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" />
           </Card>
           <Card className="flex flex-col gap-3">
             <div className="flex items-center gap-3">
@@ -73,6 +73,7 @@ export function FacilitySection({ t }: { t: HotelContent }) {
               <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.facility.wakeUpLabel}</p>
             </div>
             <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.facility.wakeUp.body}</p>
+            <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" />
           </Card>
           <Card className="flex flex-col gap-3">
             <div className="flex items-center gap-3">
@@ -89,15 +90,6 @@ export function FacilitySection({ t }: { t: HotelContent }) {
             <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.facility.hairdresser.body}</p>
           </Card>
         </div>
-      </section>
-
-      {/* ── SALE MEETING ── */}
-      <section>
-        <SectionLabel>{t.facility.meetingsLabel}</SectionLabel>
-        <Card className="flex items-start gap-3">
-          <IconBadge icon={Users} size={18} />
-          <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.facility.meetings.body}</p>
-        </Card>
       </section>
 
       {/* ── PALESTRA & BICI ── */}

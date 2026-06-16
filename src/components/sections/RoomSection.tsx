@@ -71,6 +71,30 @@ export function RoomSection({ t }: { t: HotelContent }) {
       <ImageBanner src="/images/room.webp" alt={t.room.label} />
       <SectionHeader title={t.room.label} intro={t.room.intro} />
 
+      {/* ── WI-FI & ANIMALI ── */}
+      <section className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:gap-3">
+        <Card className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <IconBadge icon={Wifi} size={18} />
+            <div>
+              <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.room.wifiLabel}</p>
+              <p className="font-mono text-sm text-[var(--color-accent)]">{t.room.wifi.network}</p>
+            </div>
+          </div>
+          <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.room.wifi.body}</p>
+        </Card>
+        <Card className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <IconBadge icon={PawPrint} size={18} />
+            <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.room.petsLabel}</p>
+          </div>
+          <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.room.pets.body}</p>
+          <div>
+            <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" />
+          </div>
+        </Card>
+      </section>
+
       {/* ── SERVIZI IN CAMERA ── */}
       <section>
         <SectionLabel>{t.room.servicesLabel}</SectionLabel>
@@ -123,30 +147,6 @@ export function RoomSection({ t }: { t: HotelContent }) {
           <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.room.laundry.body}</p>
           <div className="border-t border-[var(--color-border)] pt-3 text-sm font-medium text-[var(--color-text)]">
             {t.room.laundry.hours}
-          </div>
-        </Card>
-      </section>
-
-      {/* ── WI-FI & ANIMALI ── */}
-      <section className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:gap-3">
-        <Card className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
-            <IconBadge icon={Wifi} size={18} />
-            <div>
-              <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.room.wifiLabel}</p>
-              <p className="font-mono text-sm text-[var(--color-accent)]">{t.room.wifi.network}</p>
-            </div>
-          </div>
-          <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.room.wifi.body}</p>
-        </Card>
-        <Card className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
-            <IconBadge icon={PawPrint} size={18} />
-            <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">{t.room.petsLabel}</p>
-          </div>
-          <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{t.room.pets.body}</p>
-          <div>
-            <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" />
           </div>
         </Card>
       </section>

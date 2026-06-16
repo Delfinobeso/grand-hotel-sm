@@ -193,9 +193,9 @@ const it: HotelContent = {
   nav: {
     home: "Home",
     room: "Camera",
-    facility: "Hotel",
+    facility: "Struttura",
     dining: "Mangiare",
-    wellness: "Benessere",
+    wellness: "Spa",
     info: "Dove",
     about: "Info",
   },
@@ -315,7 +315,7 @@ const it: HotelContent = {
   },
   facility: {
     label: "Servizi della Struttura",
-    intro: "Parcheggio, concierge, sale meeting e gli spazi della struttura — palestra e biciclette — per il vostro soggiorno a San Marino.",
+    intro: "Parcheggio, concierge e gli spazi della struttura — palestra e biciclette — per il vostro soggiorno a San Marino.",
     parkingLabel: "Parcheggio",
     garage: {
       title: "Garage privato",
@@ -362,7 +362,7 @@ const it: HotelContent = {
   },
   dining: {
     label: "Ristorante",
-    intro: "La cucina del Grand Hotel San Marino e gli altri locali del gruppo GHSM.",
+    intro: "La cucina del Grand Hotel San Marino e gli altri locali del gruppo GHSM. Per il Room Service direttamente in camera, consulta la sezione Camera.",
     arengoLabel: "Ristorante L'Arengo",
     arengo: {
       hours: [
@@ -536,9 +536,9 @@ const en: HotelContent = {
   nav: {
     home: "Home",
     room: "Room",
-    facility: "Hotel",
+    facility: "Facility",
     dining: "Food",
-    wellness: "Wellness",
+    wellness: "Spa",
     info: "Explore",
     about: "Info",
   },
@@ -658,7 +658,7 @@ const en: HotelContent = {
   },
   facility: {
     label: "Hotel Facilities",
-    intro: "Parking, concierge, meeting rooms and the hotel's own facilities — gym and bikes — for your stay in San Marino.",
+    intro: "Parking, concierge and the hotel's own facilities — gym and bikes — for your stay in San Marino.",
     parkingLabel: "Parking",
     garage: {
       title: "Private garage",
@@ -705,7 +705,7 @@ const en: HotelContent = {
   },
   dining: {
     label: "Dining",
-    intro: "The cuisine of the Grand Hotel San Marino and the other venues of the GHSM Group.",
+    intro: "The cuisine of the Grand Hotel San Marino and the other venues of the GHSM Group. For Room Service in your room, see the Room section.",
     arengoLabel: "L'Arengo Restaurant",
     arengo: {
       hours: [

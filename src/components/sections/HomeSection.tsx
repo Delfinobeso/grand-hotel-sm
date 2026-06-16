@@ -21,7 +21,7 @@ export function HomeSection({ t }: { t: HotelContent }) {
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-accent)]/95 via-[var(--color-accent)]/60 to-transparent" />
         <div className="relative px-5 pb-6 pt-28 text-[var(--color-on-accent)] lg:px-7 lg:pb-8 lg:pt-36">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] opacity-60">{t.home.stayLabel}</p>
-          <h1 className="mt-2 text-xl font-bold leading-snug lg:text-2xl">{t.home.welcomeTitle}</h1>
+          <p className="mt-2 text-xl font-bold leading-snug lg:text-2xl">{t.home.welcomeTitle}</p>
           <p className="mt-2 text-sm leading-relaxed opacity-90 lg:text-base">{t.home.welcomeBody}</p>
           <div className="mt-4 flex flex-col gap-2 border-t border-white/15 pt-4 text-sm opacity-90 sm:flex-row sm:items-center sm:gap-6">
             <span className="flex items-center gap-2">
@@ -33,6 +33,7 @@ export function HomeSection({ t }: { t: HotelContent }) {
               {t.home.checkOut.label}: {t.home.checkOut.value}
             </span>
           </div>
+          <p className="mt-2 text-xs opacity-60">{t.home.lateCheckout}</p>
         </div>
       </section>
 
