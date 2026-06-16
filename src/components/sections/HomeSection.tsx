@@ -144,12 +144,14 @@ export function HomeSection({
 
         {/* Strip con sfondo chiaro — edge-to-edge su mobile */}
         <div className="-mx-5 sm:-mx-6 lg:mx-0 bg-[var(--color-surface)]">
+          {/* scroll-pl-5: dice allo snap di rispettare il padding sx */}
           <div
-            className="flex gap-2.5 overflow-x-auto snap-x snap-mandatory py-3.5"
+            className="overflow-x-auto snap-x snap-mandatory scroll-pl-5 sm:scroll-pl-6 lg:scroll-pl-2"
             style={{ scrollbarWidth: "none" }}
           >
-            {/* spacer sinistro per garantire padding indipendente dall'overflow */}
-            <div className="shrink-0 w-5 sm:w-6 lg:w-2" />
+            {/* w-max: il flex container è largo quanto il suo contenuto + padding,
+                così px-5 funziona correttamente come spazio scrollabile */}
+            <div className="flex w-max gap-2.5 py-3.5 px-5 sm:px-6 lg:px-2">
             {QUICK_ACTIONS.map((action) => {
               const Icon = action.icon;
               const label = action.getLabel(t);
@@ -180,8 +182,7 @@ export function HomeSection({
                 </button>
               );
             })}
-            {/* spacer destro */}
-            <div className="shrink-0 w-5 sm:w-6 lg:w-2" />
+            </div>
           </div>
         </div>
       </section>
