@@ -58,6 +58,8 @@ export interface HotelContent {
     checkOut: HoursRow;
     lateCheckout: string;
     highlightsLabel: string;
+    highlightsSeeAll: string;
+    chatPlaceholder: string;
     highlights: { title: string; body: string }[];
     hoursLabel: string;
     hours: HoursRow[];
@@ -232,6 +234,8 @@ const it: HotelContent = {
     checkOut: { label: "Check-out", value: "Entro le ore 11:00" },
     lateCheckout: "Late check-out su disponibilità, con supplemento.",
     highlightsLabel: "Azioni rapide",
+    highlightsSeeAll: "Vedi tutto",
+    chatPlaceholder: "Chiedi al nostro Concierge digitale…",
     highlights: [
       {
         title: "Wi-Fi",
@@ -577,6 +581,8 @@ const en: HotelContent = {
     checkOut: { label: "Check-out", value: "By 11:00 AM" },
     lateCheckout: "Late check-out subject to availability, with a supplement.",
     highlightsLabel: "Quick actions",
+    highlightsSeeAll: "See all",
+    chatPlaceholder: "Ask our digital Concierge…",
     highlights: [
       {
         title: "Wi-Fi",

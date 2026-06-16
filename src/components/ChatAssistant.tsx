@@ -41,8 +41,16 @@ function useVisualViewport() {
   return rect;
 }
 
-export default function ChatAssistant({ lang }: { lang: "it" | "en" }) {
-  const [open, setOpen] = useState(false);
+export default function ChatAssistant({
+  lang,
+  open,
+  onOpenChange,
+}: {
+  lang: "it" | "en";
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  const setOpen = onOpenChange;
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);

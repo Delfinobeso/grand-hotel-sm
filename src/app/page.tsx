@@ -47,6 +47,7 @@ export default function Home() {
   const [lang, setLang] = useState<Lang>("it");
   const [activeTab, setActiveTab] = useState<TabKey>("home");
   const [serviceView, setServiceView] = useState<ServiceId | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
 
   // One-time sync from localStorage after mount: the inline THEME_SCRIPT in layout.tsx
   // already applied data-theme/lang to <html> before paint, so this only updates the
@@ -97,7 +98,7 @@ export default function Home() {
   };
 
   const sections: Record<TabKey, React.ReactNode> = {
-    home:     <HomeSection t={t} onNavigate={handleNavigateFromHome} />,
+    home:     <HomeSection t={t} onNavigate={handleNavigateFromHome} onOpenChat={() => setChatOpen(true)} />,
     services: <DirectorySection t={t} subView={serviceView} onSubViewChange={setServiceView} />,
     map:      <InfoSection t={t} />,
     info:     <AboutSection t={t} />,
@@ -202,7 +203,7 @@ export default function Home() {
         })}
       </nav>
 
-      <ChatAssistant lang={lang} />
+      <ChatAssistant lang={lang} open={chatOpen} onOpenChange={setChatOpen} />
     </div>
   );
 }
