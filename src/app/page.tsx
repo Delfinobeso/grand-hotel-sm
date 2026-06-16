@@ -108,34 +108,32 @@ export default function Home() {
     <div className="flex min-h-dvh flex-col bg-[var(--color-bg)]">
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col lg:flex-row lg:gap-6 lg:px-6 lg:py-6 xl:max-w-6xl xl:gap-8 xl:px-8 xl:py-8">
         {/* ── HEADER / SIDEBAR ── */}
-        <header className="sticky top-0 z-20 flex flex-col gap-4 border-b border-[var(--color-border)] bg-[var(--color-bg)]/90 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-4 backdrop-blur-md lg:top-6 lg:w-64 lg:shrink-0 lg:gap-6 lg:self-start lg:rounded-3xl lg:border lg:bg-[var(--color-surface)] lg:p-6 lg:backdrop-blur-none xl:w-72">
-          <div className="flex items-center justify-between gap-4 lg:flex-col lg:items-start lg:gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent)]">{t.home.eyebrow}</p>
-              <h1 className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1 leading-tight">
-                <span className="whitespace-nowrap text-2xl font-extrabold tracking-tight text-[var(--color-text)] lg:text-3xl">
-                  {t.home.titleMain}
-                </span>
-                <span className="whitespace-nowrap font-display text-xl italic text-[var(--color-accent)] lg:text-2xl">
+        <header className="sticky top-0 z-20 flex flex-col gap-3 border-b border-[var(--color-border)] bg-[var(--color-bg)]/90 px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur-md lg:top-6 lg:w-64 lg:shrink-0 lg:gap-6 lg:self-start lg:rounded-3xl lg:border lg:bg-[var(--color-surface)] lg:p-6 lg:backdrop-blur-none xl:w-72">
+          <div className="flex items-center justify-between gap-3 lg:flex-col lg:items-start lg:gap-3">
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--color-accent)]">{t.home.eyebrow}</p>
+              <h1 className="mt-0.5 text-lg font-extrabold leading-tight tracking-tight text-[var(--color-text)] lg:text-3xl">
+                {t.home.titleMain}{" "}
+                <span className="font-display italic text-[var(--color-accent)] lg:text-2xl">
                   {t.home.titleAccent}
                 </span>
               </h1>
             </div>
-            <div className="flex shrink-0 flex-row items-center gap-2 lg:w-full lg:justify-between">
+            <div className="flex shrink-0 items-center gap-1.5 lg:w-full lg:justify-between">
               <button
                 onClick={toggleLang}
                 aria-label={t.common.languageLabel}
-                className="flex h-11 items-center gap-1.5 rounded-full bg-[var(--color-surface-muted)] px-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-text)] transition-all duration-200 ease-out hover:bg-[var(--color-border)] active:scale-90 lg:flex-1 justify-center"
+                className="flex h-9 items-center gap-1 rounded-full bg-[var(--color-surface-muted)] px-2.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text)] transition-all duration-200 ease-out hover:bg-[var(--color-border)] active:scale-90 lg:flex-1 lg:justify-center lg:h-11 lg:px-3 lg:text-xs"
               >
-                <Languages size={16} strokeWidth={1.75} />
+                <Languages size={14} strokeWidth={1.75} />
                 {lang}
               </button>
               <button
                 onClick={toggleTheme}
                 aria-label="Cambia tema"
-                className="flex h-11 items-center justify-center gap-1.5 rounded-full bg-[var(--color-surface-muted)] px-3 text-xs font-medium text-[var(--color-text)] transition-all duration-200 ease-out hover:scale-105 hover:bg-[var(--color-border)] active:scale-90 lg:flex-1 lg:w-auto"
+                className="flex h-9 items-center justify-center gap-1 rounded-full bg-[var(--color-surface-muted)] px-2.5 text-[11px] font-medium text-[var(--color-text)] transition-all duration-200 ease-out hover:bg-[var(--color-border)] active:scale-90 lg:flex-1 lg:h-11 lg:px-3"
               >
-                {theme === "light" ? <Moon size={16} strokeWidth={1.75} /> : <Sun size={16} strokeWidth={1.75} />}
+                {theme === "light" ? <Moon size={14} strokeWidth={1.75} /> : <Sun size={14} strokeWidth={1.75} />}
                 <span className="sm:hidden">{theme === "light" ? "Dark" : "Light"}</span>
               </button>
             </div>

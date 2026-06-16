@@ -229,7 +229,7 @@ const it: HotelContent = {
     stayLabel: "Il vostro soggiorno",
     welcomeTitle: "Vi diamo il benvenuto",
     welcomeBody:
-      "La vostra camera è pronta. Il Grand Hotel San Marino dispone di 60 camere e suite con vista sulla Valle del Montefeltro, in una posizione ideale per escursioni in bici e passeggiate tra i castelli della Repubblica.",
+      "Questa app è la vostra guida al soggiorno: richiedete il room service, visualizzate gli orari dei servizi, esplorate il ristorante e la spa, e scoprite dove andare a San Marino.",
     checkIn: { label: "Check-in", value: "Dalle ore 14:00" },
     checkOut: { label: "Check-out", value: "Entro le ore 11:00" },
     lateCheckout: "Late check-out su disponibilità, con supplemento.",
@@ -576,7 +576,7 @@ const en: HotelContent = {
     stayLabel: "Your stay",
     welcomeTitle: "Welcome",
     welcomeBody:
-      "Your room is ready. The Grand Hotel San Marino has 60 rooms and suites overlooking the Montefeltro Valley, in an ideal location for cycling and walking among the castles of the Republic.",
+      "This app is your guide to your stay: request room service, check service hours, explore the restaurant and spa, and discover what to do in San Marino.",
     checkIn: { label: "Check-in", value: "From 2:00 PM" },
     checkOut: { label: "Check-out", value: "By 11:00 AM" },
     lateCheckout: "Late check-out subject to availability, with a supplement.",

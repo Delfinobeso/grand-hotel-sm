@@ -61,6 +61,11 @@ body {
   display: none;
 }
 
+@keyframes wave-shift {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 .leaflet-container {
   background: var(--color-surface-muted);
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, sans-serif;
