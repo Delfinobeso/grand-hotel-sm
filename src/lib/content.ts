@@ -22,12 +22,14 @@ export interface MassageItem {
 export interface HotelContent {
   nav: {
     home: string;
-    room: string;
-    facility: string;
-    dining: string;
-    wellness: string;
+    services: string;
+    map: string;
     info: string;
-    about: string;
+  };
+  services: {
+    label: string;
+    quickLabel: string;
+    backLabel: string;
   };
   common: {
     receptionCta: string;
@@ -192,12 +194,9 @@ const TV_CHANNELS = [
 const it: HotelContent = {
   nav: {
     home: "Home",
-    room: "Camera",
-    facility: "Struttura",
-    dining: "Mangiare",
-    wellness: "Spa",
-    info: "Dove",
-    about: "Info",
+    services: "Servizi",
+    map: "Dove",
+    info: "Info",
   },
   common: {
     receptionCta: "Chiama la Reception",
@@ -529,18 +528,20 @@ const it: HotelContent = {
     ],
     contactsLabel: "Indirizzo e contatti",
   },
+  services: {
+    label: "Tutti i servizi",
+    quickLabel: "Accesso rapido",
+    backLabel: "Tutti i servizi",
+  },
   footer: "Grand Hotel San Marino",
 };
 
 const en: HotelContent = {
   nav: {
     home: "Home",
-    room: "Room",
-    facility: "Facility",
-    dining: "Food",
-    wellness: "Spa",
-    info: "Explore",
-    about: "Info",
+    services: "Services",
+    map: "Explore",
+    info: "Info",
   },
   common: {
     receptionCta: "Call Reception",
@@ -871,6 +872,11 @@ const en: HotelContent = {
       { name: "Christmas Markets", date: "Christmas season" },
     ],
     contactsLabel: "Address & Contacts",
+  },
+  services: {
+    label: "All Services",
+    quickLabel: "Quick access",
+    backLabel: "All Services",
   },
   footer: "Grand Hotel San Marino",
 };

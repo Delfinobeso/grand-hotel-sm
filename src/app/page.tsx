@@ -8,43 +8,27 @@ import {
   Moon,
   Languages,
   Home as HomeIcon,
-  BedDouble,
-  ConciergeBell,
-  UtensilsCrossed,
-  Sparkles,
+  LayoutGrid,
   MapPin as MapIcon,
   Info as InfoIcon,
-  Ellipsis,
-  X,
   type LucideIcon,
 } from "lucide-react";
 import { content, type Lang, type HotelContent } from "@/lib/content";
 import { HOTEL } from "@/lib/hotel";
 import { HomeSection } from "@/components/sections/HomeSection";
-import { RoomSection } from "@/components/sections/RoomSection";
-import { FacilitySection } from "@/components/sections/FacilitySection";
-import { DiningSection } from "@/components/sections/DiningSection";
-import { WellnessSection } from "@/components/sections/WellnessSection";
+import { DirectorySection } from "@/components/sections/DirectorySection";
 import { InfoSection } from "@/components/sections/InfoSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import ChatAssistant from "@/components/ChatAssistant";
 
-type TabKey = "home" | "room" | "facility" | "dining" | "wellness" | "info" | "about";
+type TabKey = "home" | "services" | "map" | "info";
 
-const MAIN_TABS: { key: TabKey; icon: LucideIcon }[] = [
-  { key: "home", icon: HomeIcon },
-  { key: "room", icon: BedDouble },
-  { key: "dining", icon: UtensilsCrossed },
-  { key: "wellness", icon: Sparkles },
-  { key: "info", icon: MapIcon },
+const TABS: { key: TabKey; icon: LucideIcon }[] = [
+  { key: "home",     icon: HomeIcon },
+  { key: "services", icon: LayoutGrid },
+  { key: "map",      icon: MapIcon },
+  { key: "info",     icon: InfoIcon },
 ];
-
-const MORE_TABS: { key: TabKey; icon: LucideIcon }[] = [
-  { key: "facility", icon: ConciergeBell },
-  { key: "about", icon: InfoIcon },
-];
-
-const ALL_TABS = [...MAIN_TABS, ...MORE_TABS];
 
 function ReceptionButton({ t }: { t: HotelContent }) {
   return (
@@ -62,7 +46,6 @@ export default function Home() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [lang, setLang] = useState<Lang>("it");
   const [activeTab, setActiveTab] = useState<TabKey>("home");
-  const [moreOpen, setMoreOpen] = useState(false);
 
   // One-time sync from localStorage after mount: the inline THEME_SCRIPT in layout.tsx
   // already applied data-theme/lang to <html> before paint, so this only updates the
@@ -101,23 +84,17 @@ export default function Home() {
   const t = content[lang];
 
   const navLabels: Record<TabKey, string> = {
-    home: t.nav.home,
-    room: t.nav.room,
-    facility: t.nav.facility,
-    dining: t.nav.dining,
-    wellness: t.nav.wellness,
-    info: t.nav.info,
-    about: t.nav.about,
+    home:     t.nav.home,
+    services: t.nav.services,
+    map:      t.nav.map,
+    info:     t.nav.info,
   };
 
   const sections: Record<TabKey, React.ReactNode> = {
-    home: <HomeSection t={t} />,
-    room: <RoomSection t={t} />,
-    facility: <FacilitySection t={t} />,
-    dining: <DiningSection t={t} />,
-    wellness: <WellnessSection t={t} />,
-    info: <InfoSection t={t} />,
-    about: <AboutSection t={t} />,
+    home:     <HomeSection t={t} />,
+    services: <DirectorySection t={t} />,
+    map:      <InfoSection t={t} />,
+    info:     <AboutSection t={t} />,
   };
 
   return (
@@ -159,7 +136,7 @@ export default function Home() {
 
           {/* ── Nav desktop ── */}
           <nav className="hidden flex-col gap-1 lg:flex">
-            {ALL_TABS.map(({ key, icon: Icon }) => {
+            {TABS.map(({ key, icon: Icon }) => {
               const active = activeTab === key;
               return (
                 <button
@@ -200,13 +177,13 @@ export default function Home() {
       </div>
 
       {/* ── BOTTOM NAV (mobile/tablet) ── */}
-      <nav className="sticky bottom-0 z-20 grid grid-cols-6 border-t border-[var(--color-border)] bg-[var(--color-bg)]/95 px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">
-        {MAIN_TABS.map(({ key, icon: Icon }) => {
+      <nav className="sticky bottom-0 z-20 grid grid-cols-4 border-t border-[var(--color-border)] bg-[var(--color-bg)]/95 px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">
+        {TABS.map(({ key, icon: Icon }) => {
           const active = activeTab === key;
           return (
             <button
               key={key}
-              onClick={() => { setActiveTab(key); setMoreOpen(false); }}
+              onClick={() => setActiveTab(key)}
               aria-current={active}
               className={`flex flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors duration-150 ${
                 active ? "text-[var(--color-accent)]" : "text-[var(--color-text-muted)]"
@@ -217,56 +194,8 @@ export default function Home() {
             </button>
           );
         })}
-        <button
-          onClick={() => setMoreOpen(!moreOpen)}
-          aria-label="Altro"
-          className={`flex flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors duration-150 ${
-            moreOpen || MORE_TABS.some(t => t.key === activeTab) ? "text-[var(--color-accent)]" : "text-[var(--color-text-muted)]"
-          }`}
-        >
-          <Ellipsis size={20} strokeWidth={moreOpen || MORE_TABS.some(t => t.key === activeTab) ? 2.25 : 1.75} />
-          {lang === "it" ? "Altro" : "More"}
-        </button>
       </nav>
 
-      {/* ── MORE OVERLAY (mobile) ── */}
-      {moreOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden" onClick={() => setMoreOpen(false)}>
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-          <div
-            className="absolute bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-4 right-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-2xl p-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-semibold text-[var(--color-text)]">
-                {lang === "it" ? "Altro" : "More"}
-              </span>
-              <button
-                onClick={() => setMoreOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)]"
-              >
-                <X size={16} strokeWidth={1.75} />
-              </button>
-            </div>
-            <div className="flex flex-col gap-1">
-              {MORE_TABS.map(({ key, icon: Icon }) => (
-                <button
-                  key={key}
-                  onClick={() => { setActiveTab(key); setMoreOpen(false); }}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors duration-150 ${
-                    activeTab === key
-                      ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
-                      : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-muted)]"
-                  }`}
-                >
-                  <Icon size={20} strokeWidth={1.75} />
-                  {navLabels[key]}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
       <ChatAssistant lang={lang} />
     </div>
   );
