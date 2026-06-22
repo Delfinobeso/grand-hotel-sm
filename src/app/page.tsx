@@ -7,8 +7,7 @@ import {
   Moon,
   Home as HomeIcon,
   BedDouble,
-  UtensilsCrossed,
-  Flower2,
+  Sparkles,
   Map as MapIcon,
   type LucideIcon,
 } from "lucide-react";
@@ -17,16 +16,14 @@ import { HOTEL } from "@/lib/hotel";
 import type { TabKey } from "@/lib/nav";
 import { OggiSection } from "@/components/sections/OggiSection";
 import { HotelSection } from "@/components/sections/HotelSection";
-import { DiningSection } from "@/components/sections/DiningSection";
-import { WellnessSection } from "@/components/sections/WellnessSection";
+import { EsperienzeSection } from "@/components/sections/EsperienzeSection";
 import { ExploreSection } from "@/components/sections/ExploreSection";
 import ChatAssistant from "@/components/ChatAssistant";
 
 const TABS: { key: TabKey; icon: LucideIcon }[] = [
   { key: "oggi", icon: HomeIcon },
   { key: "hotel", icon: BedDouble },
-  { key: "dining", icon: UtensilsCrossed },
-  { key: "wellness", icon: Flower2 },
+  { key: "experiences", icon: Sparkles },
   { key: "explore", icon: MapIcon },
 ];
 
@@ -80,16 +77,14 @@ export default function Home() {
   const navLabels: Record<TabKey, string> = {
     oggi: t.nav.oggi,
     hotel: t.nav.hotel,
-    dining: t.nav.dining,
-    wellness: t.nav.wellness,
+    experiences: t.nav.experiences,
     explore: t.nav.explore,
   };
 
   const sections: Record<TabKey, React.ReactNode> = {
     oggi: <OggiSection t={t} onOpenChat={() => setChatOpen(true)} onNavigate={setActiveTab} />,
     hotel: <HotelSection t={t} />,
-    dining: <DiningSection t={t} />,
-    wellness: <WellnessSection t={t} />,
+    experiences: <EsperienzeSection t={t} />,
     explore: <ExploreSection t={t} />,
   };
 
