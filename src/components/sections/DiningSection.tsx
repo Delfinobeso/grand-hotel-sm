@@ -11,6 +11,7 @@ import {
   CardImage,
   CallButton,
   NavigateButton,
+  BookButton,
 } from "@/components/ui";
 
 const VENUE_IMG: Record<string, string> = {
@@ -68,7 +69,14 @@ export function DiningSection({ t }: { t: HotelContent }) {
               <p className="mt-2 text-[0.95rem] leading-relaxed text-[var(--color-text-secondary)]">{v.body}</p>
               {pin && (
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <NavigateButton lat={pin.lat} lon={pin.lon} name={v.name} label={t.common.openInMapsLabel} />
+                  {pin.bookingUrl && <BookButton href={pin.bookingUrl} label={t.common.bookLabel} />}
+                  <NavigateButton
+                    lat={pin.lat}
+                    lon={pin.lon}
+                    name={v.name}
+                    label={t.common.openInMapsLabel}
+                    variant={pin.bookingUrl ? "outline" : "solid"}
+                  />
                   {pin.phoneHref && (
                     <CallButton href={pin.phoneHref} label={t.common.callLabel} variant="outline" />
                   )}

@@ -10,6 +10,7 @@ import {
   Check,
   Copy,
   Quote,
+  CalendarCheck,
   type LucideIcon,
 } from "lucide-react";
 import type { HoursRow, MassageItem } from "@/lib/content";
@@ -397,6 +398,23 @@ export function NavigateButton({
       className={variant === "solid" ? ctaSolid : ctaOutline}
     >
       <MapPin size={16} strokeWidth={1.875} />
+      {label}
+    </a>
+  );
+}
+
+export function BookButton({
+  href,
+  label,
+  variant = "solid",
+}: {
+  href: string;
+  label: string;
+  variant?: "solid" | "outline";
+}) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={variant === "solid" ? ctaSolid : ctaOutline}>
+      <CalendarCheck size={16} strokeWidth={1.875} />
       {label}
     </a>
   );

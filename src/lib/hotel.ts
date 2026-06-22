@@ -18,7 +18,12 @@ export interface MapPin {
   phone?: string;
   phoneHref?: string;
   walkMinutes?: number;
+  bookingUrl?: string;
 }
+
+/** TheFork booking widget for Ristorante La Terrazza. */
+export const LA_TERRAZZA_BOOKING =
+  "https://widget.thefork.com/it/bdef5000-1a1c-435f-9501-170ed277ac99?origin=facebook&utm_medium=integration&utm_source=instagram&step=date";
 
 /** GHSM Group venues outside the hotel — coordinates from OpenStreetMap (centro storico). */
 export const GHSM_VENUES: MapPin[] = [
@@ -39,6 +44,8 @@ export const GHSM_VENUES: MapPin[] = [
     phone: "+378 0549 991007",
     phoneHref: "tel:+3780549991007",
     walkMinutes: 6,
+    bookingUrl:
+      "https://widget.thefork.com/it/bdef5000-1a1c-435f-9501-170ed277ac99?origin=facebook&utm_medium=integration&utm_source=instagram&step=date",
   },
   {
     id: "caffeTitano",

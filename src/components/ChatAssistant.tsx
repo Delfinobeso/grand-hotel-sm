@@ -1,12 +1,61 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Sparkles, Send, Phone, X } from "lucide-react";
+import { Sparkles, Send, Phone, X, MapPin, CalendarCheck, ExternalLink, type LucideIcon } from "lucide-react";
 import { HOTEL } from "@/lib/hotel";
 
 interface Message {
   role: "user" | "assistant";
   text: string;
+}
+
+interface ChatAction {
+  label: string;
+  url: string;
+}
+
+/** Pull Markdown links out of an assistant reply so they can render as buttons. */
+function parseActions(text: string): { clean: string; actions: ChatAction[] } {
+  const re = /\[([^\]]+)\]\((https?:\/\/[^\s)]+|tel:[^\s)]+)\)/g;
+  const actions: ChatAction[] = [];
+  const clean = text
+    .replace(re, (_m, label: string, url: string) => {
+      actions.push({ label, url });
+      return label;
+    })
+    .replace(/[ \t]+([.,;:])/g, "$1")
+    .trim();
+  return { clean, actions };
+}
+
+function actionIcon(url: string): LucideIcon {
+  if (url.startsWith("tel:")) return Phone;
+  if (url.includes("thefork")) return CalendarCheck;
+  if (url.includes("maps")) return MapPin;
+  return ExternalLink;
+}
+
+function ChatActions({ actions }: { actions: ChatAction[] }) {
+  if (actions.length === 0) return null;
+  return (
+    <div className="mt-2.5 flex flex-wrap gap-2">
+      {actions.map((a, i) => {
+        const Icon = actionIcon(a.url);
+        const external = a.url.startsWith("http");
+        return (
+          <a
+            key={i}
+            href={a.url}
+            {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+            className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent)] px-3.5 py-2 text-[0.8125rem] font-semibold text-[var(--color-on-accent)] transition-opacity duration-200 hover:opacity-90 active:scale-[0.97]"
+          >
+            <Icon size={14} strokeWidth={2} />
+            {a.label}
+          </a>
+        );
+      })}
+    </div>
+  );
 }
 
 const COPY = {
@@ -188,19 +237,26 @@ export default function ChatAssistant({
               </div>
             )}
 
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div
-                  className={`max-w-[85%] whitespace-pre-line px-3.5 py-2.5 text-[0.95rem] leading-relaxed ${
-                    m.role === "user"
-                      ? "rounded-2xl rounded-tr-md bg-[var(--color-accent)] text-[var(--color-on-accent)]"
-                      : "rounded-2xl rounded-tl-md bg-[var(--color-surface)] text-[var(--color-text)]"
-                  }`}
-                >
-                  {m.text}
+            {messages.map((m, i) => {
+              if (m.role === "user") {
+                return (
+                  <div key={i} className="flex justify-end">
+                    <div className="max-w-[85%] whitespace-pre-line rounded-2xl rounded-tr-md bg-[var(--color-accent)] px-3.5 py-2.5 text-[0.95rem] leading-relaxed text-[var(--color-on-accent)]">
+                      {m.text}
+                    </div>
+                  </div>
+                );
+              }
+              const { clean, actions } = parseActions(m.text);
+              return (
+                <div key={i} className="flex justify-start">
+                  <div className="max-w-[88%] rounded-2xl rounded-tl-md bg-[var(--color-surface)] px-3.5 py-2.5">
+                    <p className="whitespace-pre-line text-[0.95rem] leading-relaxed text-[var(--color-text)]">{clean}</p>
+                    <ChatActions actions={actions} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {loading && (
               <div className="flex justify-start">
