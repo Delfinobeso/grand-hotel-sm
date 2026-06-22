@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { ConciergeBell, Send, Phone, X, MapPin, CalendarCheck, ExternalLink, type LucideIcon } from "lucide-react";
 import { HOTEL } from "@/lib/hotel";
+
+const EASE_IOS = [0.2, 0, 0, 1] as const;
+const SHEET_IN: Transition = { duration: 0.42, ease: EASE_IOS };
 
 interface Message {
   role: "user" | "assistant";
@@ -89,24 +93,6 @@ const COPY = {
   },
 };
 
-/** Pin the panel to the real visualViewport (not the layout viewport) for the iOS keyboard. */
-function useVisualViewport() {
-  const [rect, setRect] = useState({ top: 0, height: 0 });
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.visualViewport) return;
-    const vv = window.visualViewport;
-    const sync = () => setRect({ top: vv.offsetTop, height: vv.height });
-    sync();
-    vv.addEventListener("resize", sync);
-    vv.addEventListener("scroll", sync);
-    return () => {
-      vv.removeEventListener("resize", sync);
-      vv.removeEventListener("scroll", sync);
-    };
-  }, []);
-  return rect;
-}
-
 export default function ChatAssistant({
   lang,
   open,
@@ -122,7 +108,6 @@ export default function ChatAssistant({
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const vv = useVisualViewport();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -159,39 +144,47 @@ export default function ChatAssistant({
     }
   };
 
-  const panelStyle: React.CSSProperties = vv.height
-    ? { position: "fixed", top: vv.top, left: 0, right: 0, height: vv.height, zIndex: 50 }
-    : {};
-
   return (
     <>
       {/* FAB */}
-      {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          aria-label={c.fab}
-          className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-[0_8px_24px_oklch(0.2_0.04_258/0.35)] transition-transform duration-200 ease-out hover:scale-105 active:scale-95 lg:bottom-6"
-          style={{ transitionTimingFunction: "var(--ease-spring)" }}
-        >
-          <ConciergeBell size={22} strokeWidth={1.75} />
-        </button>
-      )}
+      <AnimatePresence>
+        {!open && (
+          <motion.button
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.6, opacity: 0 }}
+            transition={{ duration: 0.28, ease: [0.34, 1.56, 0.64, 1] }}
+            onClick={() => setOpen(true)}
+            aria-label={c.fab}
+            className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-[0_8px_24px_oklch(0.2_0.04_258/0.35)] active:scale-95 lg:bottom-6"
+          >
+            <ConciergeBell size={22} strokeWidth={1.75} />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
-      {/* Scrim */}
-      {open && (
-        <div
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
-          onClick={() => setOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {open && (
+          <>
+            {/* Scrim */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+              onClick={() => setOpen(false)}
+            />
 
-      {/* Panel */}
-      {open && (
-        <div
-          className="flex flex-col bg-[var(--color-bg)] lg:fixed lg:inset-auto lg:bottom-6 lg:right-4 lg:z-50 lg:h-[34rem] lg:w-96 lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl"
-          style={panelStyle}
-        >
-          {/* Header */}
+            {/* Panel — full-screen on mobile (keyboard handled by interactive-widget) */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={SHEET_IN}
+              className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)] lg:inset-auto lg:bottom-6 lg:right-4 lg:h-[34rem] lg:w-96 lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl"
+            >
+              {/* Header */}
           <div className="flex shrink-0 items-center gap-3 border-b border-[var(--color-border)] px-4 pt-[max(0.875rem,env(safe-area-inset-top))] pb-3.5 lg:rounded-t-3xl">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)]">
               <ConciergeBell size={18} strokeWidth={1.75} />
@@ -285,7 +278,6 @@ export default function ChatAssistant({
                 onFocus={() => setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 350)}
                 placeholder={c.placeholder}
                 className="h-11 flex-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-[0.95rem] text-[var(--color-text)] outline-none transition-colors placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-accent)]"
-                autoFocus
               />
               <button
                 onClick={() => send(input)}
@@ -297,8 +289,10 @@ export default function ChatAssistant({
               </button>
             </div>
           </div>
-        </div>
-      )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }

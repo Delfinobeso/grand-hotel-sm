@@ -91,22 +91,30 @@ function MapDriver({ active, onRoute }: { active: Place; onRoute: (r: LatLng[]) 
   const map = useMap();
 
   useEffect(() => {
-    map.flyTo([active.lat, active.lon], 17, { duration: 0.9, easeLinearity: 0.22 });
-
     const ctrl = new AbortController();
     const straight: LatLng[] = [
       [HOTEL.lat, HOTEL.lon],
       [active.lat, active.lon],
     ];
+    // Frame the whole route (hotel → place); large bottom padding keeps it above the banner.
+    const frame = (coords: LatLng[]) => {
+      onRoute(coords);
+      map.flyToBounds(L.latLngBounds(coords), {
+        paddingTopLeft: [36, 96],
+        paddingBottomRight: [36, 300],
+        maxZoom: 17,
+        duration: 0.9,
+        easeLinearity: 0.24,
+      });
+    };
     const url = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${HOTEL.lon},${HOTEL.lat};${active.lon},${active.lat}?overview=full&geometries=geojson`;
     fetch(url, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => {
         const coords = d?.routes?.[0]?.geometry?.coordinates as [number, number][] | undefined;
-        if (coords?.length) onRoute(coords.map(([lon, lat]) => [lat, lon] as LatLng));
-        else onRoute(straight);
+        frame(coords?.length ? coords.map(([lon, lat]) => [lat, lon] as LatLng) : straight);
       })
-      .catch(() => onRoute(straight));
+      .catch(() => frame(straight));
 
     return () => ctrl.abort();
   }, [active, map, onRoute]);
