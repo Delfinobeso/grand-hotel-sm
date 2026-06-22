@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import {
   Phone,
   Clock,
@@ -188,20 +187,10 @@ export default function Home() {
 
         {/* ── CONTENT ── */}
         <main className="flex-1 px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:pt-6 lg:pb-0">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-            >
-              {sections[activeTab]}
-              <p className="mt-8 text-center text-xs text-[var(--color-text-muted)]">
-                {t.footer} · © {new Date().getFullYear()}
-              </p>
-            </motion.div>
-          </AnimatePresence>
+          {sections[activeTab]}
+          <p className="mt-8 text-center text-xs text-[var(--color-text-muted)]">
+            {t.footer} · © {new Date().getFullYear()}
+          </p>
         </main>
       </div>
 
@@ -214,17 +203,10 @@ export default function Home() {
               key={key}
               onClick={() => { setActiveTab(key); if (key !== "services") setNavFromHome(false); else { setNavFromHome(false); setServiceView(null); } }}
               aria-current={active}
-              className={`relative flex flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors duration-150 ${
+              className={`flex flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors duration-150 ${
                 active ? "text-[var(--color-accent)]" : "text-[var(--color-text-muted)]"
               }`}
             >
-              {active && (
-                <motion.span
-                  layoutId="nav-indicator"
-                  className="absolute -top-2 h-0.5 w-7 rounded-full bg-[var(--color-accent)]"
-                  transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                />
-              )}
               <Icon size={20} strokeWidth={active ? 2.25 : 1.75} />
               {navLabels[key]}
             </button>

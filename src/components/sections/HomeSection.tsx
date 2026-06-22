@@ -119,7 +119,7 @@ export function HomeSection({
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent)]">
           {t.home.stayLabel}
         </p>
-        <p className="font-display mt-1.5 text-2xl font-bold italic leading-snug text-[var(--color-text)] lg:text-3xl">
+        <p className="mt-1.5 text-xl font-bold leading-snug text-[var(--color-text)] lg:text-2xl">
           {t.home.welcomeTitle}
         </p>
         <p className="mt-2 text-sm leading-relaxed text-[var(--color-text-secondary)] lg:text-base">
