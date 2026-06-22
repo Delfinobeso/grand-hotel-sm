@@ -38,7 +38,7 @@ export function ExploreSection({ t }: { t: HotelContent }) {
       {/* Info / events trigger */}
       <button
         onClick={() => setSheet(true)}
-        className="absolute right-3 top-3 z-[1100] inline-flex h-11 items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/90 px-4 text-[0.85rem] font-semibold text-[var(--color-text)] shadow-[0_6px_20px_oklch(0.2_0.04_258/0.2)] backdrop-blur-xl transition-transform duration-200 active:scale-95"
+        className="absolute right-3 top-3 z-20 inline-flex h-11 items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/90 px-4 text-[0.85rem] font-semibold text-[var(--color-text)] shadow-[0_6px_20px_oklch(0.2_0.04_258/0.2)] backdrop-blur-xl transition-transform duration-200 active:scale-95"
       >
         <Info size={16} strokeWidth={2} />
         {info.sheetLabel}
@@ -54,14 +54,14 @@ export function ExploreSection({ t }: { t: HotelContent }) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setSheet(false)}
-              className="fixed inset-0 z-[1200] bg-black/40 backdrop-blur-sm"
+              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
             />
             <motion.div
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ duration: 0.4, ease: EASE_EXPO }}
-              className="fixed inset-x-0 bottom-0 z-[1300] max-h-[85svh] overflow-y-auto rounded-t-3xl bg-[var(--color-bg)] pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+              className="fixed inset-x-0 bottom-0 z-40 max-h-[85svh] overflow-y-auto rounded-t-3xl bg-[var(--color-bg)] pb-[max(1.5rem,env(safe-area-inset-bottom))]"
             >
               <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg)]/90 px-5 py-3.5 backdrop-blur-md">
                 <h2 className="font-display text-lg font-semibold text-[var(--color-text)]">{info.sheetLabel}</h2>

@@ -177,7 +177,7 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
   const activePlace = places[active];
 
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden isolate">
       <MapContainer
         center={[HOTEL.lat, HOTEL.lon]}
         zoom={16}

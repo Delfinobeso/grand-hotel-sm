@@ -8,6 +8,25 @@ import { HOTEL } from "@/lib/hotel";
 const EASE_IOS = [0.2, 0, 0, 1] as const;
 const SHEET_IN: Transition = { duration: 0.42, ease: EASE_IOS };
 
+/** Size the mobile panel to the visual viewport so the header stays fixed and the
+ * keyboard pushes only the message area up (iOS-reliable; resizes-content is ignored in PWAs). */
+function useVisualViewport() {
+  const [rect, setRect] = useState<{ top: number; height: number } | null>(null);
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const sync = () => setRect({ top: vv.offsetTop, height: vv.height });
+    sync();
+    vv.addEventListener("resize", sync);
+    vv.addEventListener("scroll", sync);
+    return () => {
+      vv.removeEventListener("resize", sync);
+      vv.removeEventListener("scroll", sync);
+    };
+  }, []);
+  return rect;
+}
+
 interface Message {
   role: "user" | "assistant";
   text: string;
@@ -107,11 +126,25 @@ export default function ChatAssistant({
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mobile, setMobile] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const vv = useVisualViewport();
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const u = () => setMobile(mq.matches);
+    u();
+    mq.addEventListener("change", u);
+    return () => mq.removeEventListener("change", u);
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
+
+  // On mobile, pin the panel to the visual viewport (above the keyboard).
+  const panelStyle: React.CSSProperties | undefined =
+    mobile && vv ? { position: "fixed", top: vv.top, left: 0, right: 0, height: vv.height } : undefined;
 
   const send = async (text: string) => {
     if (!text.trim() || loading) return;
@@ -172,7 +205,7 @@ export default function ChatAssistant({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden"
               onClick={() => setOpen(false)}
             />
 
@@ -182,6 +215,7 @@ export default function ChatAssistant({
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={SHEET_IN}
+              style={panelStyle}
               className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)] lg:inset-auto lg:bottom-6 lg:right-4 lg:h-[34rem] lg:w-96 lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl"
             >
               {/* Header */}
