@@ -11,6 +11,7 @@ import {
   LogIn,
   DoorOpen,
   Sparkles,
+  ConciergeBell,
   UtensilsCrossed,
   BellRing,
   Dumbbell,
@@ -25,7 +26,6 @@ import type { ServiceHours } from "@/lib/hours";
 
 /* ── GHSM Group strip ── */
 const GROUP: { name: string; sub: string; img: string; tab: TabKey }[] = [
-  { name: "Grand Hotel San Marino", sub: "Hotel · ★★★★", img: "/images/home.webp", tab: "explore" },
   { name: "Centro Mességué", sub: "Benessere", img: "/images/wellness.webp", tab: "wellness" },
   { name: "Ristorante La Terrazza", sub: "Ristorante", img: "/images/venue-laterrazza.webp", tab: "dining" },
   { name: "Caffè Titano", sub: "Caffè", img: "/images/venue-caffetitano.webp", tab: "dining" },
@@ -255,7 +255,7 @@ export function OggiSection({
           className="flex w-full items-center gap-4 rounded-2xl bg-[var(--color-accent)] px-5 py-4 text-left transition-[transform,opacity] duration-200 ease-out hover:opacity-95 active:scale-[0.99]"
         >
           <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 text-[var(--color-on-accent)]">
-            <Sparkles size={20} strokeWidth={1.75} />
+            <ConciergeBell size={21} strokeWidth={1.75} />
             <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[var(--color-accent)] bg-[var(--color-success)]" />
           </span>
           <span className="min-w-0 flex-1">

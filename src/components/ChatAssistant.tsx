@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Sparkles, Send, Phone, X, MapPin, CalendarCheck, ExternalLink, type LucideIcon } from "lucide-react";
+import { ConciergeBell, Send, Phone, X, MapPin, CalendarCheck, ExternalLink, type LucideIcon } from "lucide-react";
 import { HOTEL } from "@/lib/hotel";
 
 interface Message {
@@ -173,7 +173,7 @@ export default function ChatAssistant({
           className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-[0_8px_24px_oklch(0.2_0.04_258/0.35)] transition-transform duration-200 ease-out hover:scale-105 active:scale-95 lg:bottom-6"
           style={{ transitionTimingFunction: "var(--ease-spring)" }}
         >
-          <Sparkles size={22} strokeWidth={1.75} />
+          <ConciergeBell size={22} strokeWidth={1.75} />
         </button>
       )}
 
@@ -194,7 +194,7 @@ export default function ChatAssistant({
           {/* Header */}
           <div className="flex shrink-0 items-center gap-3 border-b border-[var(--color-border)] px-4 pt-[max(0.875rem,env(safe-area-inset-top))] pb-3.5 lg:rounded-t-3xl">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)]">
-              <Sparkles size={18} strokeWidth={1.75} />
+              <ConciergeBell size={18} strokeWidth={1.75} />
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-[0.95rem] font-semibold leading-tight text-[var(--color-text)]">{c.title}</p>

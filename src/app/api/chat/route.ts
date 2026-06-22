@@ -18,10 +18,10 @@ INFORMAZIONI UFFICIALI DEL GRAND HOTEL SAN MARINO (fonte: grandhotel.sm e sito G
 - Categoria: 4 stelle
 - Parte di: GHSM Group — "Ospitalità a San Marino dal 1894"
 - Indirizzo: Viale Antonio Onofri 31, 47890 San Marino Città, Repubblica di San Marino
-- Telefono: +378 0549 992400
-- Fax: +378 0549 992951
+- Telefono: +39 0549 992400
+- Fax: +39 0549 992951
 - Email: info@grandhotel.sm
-- Linea assistenza esperta (preventivi personalizzati): +378 0549 992274
+- Linea assistenza esperta (preventivi personalizzati): +39 0549 992274
 - 60 camere e suite moderne ed eleganti con vista mozzafiato sulla Valle del Montefeltro
 - Check-in: dalle 14:00 | Check-out: entro le 11:00
 - Late check-out: su disponibilità, con supplemento
@@ -89,19 +89,19 @@ Tutte con vista panoramica:
 ### Ristorante La Terrazza
 - Cucina enogastronomica di alto livello tra i merli di una Torre medievale, vista panoramica
 - Cene a lume di candela — esperienza unica
-- Tel +378 0549 991007
+- Tel +39 0549 991007
 - PRENOTAZIONE ONLINE disponibile via TheFork (vedi link in "LINK E AZIONI"). Per prenotare a La Terrazza fornisci sempre quel link.
 
 ### Caffè Titano
 - Nel pieno centro storico, affacciato su splendida piazzetta medievale
 - In uno degli angoli più suggestivi del borgo antico
-- Tel +378 0549 992473
+- Tel +39 0549 992473
 
 ### La Cremeria del Titano
 - Gelateria artigianale nel cuore del centro storico
 - Sapori autentici e semplici, aperta nei mesi caldi
 - Accanto al Caffè Titano
-- Tel +378 0549 992473
+- Tel +39 0549 992473
 
 ## BENESSERE — CENTRO MEDICO MAURICE MESSÉGUÉ
 - Da oltre 30 anni nel cuore di San Marino — esperienza e successo clinico riconosciuto
@@ -167,11 +167,11 @@ Tutte con vista panoramica:
 - Mercatini di Natale: periodo natalizio
 
 ## CONTATTI
-- Telefono: +378 0549 992400
-- Fax: +378 0549 992951
+- Telefono: +39 0549 992400
+- Fax: +39 0549 992951
 - Email: info@grandhotel.sm
 - Reception 24h: tasto 9 dalla camera
-- Linea preventivi: +378 0549 992274
+- Linea preventivi: +39 0549 992274
 - Sito web: grandhotel.sm
 
 ## LINK E AZIONI (usa SOLO questi, in formato Markdown [Testo](URL))
@@ -194,15 +194,15 @@ Indicazioni mappa (per "come arrivo / dov'è"):
 - Museo di Stato: [Apri in Mappe](https://maps.apple.com/?ll=43.935991,12.446556&q=Museo%20di%20Stato)
 
 Chiamate (formato [Testo](tel:NUMERO)):
-- Reception Grand Hotel: [Chiama la Reception](tel:+3780549992400)
-- La Terrazza / Titano Suites: [Chiama](tel:+3780549991007)
-- Caffè Titano / Cremeria: [Chiama](tel:+3780549992473)
+- Reception Grand Hotel: [Chiama la Reception](tel:+390549992400)
+- La Terrazza / Titano Suites: [Chiama](tel:+390549991007)
+- Caffè Titano / Cremeria: [Chiama](tel:+390549992473)
 ---
 
 REGOLE FONDAMENTALI:
 1. Rispondi nella STESSA lingua della domanda (italiano o inglese), in modo cortese e conciso (max 3-5 frasi). Dai del "Lei" in italiano. NON aprire con un saluto ("Buongiorno"/"Salve"): entra subito nel merito.
 2. Cita SOLO informazioni presenti in questa scheda (hotel + guida San Marino). Puoi rispondere liberamente a domande turistiche su San Marino usando la sezione "GUIDA TURISTICA".
-3. Se la domanda non trova risposta nella scheda, indirizza alla Reception: in italiano "La invito a contattare la Reception al tasto 9 dal telefono in camera o al numero +378 0549 992400"; in inglese "please contact Reception by dialling 9 from your room phone, or call +378 0549 992400".
+3. Se la domanda non trova risposta nella scheda, indirizza alla Reception: in italiano "La invito a contattare la Reception al tasto 9 dal telefono in camera o al numero +39 0549 992400"; in inglese "please contact Reception by dialling 9 from your room phone, or call +39 0549 992400".
 4. Non inventare né supporre orari, prezzi o servizi non elencati. Per orari/biglietti aggiornati di torri e musei rimanda a museidistato.sm o alla Reception.
 5. Non usare mai espressioni come "penso che", "probabilmente", "dovrebbe".
 6. Per meteo, disponibilità camere o prenotazioni specifiche: indirizza sempre alla Reception.
@@ -268,7 +268,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Chat API error:", error);
     return NextResponse.json(
-      { reply: "Per questa informazione La invito a contattare la Reception al tasto 9 dal telefono in camera o al numero +378 0549 992400." },
+      { reply: "Per questa informazione La invito a contattare la Reception al tasto 9 dal telefono in camera o al numero +39 0549 992400." },
       { status: 200 },
     );
   }

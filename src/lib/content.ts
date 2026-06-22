@@ -144,6 +144,7 @@ export interface HotelContent {
   info: {
     label: string;
     intro: string;
+    sheetLabel: string;
     ghsmLabel: string;
     poiLabel: string;
     pois: { id: string; name: string; body: string }[];
@@ -498,6 +499,7 @@ const it: HotelContent = {
   info: {
     label: "Dove",
     intro: "La mappa della zona, gli indirizzi del gruppo GHSM, i luoghi da non perdere a San Marino e come muoversi in città.",
+    sheetLabel: "Eventi e info",
     ghsmLabel: "Indirizzi GHSM nei dintorni",
     poiLabel: "Da non perdere a San Marino",
     pois: [
@@ -878,6 +880,7 @@ const en: HotelContent = {
   info: {
     label: "Explore",
     intro: "The area map, GHSM Group addresses, must-see places in San Marino and how to get around.",
+    sheetLabel: "Events & info",
     ghsmLabel: "GHSM Group nearby",
     poiLabel: "Must-see in San Marino",
     pois: [

@@ -166,12 +166,16 @@ export default function Home() {
         </header>
 
         {/* ── CONTENT ── */}
-        <main className="flex-1 px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:pt-2 lg:pb-0">
-          {sections[activeTab]}
-          <p className="mt-10 text-center text-xs text-[var(--color-text-muted)]">
-            {t.footer} · © {new Date().getFullYear()}
-          </p>
-        </main>
+        {activeTab === "explore" ? (
+          <main className="flex-1 lg:min-h-[calc(100dvh-3rem)]">{sections.explore}</main>
+        ) : (
+          <main className="flex-1 px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:pt-2 lg:pb-0">
+            {sections[activeTab]}
+            <p className="mt-10 text-center text-xs text-[var(--color-text-muted)]">
+              {t.footer} · © {new Date().getFullYear()}
+            </p>
+          </main>
+        )}
       </div>
 
       {/* ── FLOATING DOCK (mobile/tablet) ──
