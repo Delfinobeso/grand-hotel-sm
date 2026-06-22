@@ -36,14 +36,68 @@ Tutte con vista panoramica:
 - Reception: tasto 9 dal telefono in camera, 24 ore su 24
 - Room Service: tasto 9, 07:00-23:00, supplemento €6,00 per ordine
 - Centro Mességué: tasto 471 per informazioni e prenotazioni
-- Wi-Fi: rete GRANDHOTELRSM, gratuita in tutto l'hotel. Selezionare la rete, attendere la notifica di registrazione
 - Cassaforte: tasto R + codice personale 4-10 cifre + #
 - Aria condizionata: regolabile dal pannello in camera, si disattiva aprendo la finestra
 - Non disturbare: cartoncino sulla maniglia esterna
 - Lavanderia: 08:30-16:00, costi e tempi dipendono dal tipo di tessuto. Modulo nell'armadio della camera
-- Canali TV: 37 canali disponibili in camera
 - Animali domestici: piccola taglia ammessi, supplemento €4,00 al giorno
 - Colazione: servita al Ristorante L'Arengo 07:00-10:00, room service disponibile
+
+## WI-FI
+- Rete: GRANDHOTELRSM — gratuita in tutto l'hotel, nessuna password
+- Connessione tramite portale captivo (captive portal):
+  1. Aprire le impostazioni Wi-Fi del proprio dispositivo
+  2. Selezionare la rete GRANDHOTELRSM
+  3. Verrà mostrata una notifica o pop-up di registrazione — toccarla (o aprire il browser se non appare)
+  4. Attendere circa 10 secondi che si carichi la pagina
+  5. Registrarsi con email o accedere con social (Facebook, Google) — non serve PIN
+  6. Compilare i campi richiesti, accettare i termini e premere "Connetti"
+  7. La connessione è attiva. Valida per tutta la durata del soggiorno
+- Se non appare il pop-up: aprire il browser e navigare su qualsiasi sito — il portale si aprirà automaticamente
+- Per problemi di connessione: contattare la Reception al tasto 9
+
+## CANALI TV IN CAMERA
+Tutti i canali disponibili nel televisore della camera:
+- Canale 1 — Rai 1
+- Canale 2 — Rai 2
+- Canale 3 — Rai 3
+- Canale 4 — Rete 4
+- Canale 5 — Canale 5
+- Canale 6 — Italia 1
+- Canale 7 — La7
+- Canale 8 — TV8
+- Canale 9 — Nove
+- Canale 20 — Mediaset 20
+- Canale 21 — Rai 4
+- Canale 22 — Iris
+- Canale 23 — Rai 5
+- Canale 24 — Rai Movie
+- Canale 25 — Rai Premium
+- Canale 26 — Cielo
+- Canale 35 — Focus
+- Canale 36 — RTL 102.5 TV
+- Canale 40 — Boing
+- Canale 41 — K2
+- Canale 42 — Rai Gulp
+- Canale 43 — Rai Yoyo
+- Canale 44 — Frisbee
+- Canale 45 — Boing Plus
+- Canale 46 — Cartonito
+- Canale 47 — Super!
+- Canale 48 — Rai News 24
+- Canale 49 — Italia 2
+- Canale 50 — Sky TG24
+- Canale 51 — TGcom24
+- Canale 52 — Dmax
+- Canale 54 — Rai Storia
+- Canale 57 — Rai Scuola
+- Canale 58 — Rai Sport
+- Canale 60 — Sport Italia
+- Canale 64 — Supertennis
+- Canale 831 — San Marino RTV
+- Canali 301-312 — Sky Sport, Sky Serie, Sky News, Sky Uno, Sky Internazionali (pacchetto Sky)
+Totale: 37 canali + pacchetto Sky
+Telecomando: tasto 1 On/Off, tasto 2 tastiera numerica, tasto 3 frecce direzionali, tasto 4 Enter/OK, tasto 5 Back/Indietro, tasto 6 Volume e Canali. Premere su/giù per cambiare canale o volume.
 
 ## SERVIZI DELLA STRUTTURA
 - Garage coperto privato: piano -1 dell'hotel, chiuso da sbarra. Servizio valet 07:00-23:00 (consegnare le chiavi in Reception, richiedere l'auto con 30 minuti di anticipo). €19,00 a notte. Prenotabile già al momento della prenotazione. Colonna di ricarica per veicoli elettrici con supplemento

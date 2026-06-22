@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactNode } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
   BedDouble,
@@ -51,95 +52,109 @@ export function DirectorySection({
   subView: ServiceId | null;
   onSubViewChange: (v: ServiceId | null) => void;
 }) {
-  if (subView !== null) {
-    return (
-      <div className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8">
-        <button
-          onClick={() => onSubViewChange(null)}
-          className="flex items-center gap-2 self-start rounded-xl bg-[var(--color-surface)] px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-surface-muted)] active:scale-95"
-        >
-          <ArrowLeft size={16} strokeWidth={1.75} />
-          {t.services.backLabel}
-        </button>
-        {SECTIONS[subView](t)}
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8">
-      {/* ── HEADER ── */}
-      <div className="px-1">
-        <h2 className="text-2xl font-extrabold tracking-tight text-[var(--color-text)] lg:text-3xl">
-          {t.services.label}
-        </h2>
-      </div>
+    <AnimatePresence mode="wait" initial={false}>
+      {subView !== null ? (
+        <motion.div
+          key={subView}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 20 }}
+          transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
+          className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8"
+        >
+          <button
+            onClick={() => onSubViewChange(null)}
+            className="flex items-center gap-2 self-start rounded-xl bg-[var(--color-surface)] px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-surface-muted)] active:scale-95"
+          >
+            <ArrowLeft size={16} strokeWidth={1.75} />
+            {t.services.backLabel}
+          </button>
+          {SECTIONS[subView](t)}
+        </motion.div>
+      ) : (
+        <motion.div
+          key="grid"
+          initial={{ opacity: 0, x: -12 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -12 }}
+          transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          className="flex flex-col gap-7 md:gap-5 lg:gap-6 xl:gap-8"
+        >
+          {/* ── HEADER ── */}
+          <div className="px-1">
+            <h2 className="font-display text-3xl font-bold italic tracking-tight text-[var(--color-text)] lg:text-4xl">
+              {t.services.label}
+            </h2>
+          </div>
 
-      {/* ── TILE GRID ── */}
-      <section>
-        <div className="grid grid-cols-2 gap-3">
-          {TILES.map((tile) => (
-            <button
-              key={tile.id}
-              onClick={() => onSubViewChange(tile.id)}
-              className="group flex flex-col items-start gap-4 rounded-2xl bg-[var(--color-surface)] p-4 text-left transition-all duration-200 hover:bg-[var(--color-surface-muted)] active:scale-[0.98] lg:p-5"
-            >
-              <IconBadge icon={tile.icon} size={20} />
-              <div className="flex w-full flex-col gap-1.5">
-                <span className="text-base font-semibold leading-tight text-[var(--color-text)] lg:text-lg">
-                  {tile.label(t)}
-                </span>
-                {tile.hours && (
-                  <StatusBadge hours={SERVICE_HOURS[tile.hours]} labels={t.common.status} />
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
+          {/* ── TILE GRID ── */}
+          <section>
+            <div className="grid grid-cols-2 gap-3">
+              {TILES.map((tile) => (
+                <button
+                  key={tile.id}
+                  onClick={() => onSubViewChange(tile.id)}
+                  className="group flex flex-col items-start gap-4 rounded-2xl bg-[var(--color-surface)] p-4 text-left transition-all duration-200 hover:bg-[var(--color-surface-muted)] hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98] lg:p-5"
+                >
+                  <IconBadge icon={tile.icon} size={20} />
+                  <div className="flex w-full flex-col gap-1.5">
+                    <span className="text-base font-semibold leading-tight text-[var(--color-text)] lg:text-lg">
+                      {tile.label(t)}
+                    </span>
+                    {tile.hours && (
+                      <StatusBadge hours={SERVICE_HOURS[tile.hours]} labels={t.common.status} />
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
 
-      {/* ── ACCESSO RAPIDO ── */}
-      <section>
-        <SectionLabel>{t.services.quickLabel}</SectionLabel>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:gap-3">
-          {/* Room Service */}
-          <Card className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-3">
-                <IconBadge icon={HandPlatter} size={18} />
-                <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">
-                  {t.room.roomServiceLabel}
+          {/* ── ACCESSO RAPIDO ── */}
+          <section>
+            <SectionLabel>{t.services.quickLabel}</SectionLabel>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:gap-3">
+              {/* Room Service */}
+              <Card className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-3">
+                    <IconBadge icon={HandPlatter} size={18} />
+                    <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">
+                      {t.room.roomServiceLabel}
+                    </p>
+                  </div>
+                  <StatusBadge hours={SERVICE_HOURS.roomService} labels={t.common.status} />
+                </div>
+                <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                  {t.room.roomService.body}
                 </p>
-              </div>
-              <StatusBadge hours={SERVICE_HOURS.roomService} labels={t.common.status} />
-            </div>
-            <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
-              {t.room.roomService.body}
-            </p>
-            <div className="border-t border-[var(--color-border)] pt-3 text-sm">
-              <span className="font-medium text-[var(--color-text)]">{t.room.roomService.hours}</span>
-              <span className="ml-2 text-[var(--color-text-muted)]">{t.room.roomService.supplement}</span>
-            </div>
-            <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} />
-          </Card>
+                <div className="border-t border-[var(--color-border)] pt-3 text-sm">
+                  <span className="font-medium text-[var(--color-text)]">{t.room.roomService.hours}</span>
+                  <span className="ml-2 text-[var(--color-text-muted)]">{t.room.roomService.supplement}</span>
+                </div>
+                <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} />
+              </Card>
 
-          {/* Wi-Fi */}
-          <Card className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <IconBadge icon={Wifi} size={18} />
-              <div>
-                <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">
-                  {t.room.wifiLabel}
+              {/* Wi-Fi */}
+              <Card className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <IconBadge icon={Wifi} size={18} />
+                  <div>
+                    <p className="text-base font-semibold text-[var(--color-text)] lg:text-lg">
+                      {t.room.wifiLabel}
+                    </p>
+                    <p className="font-mono text-sm text-[var(--color-accent)]">{t.room.wifi.network}</p>
+                  </div>
+                </div>
+                <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                  {t.room.wifi.body}
                 </p>
-                <p className="font-mono text-sm text-[var(--color-accent)]">{t.room.wifi.network}</p>
-              </div>
+              </Card>
             </div>
-            <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--color-text-secondary)]">
-              {t.room.wifi.body}
-            </p>
-          </Card>
-        </div>
-      </section>
-    </div>
+          </section>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
