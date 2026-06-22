@@ -121,7 +121,7 @@ export default function ChatAssistant({
         <button
           onClick={() => setOpen(true)}
           aria-label={c.fab}
-          className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-[0_8px_24px_oklch(0.2_0.04_258/0.35)] transition-transform duration-200 ease-out hover:scale-105 active:scale-95 lg:bottom-6"
+          className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-[0_8px_24px_oklch(0.2_0.04_258/0.35)] transition-transform duration-200 ease-out hover:scale-105 active:scale-95 lg:bottom-6"
           style={{ transitionTimingFunction: "var(--ease-spring)" }}
         >
           <Sparkles size={22} strokeWidth={1.75} />

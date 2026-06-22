@@ -61,6 +61,7 @@ export interface HotelContent {
     lateCheckout: string;
     nowLabel: string;
     quickLabel: string;
+    groupLabel: string;
     quick: {
       wifi: { label: string; value: string; note: string; copyDone: string };
       breakfast: { label: string; note: string };
@@ -250,7 +251,8 @@ const it: HotelContent = {
     checkOut: { label: "Check-out", value: "Entro le ore 11:00" },
     lateCheckout: "Late check-out su disponibilità, con supplemento.",
     nowLabel: "In questo momento",
-    quickLabel: "Risposte rapide",
+    quickLabel: "Azioni rapide",
+    groupLabel: "Scopri il GHSM Group",
     quick: {
       wifi: {
         label: "Wi-Fi",
@@ -629,7 +631,8 @@ const en: HotelContent = {
     checkOut: { label: "Check-out", value: "By 11:00 AM" },
     lateCheckout: "Late check-out subject to availability, with a supplement.",
     nowLabel: "Right now",
-    quickLabel: "Quick answers",
+    quickLabel: "Quick actions",
+    groupLabel: "Discover the GHSM Group",
     quick: {
       wifi: {
         label: "Wi-Fi",

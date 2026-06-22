@@ -1,13 +1,15 @@
 "use client";
 
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Wifi,
   Coffee,
-  DoorOpen,
   Phone,
   Tv,
   Clock,
   LogIn,
+  DoorOpen,
   Sparkles,
   UtensilsCrossed,
   BellRing,
@@ -17,16 +19,19 @@ import {
 } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL, SERVICE_HOURS } from "@/lib/hotel";
-import {
-  SectionLabel,
-  QuickAnswer,
-  CopyField,
-  CallButton,
-  HoursTable,
-  StatusBadge,
-} from "@/components/ui";
+import { SectionLabel, CopyField, CallButton, HoursTable, StatusBadge, EASE_EXPO } from "@/components/ui";
 import type { TabKey } from "@/lib/nav";
 import type { ServiceHours } from "@/lib/hours";
+
+/* ── GHSM Group strip ── */
+const GROUP: { name: string; sub: string; img: string; tab: TabKey }[] = [
+  { name: "Grand Hotel San Marino", sub: "Hotel · ★★★★", img: "/images/home.webp", tab: "explore" },
+  { name: "Centro Mességué", sub: "Benessere", img: "/images/wellness.webp", tab: "wellness" },
+  { name: "Ristorante La Terrazza", sub: "Ristorante", img: "/images/venue-laterrazza.webp", tab: "dining" },
+  { name: "Caffè Titano", sub: "Caffè", img: "/images/venue-caffetitano.webp", tab: "dining" },
+  { name: "La Cremeria del Titano", sub: "Gelateria", img: "/images/venue-cremeria.webp", tab: "dining" },
+  { name: "Titano Suites", sub: "Suites", img: "/images/suite.webp", tab: "explore" },
+];
 
 function LiveRow({
   icon: Icon,
@@ -60,10 +65,60 @@ export function OggiSection({
   onNavigate: (tab: TabKey) => void;
 }) {
   const h = t.home;
+  const [active, setActive] = useState<string | null>(null);
+
+  const quick: { id: string; icon: LucideIcon; label: string; detail: React.ReactNode }[] = [
+    {
+      id: "wifi",
+      icon: Wifi,
+      label: h.quick.wifi.label,
+      detail: (
+        <>
+          <CopyField value={h.quick.wifi.value} copiedLabel={h.quick.wifi.copyDone} />
+          <p className="mt-2 text-[0.875rem] leading-relaxed text-[var(--color-text-secondary)]">{h.quick.wifi.note}</p>
+        </>
+      ),
+    },
+    {
+      id: "breakfast",
+      icon: Coffee,
+      label: h.quick.breakfast.label,
+      detail: <p className="text-[0.9rem] leading-relaxed text-[var(--color-text-secondary)]">{h.quick.breakfast.note}</p>,
+    },
+    {
+      id: "reception",
+      icon: Phone,
+      label: h.quick.reception.label,
+      detail: (
+        <>
+          <p className="mb-3 text-[0.9rem] leading-relaxed text-[var(--color-text-secondary)]">{h.quick.reception.note}</p>
+          <CallButton href={HOTEL.phoneHref} label={t.common.receptionCta} />
+        </>
+      ),
+    },
+    {
+      id: "tv",
+      icon: Tv,
+      label: h.quick.tv.label,
+      detail: (
+        <>
+          <p className="mb-3 text-[0.9rem] leading-relaxed text-[var(--color-text-secondary)]">{h.quick.tv.note}</p>
+          <button
+            onClick={() => onNavigate("hotel")}
+            className="inline-flex items-center gap-1 text-[0.9375rem] font-semibold text-[var(--color-accent)]"
+          >
+            {h.quick.tv.cta}
+            <ChevronRight size={16} strokeWidth={2.25} />
+          </button>
+        </>
+      ),
+    },
+  ];
+  const activeDetail = quick.find((q) => q.id === active)?.detail;
 
   return (
     <div className="flex flex-col gap-8">
-      {/* ── Hero ── brand moment */}
+      {/* ── Hero ── */}
       <section className="relative -mx-5 -mt-5 overflow-hidden md:-mx-6 md:-mt-6 lg:mx-0 lg:mt-0 lg:rounded-3xl">
         <picture>
           <source srcSet="/images/hero-sm.webp" media="(max-width: 640px)" />
@@ -78,96 +133,140 @@ export function OggiSection({
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, oklch(0.2 0.05 258 / 0.35) 0%, oklch(0.2 0.05 258 / 0.2) 38%, var(--hero-tint) 100%)",
+              "linear-gradient(180deg, oklch(0.2 0.05 258 / 0.35) 0%, oklch(0.2 0.05 258 / 0.18) 40%, var(--hero-tint) 100%)",
           }}
         />
-        <div className="relative flex min-h-[clamp(320px,56svh,460px)] flex-col justify-end gap-4 px-6 pb-7 pt-[max(2rem,env(safe-area-inset-top))] lg:px-9 lg:pb-9">
-          <div>
-            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-white/80">
-              {h.eyebrow}
-            </p>
-            <h1 className="mt-1.5 font-display text-[2.25rem] font-semibold leading-[1.05] text-white lg:text-[3rem]">
-              {h.titleMain}
-              <br />
-              {h.titleAccent}
-            </h1>
-          </div>
+        <div className="relative flex min-h-[clamp(300px,50svh,440px)] flex-col justify-end gap-3 px-6 pb-7 pt-[max(2rem,env(safe-area-inset-top))] lg:px-9 lg:pb-9">
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-white/80">{h.eyebrow}</p>
+          <h2 className="font-display text-[2.25rem] font-semibold leading-[1.05] text-white lg:text-[3rem]">
+            {h.titleMain}
+            <br />
+            {h.titleAccent}
+          </h2>
           <p className="max-w-md text-[0.95rem] leading-relaxed text-white/85">{h.welcomeBody}</p>
-          <div className="flex flex-wrap gap-2 pt-1">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-[0.8125rem] font-medium text-white backdrop-blur-sm">
-              <LogIn size={14} strokeWidth={2} />
-              {h.checkIn.label}: {h.checkIn.value}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-[0.8125rem] font-medium text-white backdrop-blur-sm">
-              <DoorOpen size={14} strokeWidth={2} />
-              {h.checkOut.label}: {h.checkOut.value}
-            </span>
-          </div>
         </div>
       </section>
 
-      {/* ── Quick answers ── the first-30-seconds needs */}
+      {/* ── GHSM Group strip ── */}
+      <section>
+        <SectionLabel>{h.groupLabel}</SectionLabel>
+        <div className="-mx-5 overflow-x-auto scroll-pl-5 md:-mx-6 md:scroll-pl-6 lg:mx-0 lg:scroll-pl-0">
+          <ul className="flex w-max gap-3 px-5 md:px-6 lg:px-0">
+            {GROUP.map((g) => (
+              <li key={g.name} className="w-40 shrink-0">
+                <button
+                  onClick={() => onNavigate(g.tab)}
+                  className="group block w-full text-left"
+                >
+                  <div className="overflow-hidden rounded-2xl bg-[var(--color-surface-muted)]">
+                    <img
+                      src={g.img}
+                      alt={g.name}
+                      loading="lazy"
+                      className="aspect-[4/5] w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
+                    />
+                  </div>
+                  <p className="mt-2 text-[0.9rem] font-semibold leading-snug text-[var(--color-text)]">{g.name}</p>
+                  <p className="text-[0.8rem] text-[var(--color-text-muted)]">{g.sub}</p>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* ── Il vostro soggiorno ── */}
+      <section>
+        <SectionLabel>{h.stayLabel}</SectionLabel>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-2xl bg-[var(--color-surface)] px-4 py-4">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
+              <LogIn size={17} strokeWidth={1.875} />
+            </span>
+            <p className="mt-2.5 text-[0.8125rem] font-medium uppercase tracking-wide text-[var(--color-text-muted)]">
+              {h.checkIn.label}
+            </p>
+            <p className="text-[0.95rem] font-semibold text-[var(--color-text)]">{h.checkIn.value}</p>
+          </div>
+          <div className="rounded-2xl bg-[var(--color-surface)] px-4 py-4">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
+              <DoorOpen size={17} strokeWidth={1.875} />
+            </span>
+            <p className="mt-2.5 text-[0.8125rem] font-medium uppercase tracking-wide text-[var(--color-text-muted)]">
+              {h.checkOut.label}
+            </p>
+            <p className="text-[0.95rem] font-semibold text-[var(--color-text)]">{h.checkOut.value}</p>
+          </div>
+        </div>
+        <p className="mt-2 px-1 text-[0.8125rem] text-[var(--color-text-muted)]">{h.lateCheckout}</p>
+      </section>
+
+      {/* ── Azioni rapide (circular + inline detail) ── */}
       <section>
         <SectionLabel>{h.quickLabel}</SectionLabel>
-        <div className="flex flex-col gap-2">
-          <QuickAnswer icon={Wifi} label={h.quick.wifi.label} preview={h.quick.wifi.value}>
-            <CopyField value={h.quick.wifi.value} copiedLabel={h.quick.wifi.copyDone} />
-            <p className="mt-2 text-[0.875rem] leading-relaxed text-[var(--color-text-secondary)]">
-              {h.quick.wifi.note}
-            </p>
-          </QuickAnswer>
-
-          <QuickAnswer icon={Coffee} label={h.quick.breakfast.label} preview="07:00 – 10:00">
-            <p className="text-[0.875rem] leading-relaxed text-[var(--color-text-secondary)]">
-              {h.quick.breakfast.note}
-            </p>
-          </QuickAnswer>
-
-          <QuickAnswer icon={DoorOpen} label={h.quick.checkout.label} preview={h.checkOut.value}>
-            <p className="text-[0.875rem] leading-relaxed text-[var(--color-text-secondary)]">
-              {h.quick.checkout.note}
-            </p>
-          </QuickAnswer>
-
-          <QuickAnswer icon={Phone} label={h.quick.reception.label} preview="24h · 9">
-            <p className="mb-3 text-[0.875rem] leading-relaxed text-[var(--color-text-secondary)]">
-              {h.quick.reception.note}
-            </p>
-            <CallButton href={HOTEL.phoneHref} label={t.common.receptionCta} />
-          </QuickAnswer>
-
-          <QuickAnswer icon={Tv} label={h.quick.tv.label} preview={h.quick.tv.note}>
-            <button
-              onClick={() => onNavigate("hotel")}
-              className="inline-flex items-center gap-1 text-[0.9375rem] font-semibold text-[var(--color-accent)]"
-            >
-              {h.quick.tv.cta}
-              <ChevronRight size={16} strokeWidth={2.25} />
-            </button>
-          </QuickAnswer>
+        <div className="grid grid-cols-4 gap-2">
+          {quick.map((q) => {
+            const on = active === q.id;
+            const Icon = q.icon;
+            return (
+              <button
+                key={q.id}
+                onClick={() => setActive(on ? null : q.id)}
+                aria-expanded={on}
+                className="flex flex-col items-center gap-1.5"
+              >
+                <span
+                  className={`flex items-center justify-center rounded-full transition-colors duration-200 ${
+                    on
+                      ? "bg-[var(--color-accent)] text-[var(--color-on-accent)]"
+                      : "bg-[var(--color-surface)] text-[var(--color-accent)]"
+                  }`}
+                  style={{ height: "3.5rem", width: "3.5rem" }}
+                >
+                  <Icon size={22} strokeWidth={1.875} />
+                </span>
+                <span className="text-center text-[0.75rem] font-medium leading-tight text-[var(--color-text-secondary)]">
+                  {q.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
+        <AnimatePresence initial={false}>
+          {activeDetail && (
+            <motion.div
+              key={active}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: EASE_EXPO }}
+              className="overflow-hidden"
+            >
+              <div className="mt-3 rounded-2xl bg-[var(--color-surface)] px-4 py-4 lg:px-5 lg:py-5">{activeDetail}</div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
-      {/* ── Concierge entry ── */}
+      {/* ── Concierge ── */}
       <section>
         <button
           onClick={onOpenChat}
           className="flex w-full items-center gap-4 rounded-2xl bg-[var(--color-accent)] px-5 py-4 text-left transition-[transform,opacity] duration-200 ease-out hover:opacity-95 active:scale-[0.99]"
         >
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 text-[var(--color-on-accent)]">
+          <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 text-[var(--color-on-accent)]">
             <Sparkles size={20} strokeWidth={1.75} />
+            <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[var(--color-accent)] bg-[var(--color-success)]" />
           </span>
           <span className="min-w-0 flex-1">
             <span className="block font-semibold text-[var(--color-on-accent)]">{h.askLabel}</span>
-            <span className="mt-0.5 block text-[0.875rem] leading-snug text-[var(--color-on-accent)]/80">
-              {h.askBody}
-            </span>
+            <span className="mt-0.5 block text-[0.875rem] leading-snug text-[var(--color-on-accent)]/80">{h.askBody}</span>
           </span>
           <ChevronRight size={20} strokeWidth={2} className="shrink-0 text-[var(--color-on-accent)]/70" />
         </button>
       </section>
 
-      {/* ── Live status ── */}
+      {/* ── In questo momento ── */}
       <section>
         <SectionLabel>{h.nowLabel}</SectionLabel>
         <div className="rounded-2xl bg-[var(--color-surface)] px-4 lg:px-5">
@@ -181,7 +280,7 @@ export function OggiSection({
         </div>
       </section>
 
-      {/* ── Full hours ── */}
+      {/* ── Orari ── */}
       <section>
         <div className="mb-3 flex items-center gap-2 px-1">
           <Clock size={15} strokeWidth={2} className="text-[var(--color-text-muted)]" />

@@ -174,8 +174,8 @@ export default function Home() {
         </main>
       </div>
 
-      {/* ── BOTTOM NAV (mobile/tablet) ── */}
-      <nav className="sticky bottom-0 z-20 grid grid-cols-5 border-t border-[var(--color-border)] bg-[var(--color-bg)]/95 px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">
+      {/* ── FLOATING BOTTOM NAV (mobile/tablet) ── */}
+      <nav className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] left-1/2 z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/85 p-1.5 shadow-[0_10px_30px_oklch(0.2_0.04_258/0.22)] backdrop-blur-xl lg:hidden">
         {TABS.map(({ key, icon: Icon }) => {
           const active = activeTab === key;
           return (
@@ -183,11 +183,13 @@ export default function Home() {
               key={key}
               onClick={() => setActiveTab(key)}
               aria-current={active ? "page" : undefined}
-              className={`flex flex-col items-center gap-1 rounded-xl py-1.5 text-[0.6875rem] font-medium transition-colors duration-200 ${
-                active ? "text-[var(--color-accent)]" : "text-[var(--color-text-muted)]"
+              className={`flex flex-col items-center gap-0.5 rounded-full px-3 py-1.5 text-[0.625rem] font-medium transition-colors duration-200 ${
+                active
+                  ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
+                  : "text-[var(--color-text-muted)]"
               }`}
             >
-              <Icon size={21} strokeWidth={active ? 2.25 : 1.75} />
+              <Icon size={20} strokeWidth={active ? 2.25 : 1.75} />
               {navLabels[key]}
             </button>
           );
