@@ -31,7 +31,7 @@ export function ExploreSection({ t }: { t: HotelContent }) {
   const [sheet, setSheet] = useState(false);
 
   return (
-    <div className="map-fill relative w-full overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden">
       {/* Full-screen interactive map + place banners */}
       <MapExplorer t={t} />
 

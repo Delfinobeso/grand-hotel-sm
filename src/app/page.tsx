@@ -95,8 +95,8 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-dvh flex-col bg-[var(--color-bg)]">
-      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col lg:flex-row lg:gap-6 lg:px-6 lg:py-6 xl:max-w-6xl xl:gap-8 xl:px-8 xl:py-8">
+    <div className="fixed inset-0 flex flex-col overflow-hidden bg-[var(--color-bg)]">
+      <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden lg:flex-row lg:gap-6 lg:px-6 lg:py-6 xl:max-w-6xl xl:gap-8 xl:px-8 xl:py-8">
         {/* ── HEADER / SIDEBAR ── */}
         <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-[var(--color-bg)]/85 px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur-md lg:top-6 lg:w-64 lg:shrink-0 lg:flex-col lg:items-stretch lg:gap-6 lg:self-start lg:rounded-3xl lg:border lg:bg-[var(--color-surface-2)] lg:p-6 lg:backdrop-blur-none xl:w-72">
           {/* Logo */}
@@ -168,9 +168,9 @@ export default function Home() {
 
         {/* ── CONTENT ── */}
         {activeTab === "explore" ? (
-          <main className="flex-1 lg:min-h-[calc(100dvh-3rem)]">{sections.explore}</main>
+          <main className="min-h-0 flex-1 overflow-hidden">{sections.explore}</main>
         ) : (
-          <main className="flex-1 px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:pt-2 lg:pb-0">
+          <main className="min-h-0 flex-1 overflow-y-auto px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:pt-2 lg:pb-0">
             <motion.div
               key={activeTab}
               initial={{ opacity: 0, y: 10 }}

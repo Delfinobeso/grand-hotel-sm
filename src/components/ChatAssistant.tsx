@@ -210,7 +210,7 @@ export default function ChatAssistant({
           </div>
 
           {/* Messages */}
-          <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4" style={{ WebkitOverflowScrolling: "touch" }}>
+          <div className="flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4" style={{ WebkitOverflowScrolling: "touch" }}>
             {messages.length === 0 && (
               <div className="space-y-4">
                 <div className="max-w-[85%] rounded-2xl rounded-tl-md bg-[var(--color-surface)] px-3.5 py-2.5 text-[0.95rem] leading-relaxed text-[var(--color-text)]">
