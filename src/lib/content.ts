@@ -23,7 +23,8 @@ export interface HotelContent {
   nav: {
     oggi: string;
     hotel: string;
-    experiences: string;
+    dining: string;
+    wellness: string;
     explore: string;
   };
   services: {
@@ -211,7 +212,8 @@ const it: HotelContent = {
   nav: {
     oggi: "Oggi",
     hotel: "Hotel",
-    experiences: "Esperienze",
+    dining: "Ristorante",
+    wellness: "Benessere",
     explore: "San Marino",
   },
   common: {
@@ -590,7 +592,8 @@ const en: HotelContent = {
   nav: {
     oggi: "Today",
     hotel: "Hotel",
-    experiences: "Experiences",
+    dining: "Dining",
+    wellness: "Wellness",
     explore: "San Marino",
   },
   common: {

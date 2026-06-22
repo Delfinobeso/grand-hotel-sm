@@ -7,7 +7,8 @@ import {
   Moon,
   Home as HomeIcon,
   BedDouble,
-  Sparkles,
+  UtensilsCrossed,
+  Flower2,
   Map as MapIcon,
   type LucideIcon,
 } from "lucide-react";
@@ -16,14 +17,16 @@ import { HOTEL } from "@/lib/hotel";
 import type { TabKey } from "@/lib/nav";
 import { OggiSection } from "@/components/sections/OggiSection";
 import { HotelSection } from "@/components/sections/HotelSection";
-import { EsperienzeSection } from "@/components/sections/EsperienzeSection";
+import { DiningSection } from "@/components/sections/DiningSection";
+import { WellnessSection } from "@/components/sections/WellnessSection";
 import { ExploreSection } from "@/components/sections/ExploreSection";
 import ChatAssistant from "@/components/ChatAssistant";
 
 const TABS: { key: TabKey; icon: LucideIcon }[] = [
   { key: "oggi", icon: HomeIcon },
   { key: "hotel", icon: BedDouble },
-  { key: "experiences", icon: Sparkles },
+  { key: "dining", icon: UtensilsCrossed },
+  { key: "wellness", icon: Flower2 },
   { key: "explore", icon: MapIcon },
 ];
 
@@ -77,14 +80,16 @@ export default function Home() {
   const navLabels: Record<TabKey, string> = {
     oggi: t.nav.oggi,
     hotel: t.nav.hotel,
-    experiences: t.nav.experiences,
+    dining: t.nav.dining,
+    wellness: t.nav.wellness,
     explore: t.nav.explore,
   };
 
   const sections: Record<TabKey, React.ReactNode> = {
     oggi: <OggiSection t={t} onOpenChat={() => setChatOpen(true)} onNavigate={setActiveTab} />,
     hotel: <HotelSection t={t} />,
-    experiences: <EsperienzeSection t={t} />,
+    dining: <DiningSection t={t} />,
+    wellness: <WellnessSection t={t} />,
     explore: <ExploreSection t={t} />,
   };
 
@@ -169,8 +174,13 @@ export default function Home() {
         </main>
       </div>
 
-      {/* ── FLOATING BOTTOM NAV (mobile/tablet) ── */}
-      <nav className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] left-1/2 z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/85 p-1.5 shadow-[0_10px_30px_oklch(0.2_0.04_258/0.22)] backdrop-blur-xl lg:hidden">
+      {/* ── FLOATING DOCK (mobile/tablet) ──
+          Inset from the edges; corner radius is concentric with the iPhone screen
+          radius (--screen-radius − inset) so the dock nests inside the display corners. */}
+      <nav
+        className="fixed inset-x-[var(--dock-inset)] bottom-[max(var(--dock-inset),env(safe-area-inset-bottom))] z-30 mx-auto flex max-w-md items-stretch gap-0.5 border border-[var(--color-border)] bg-[var(--color-surface)]/80 p-1.5 shadow-[0_12px_36px_oklch(0.2_0.04_258/0.24)] backdrop-blur-xl lg:hidden"
+        style={{ borderRadius: "calc(var(--screen-radius) - var(--dock-inset))" }}
+      >
         {TABS.map(({ key, icon: Icon }) => {
           const active = activeTab === key;
           return (
@@ -178,14 +188,14 @@ export default function Home() {
               key={key}
               onClick={() => setActiveTab(key)}
               aria-current={active ? "page" : undefined}
-              className={`flex flex-col items-center gap-0.5 rounded-full px-3 py-1.5 text-[0.625rem] font-medium transition-colors duration-200 ${
+              className={`flex flex-1 flex-col items-center gap-1 rounded-[1.4rem] py-2 text-[0.625rem] font-medium leading-none transition-colors duration-200 ${
                 active
                   ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
-                  : "text-[var(--color-text-muted)]"
+                  : "text-[var(--color-text-muted)] active:bg-[var(--color-surface-muted)]"
               }`}
             >
               <Icon size={20} strokeWidth={active ? 2.25 : 1.75} />
-              {navLabels[key]}
+              <span className="max-w-full truncate px-0.5">{navLabels[key]}</span>
             </button>
           );
         })}

@@ -56,6 +56,11 @@
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
     "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-serif: ui-serif, "New York", Georgia, "Times New Roman", serif;
+
+  /* iPhone 17 Pro display corner radius; the bottom dock uses a concentric radius
+     (--screen-radius − --dock-inset) so its corners nest inside the screen corners. */
+  --screen-radius: 55px;
+  --dock-inset: 0.625rem;
 }
 
 * {

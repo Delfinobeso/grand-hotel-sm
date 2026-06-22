@@ -26,10 +26,10 @@ import type { ServiceHours } from "@/lib/hours";
 /* ── GHSM Group strip ── */
 const GROUP: { name: string; sub: string; img: string; tab: TabKey }[] = [
   { name: "Grand Hotel San Marino", sub: "Hotel · ★★★★", img: "/images/home.webp", tab: "explore" },
-  { name: "Centro Mességué", sub: "Benessere", img: "/images/wellness.webp", tab: "experiences" },
-  { name: "Ristorante La Terrazza", sub: "Ristorante", img: "/images/venue-laterrazza.webp", tab: "experiences" },
-  { name: "Caffè Titano", sub: "Caffè", img: "/images/venue-caffetitano.webp", tab: "experiences" },
-  { name: "La Cremeria del Titano", sub: "Gelateria", img: "/images/venue-cremeria.webp", tab: "experiences" },
+  { name: "Centro Mességué", sub: "Benessere", img: "/images/wellness.webp", tab: "wellness" },
+  { name: "Ristorante La Terrazza", sub: "Ristorante", img: "/images/venue-laterrazza.webp", tab: "dining" },
+  { name: "Caffè Titano", sub: "Caffè", img: "/images/venue-caffetitano.webp", tab: "dining" },
+  { name: "La Cremeria del Titano", sub: "Gelateria", img: "/images/venue-cremeria.webp", tab: "dining" },
   { name: "Titano Suites", sub: "Suites", img: "/images/suite.webp", tab: "explore" },
 ];
 
