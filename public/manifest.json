@@ -1,14 +1,15 @@
 {
   "name": "Grand Hotel San Marino",
   "short_name": "Grand Hotel SM",
-  "description": "La tua camera al Grand Hotel San Marino — servizi, concierge, ristorante",
+  "description": "La tua guida al soggiorno al Grand Hotel San Marino: servizi, orari, concierge, ristorante e cosa vedere.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#f6f4ef",
-  "theme_color": "#f6f4ef",
+  "background_color": "#f4f1ea",
+  "theme_color": "#f4f1ea",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

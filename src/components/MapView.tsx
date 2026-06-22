@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap, useMapEvents } from "react-leaflet";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL, GHSM_VENUES, POINTS_OF_INTEREST } from "@/lib/hotel";
 import { NavigateButton } from "@/components/ui";
@@ -21,12 +21,20 @@ function createIcon(variant: Variant): L.DivIcon {
       iconAnchor: [12, 12],
     });
   }
-  const size = variant === "hotel" ? 18 : 14;
+  if (variant === "hotel") {
+    return L.divIcon({
+      className: "",
+      html: `<div class="ghsm-hotel-pin"><span class="ghsm-hotel-pulse"></span><span class="ghsm-hotel-dot"></span></div>`,
+      iconSize: [26, 26],
+      iconAnchor: [13, 13],
+    });
+  }
+  const size = 14;
   // Distinct colors per category
   const colors: Record<Variant, { bg: string; border: string; radius: string }> = {
-    hotel:   { bg: "#3b82f6", border: "#3b82f6", radius: "50%" },       // blue
-    venue:   { bg: "#f59e0b", border: "#f59e0b", radius: "50%" },       // amber
-    poi:     { bg: "#8b5cf6", border: "#8b5cf6", radius: "4px" },       // purple
+    hotel:   { bg: "#0a2444", border: "#ffffff", radius: "50%" },       // brand navy
+    venue:   { bg: "#b88746", border: "#ffffff", radius: "50%" },       // warm gold
+    poi:     { bg: "#6b7385", border: "#ffffff", radius: "4px" },       // muted slate
     user:    { bg: "#007AFF", border: "#007AFF", radius: "50%" },        // (not used here)
   };
   const c = colors[variant];
@@ -113,19 +121,70 @@ export default function MapView({ t }: { t: HotelContent }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <UserMarker />
-      {points.map((p) => (
-        <Marker key={p.id} position={[p.lat, p.lon]} icon={createIcon(p.variant)}>
-          <Popup>
-            <div className="flex flex-col gap-2 py-1">
-              <div>
-                <p className="font-semibold text-[var(--color-text)]">{p.name}</p>
-                <p className="mt-0.5 text-xs text-[var(--color-text-secondary)]">{p.body}</p>
-              </div>
-              <NavigateButton lat={p.lat} lon={p.lon} name={p.name} label={t.common.openInMapsLabel} variant="solid" />
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+      <ZoomLabels points={points} youAreHere={t.common.youAreHere} openInMaps={t.common.openInMapsLabel} />
     </MapContainer>
+  );
+}
+
+interface MapPoint {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  body: string;
+  variant: Variant;
+}
+
+/** Renders markers; place-name labels appear once zoomed in, the hotel keeps a "you are here" badge. */
+function ZoomLabels({
+  points,
+  youAreHere,
+  openInMaps,
+}: {
+  points: MapPoint[];
+  youAreHere: string;
+  openInMaps: string;
+}) {
+  const [zoom, setZoom] = useState(15);
+  const map = useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
+  useEffect(() => {
+    // sync once after the map fits its bounds, so the threshold reflects the real zoom
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setZoom(map.getZoom());
+  }, [map]);
+
+  const showLabels = zoom >= 16;
+
+  return (
+    <>
+      {points.map((p) => {
+        const isHotel = p.variant === "hotel";
+        const labelOn = isHotel || showLabels;
+        return (
+          <Marker key={p.id} position={[p.lat, p.lon]} icon={createIcon(p.variant)} zIndexOffset={isHotel ? 1000 : 0}>
+            {labelOn && (
+              <Tooltip
+                key={isHotel ? "h-perm" : showLabels ? "perm" : "hover"}
+                permanent
+                direction="top"
+                offset={[0, isHotel ? -14 : -8]}
+                className={isHotel ? "ghsm-label ghsm-label-hotel" : "ghsm-label"}
+              >
+                {isHotel ? `${youAreHere} · ${p.name}` : p.name}
+              </Tooltip>
+            )}
+            <Popup>
+              <div className="flex flex-col gap-2 py-1">
+                <div>
+                  <p className="font-semibold text-[var(--color-text)]">{p.name}</p>
+                  {p.body && <p className="mt-0.5 text-xs text-[var(--color-text-secondary)]">{p.body}</p>}
+                </div>
+                <NavigateButton lat={p.lat} lon={p.lon} name={p.name} label={openInMaps} variant="solid" />
+              </div>
+            </Popup>
+          </Marker>
+        );
+      })}
+    </>
   );
 }

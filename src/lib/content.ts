@@ -21,10 +21,11 @@ export interface MassageItem {
 
 export interface HotelContent {
   nav: {
-    home: string;
-    services: string;
-    map: string;
-    info: string;
+    oggi: string;
+    hotel: string;
+    dining: string;
+    wellness: string;
+    explore: string;
   };
   services: {
     label: string;
@@ -41,6 +42,7 @@ export interface HotelContent {
     openInMapsLabel: string;
     addToCalendarLabel: string;
     callValetLabel: string;
+    youAreHere: string;
     minWalk: string;
     floorGround: string;
     floorThird: string;
@@ -57,6 +59,18 @@ export interface HotelContent {
     checkIn: HoursRow;
     checkOut: HoursRow;
     lateCheckout: string;
+    nowLabel: string;
+    quickLabel: string;
+    quick: {
+      wifi: { label: string; value: string; note: string; copyDone: string };
+      breakfast: { label: string; note: string };
+      checkout: { label: string; note: string };
+      reception: { label: string; note: string };
+      tv: { label: string; note: string; cta: string };
+    };
+    askLabel: string;
+    askBody: string;
+    askCta: string;
     highlightsLabel: string;
     highlightsSeeAll: string;
     chatPlaceholder: string;
@@ -195,10 +209,11 @@ const TV_CHANNELS = [
 
 const it: HotelContent = {
   nav: {
-    home: "Home",
-    services: "Servizi",
-    map: "Dove",
-    info: "Info",
+    oggi: "Oggi",
+    hotel: "Hotel",
+    dining: "Ristorante",
+    wellness: "Benessere",
+    explore: "San Marino",
   },
   common: {
     receptionCta: "Chiama la Reception",
@@ -216,6 +231,7 @@ const it: HotelContent = {
     openInMapsLabel: "Apri in Mappe",
     addToCalendarLabel: "Aggiungi al calendario",
     callValetLabel: "Chiama il Valet",
+    youAreHere: "Ti trovi qui",
     minWalk: "min a piedi",
     floorGround: "Piano Terra",
     floorThird: "3° piano",
@@ -233,6 +249,36 @@ const it: HotelContent = {
     checkIn: { label: "Check-in", value: "Dalle ore 14:00" },
     checkOut: { label: "Check-out", value: "Entro le ore 11:00" },
     lateCheckout: "Late check-out su disponibilità, con supplemento.",
+    nowLabel: "In questo momento",
+    quickLabel: "Risposte rapide",
+    quick: {
+      wifi: {
+        label: "Wi-Fi",
+        value: "GRANDHOTELRSM",
+        note: "Gratuito in tutto l'hotel. Seleziona la rete e attendi la pagina di accesso.",
+        copyDone: "Copiato",
+      },
+      breakfast: {
+        label: "Colazione",
+        note: "Ristorante L'Arengo · 07:00 – 10:00. In camera con supplemento di €6,00.",
+      },
+      checkout: {
+        label: "Check-out",
+        note: "Entro le ore 11:00. Late check-out su richiesta in Reception.",
+      },
+      reception: {
+        label: "Reception",
+        note: "Aperta 24 ore su 24. Dal telefono in camera, tasto 9.",
+      },
+      tv: {
+        label: "Canali TV",
+        note: "37 canali disponibili in camera, dal n. 1 all'831.",
+        cta: "Vedi tutti i canali",
+      },
+    },
+    askLabel: "Concierge digitale",
+    askBody: "Una domanda sul soggiorno o su San Marino? Chiedete pure, vi rispondo subito.",
+    askCta: "Apri il Concierge",
     highlightsLabel: "Azioni rapide",
     highlightsSeeAll: "Vedi tutto",
     chatPlaceholder: "Chiedi al nostro Concierge digitale…",
@@ -542,10 +588,11 @@ const it: HotelContent = {
 
 const en: HotelContent = {
   nav: {
-    home: "Home",
-    services: "Services",
-    map: "Explore",
-    info: "Info",
+    oggi: "Today",
+    hotel: "Hotel",
+    dining: "Dining",
+    wellness: "Wellness",
+    explore: "San Marino",
   },
   common: {
     receptionCta: "Call Reception",
@@ -563,6 +610,7 @@ const en: HotelContent = {
     openInMapsLabel: "Open in Maps",
     addToCalendarLabel: "Add to calendar",
     callValetLabel: "Call Valet",
+    youAreHere: "You are here",
     minWalk: "min walk",
     floorGround: "Ground floor",
     floorThird: "3rd floor",
@@ -580,6 +628,36 @@ const en: HotelContent = {
     checkIn: { label: "Check-in", value: "From 2:00 PM" },
     checkOut: { label: "Check-out", value: "By 11:00 AM" },
     lateCheckout: "Late check-out subject to availability, with a supplement.",
+    nowLabel: "Right now",
+    quickLabel: "Quick answers",
+    quick: {
+      wifi: {
+        label: "Wi-Fi",
+        value: "GRANDHOTELRSM",
+        note: "Free throughout the hotel. Select the network and wait for the sign-in page.",
+        copyDone: "Copied",
+      },
+      breakfast: {
+        label: "Breakfast",
+        note: "L'Arengo Restaurant · 7:00 – 10:00 AM. In-room with a €6.00 supplement.",
+      },
+      checkout: {
+        label: "Check-out",
+        note: "By 11:00 AM. Late check-out on request at Reception.",
+      },
+      reception: {
+        label: "Reception",
+        note: "Open 24 hours. Dial 9 from your room phone.",
+      },
+      tv: {
+        label: "TV Channels",
+        note: "37 channels available in your room, from no. 1 to 831.",
+        cta: "See all channels",
+      },
+    },
+    askLabel: "Digital Concierge",
+    askBody: "A question about your stay or about San Marino? Just ask, I'll reply right away.",
+    askCta: "Open the Concierge",
     highlightsLabel: "Quick actions",
     highlightsSeeAll: "See all",
     chatPlaceholder: "Ask our digital Concierge…",
