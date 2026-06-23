@@ -60,15 +60,27 @@ function actionIcon(url: string): LucideIcon {
 
 /** Convert basic markdown formatting to HTML for chat rendering.
  *  Handles **bold**, *italic*, and ~~strikethrough~~.
- *  Appends a pulsing cursor when streaming is true and there's content. */
+ *  During streaming, strips ALL markdown syntax so the user only sees clean text.
+ *  When complete, applies formatting and appends a pulsing cursor if streaming. */
 function renderMarkdown(text: string, streaming?: boolean): string {
-  let html = text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-  html = html.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(/\*([\s\S]+?)\*/g, "<em>$1</em>");
-  html = html.replace(/~~([\s\S]+?)~~/g, "<del>$1</del>");
+  let html = text;
+  if (streaming) {
+    // Strip markdown syntax that would look broken mid-typewriter
+    html = html.replace(/\*\*(.+?)\*\*?/g, "$1");  // bold
+    html = html.replace(/(?<!\*)\*(?!\*)(.+?)\*?/g, "$1");  // italic
+    html = html.replace(/\[([^\]]*)\]\([^)]*\)?/g, "$1");  // links → label only
+    html = html.replace(/~~(.+?)~~?/g, "$1");  // strikethrough
+    // Escape HTML
+    html = html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  } else {
+    html = html
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    html = html.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
+    html = html.replace(/\*([\s\S]+?)\*/g, "<em>$1</em>");
+    html = html.replace(/~~([\s\S]+?)~~/g, "<del>$1</del>");
+  }
   if (streaming && text.length > 0) {
     html += ' <span class="streaming-cursor">▌</span>';
   }
