@@ -166,6 +166,26 @@ body {
   }
 }
 
+/* Streaming text cursor — subtle pulse while the AI is typing */
+.streaming-cursor {
+  display: inline;
+  color: var(--color-accent);
+  animation: cursor-pulse 0.9s var(--ease-out) infinite;
+}
+@keyframes cursor-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+
+/* Smooth reveal for streaming text */
+.chat-bubble {
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+}
+.chat-bubble-entering {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
 /* ── Leaflet theming ── */
 .leaflet-container {
   background: var(--color-surface-muted);

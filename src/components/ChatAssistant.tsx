@@ -60,8 +60,8 @@ function actionIcon(url: string): LucideIcon {
 
 /** Convert basic markdown formatting to HTML for chat rendering.
  *  Handles **bold**, *italic*, and ~~strikethrough~~.
- *  Performed AFTER parseActions strips links, so only text formatting remains. */
-function renderMarkdown(text: string): string {
+ *  Appends a pulsing cursor when streaming is true and there's content. */
+function renderMarkdown(text: string, streaming?: boolean): string {
   let html = text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -69,6 +69,9 @@ function renderMarkdown(text: string): string {
   html = html.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
   html = html.replace(/\*([\s\S]+?)\*/g, "<em>$1</em>");
   html = html.replace(/~~([\s\S]+?)~~/g, "<del>$1</del>");
+  if (streaming && text.length > 0) {
+    html += ' <span class="streaming-cursor">▌</span>';
+  }
   return html;
 }
 
@@ -344,19 +347,20 @@ export default function ChatAssistant({
               if (m.role === "user") {
                 return (
                   <div key={i} className="flex justify-end">
-                    <div className="max-w-[85%] whitespace-pre-line rounded-2xl rounded-tr-md bg-[var(--color-accent)] px-3.5 py-2.5 text-[0.95rem] leading-relaxed text-[var(--color-on-accent)]">
+                    <div className="chat-bubble max-w-[85%] whitespace-pre-line rounded-2xl rounded-tr-md bg-[var(--color-accent)] px-3.5 py-2.5 text-[0.95rem] leading-relaxed text-[var(--color-on-accent)]">
                       {m.text}
                     </div>
                   </div>
                 );
               }
               const { clean, actions } = parseActions(m.text);
+              const isStreaming = loading && i === messages.length - 1;
               return (
                 <div key={i} className="flex justify-start">
-                  <div className="max-w-[88%] rounded-2xl rounded-tl-md bg-[var(--color-surface)] px-3.5 py-2.5">
+                  <div className={`chat-bubble max-w-[88%] rounded-2xl rounded-tl-md bg-[var(--color-surface)] px-3.5 py-2.5 shadow-sm transition-all duration-300 ease-out ${isStreaming && clean.length === 0 ? "chat-bubble-entering" : ""}`}>
                   <div
                     className="whitespace-pre-line text-[0.95rem] leading-relaxed text-[var(--color-text)] [&_strong]:font-semibold [&_em]:italic"
-                    dangerouslySetInnerHTML={{ __html: renderMarkdown(clean) }}
+                    dangerouslySetInnerHTML={{ __html: renderMarkdown(clean, isStreaming) }}
                   />
                     <ChatActions actions={actions} />
                   </div>
