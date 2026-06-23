@@ -174,6 +174,65 @@ Tutte con vista panoramica:
 - Linea preventivi: +39 0549 992274
 - Sito web: grandhotel.sm
 
+## MENÙ RISTORANTI E BAR (fonte: siti ufficiali GHSM Group — aggiornato giugno 2026)
+
+### RISTORANTE LA TERRAZZA (cucina haute-cuisine, panoramico, Hotel Titano)
+Menu alla carta dello Chef Saverio Guida. Coperto €3,50 (include entrée e pane fatto in casa).
+
+**Antipasti:**
+- Uovo C.B.T., spuma di fossa e spinaci — €15
+- Tartare di manzo, barbabietola e lamponi — €16
+- Mortadella, peperoni rossi e robiola — €16
+- Radicchio brasato, cipollotto, arancia e noci — €15
+
+**Primi:**
+- Tagliatella al ragù della tradizione romagnola — €15
+- Gnocchi di zucca, caramello di zucca, porcini e maggiorana — €17
+- Cappellacci ricotta, mascarpone, spinaci, salsa al pomodoro e olio al basilico — €18
+- Bottoni di agnello, brodo di verza e parmigiano — €18
+- Pasta secca con bietola, baccalà e acciuga — €18
+
+**Secondi:**
+- Cavolfiore, spuma di patate e glassa vegetale (vegetariano) — €15
+- Pollo con cime di rapa e lime — €19
+- Pescato del giorno, zucchine, pompelmo e ponzu — €20
+- Manzo o agnello con radicchio, vino rosso e topinambur — €22
+
+**Contorni:** Patate arrosto alle erbe aromatiche €6, Insalata mista di stagione €7, Erbetta di campo ripassate €7.
+
+**Menu degustazione:**
+- Percorso del Territorio (tradizionale locale): 4 portate — €35 a persona
+- Percorso Degustazione (chef): 5 portate — €45 a persona
+- Menù Bambino: tagliatella al ragù + cotoletta + gelato artigianale — €15
+
+**Dolci:**
+- Pan dolce alle pesche con crema pasticciera vaniglia Madagascar — €8
+- Mezza sfera popcorn, caramello, lampone e mandorla — €8
+- Tarte tatin alle mele e spuma alla cannella — €8
+- Gelato artigianale della Cremeria del Titano
+
+Prenotazione online disponibile. Per prenotare fornisci SEMPRE [Prenota La Terrazza](https://widget.thefork.com/it/bdef5000-1a1c-435f-9501-170ed277ac99).
+
+### RISTORANTE L'ARENGO (in hotel, piano terra)
+Cucina italiana tradizionale. Pasta fatta in casa dallo Chef Pastaio: lasagne, ravioli, tortellacci. Menu alla carta, menu tradizionale, menu bambini, menu dietetico Mességué (ipocalorico e per intolleranze). Fino a 120 coperti. Aperto anche a clienti esterni. Pane fatto in casa. Prenotazione gradita, non ha prenotazione online: indirizza al telefono della Reception.
+
+Orari: Colazione 07:00-10:00, Pranzo 12:00-14:30, Cena 19:00-21:30.
+
+### CAFFÈ TITANO (Piazzetta del Titano 4, centro storico)
+Caffetteria contemporanea con dehors sulla piazzetta medievale. WiFi gratuito.
+
+- **Colazione:** cappuccini, caffè speciali, brioches artigianali (produzione propria), muffin, biscotti.
+- **Pranzo:** Lunch Break Menu (cambia ogni giorno): primo caldo o zuppa, secondo o insalatona. In alternativa: piadine, panini farciti, focacce, pizzette. Vini locali, birre.
+- **Merenda:** oltre 30 gusti di cioccolata, 40 tipi di tè, torte, pasticceria artigianale, crêpes, bomboloni caldi.
+- **Aperitivo / Happy Hour.**
+- Consegna a domicilio disponibile. Tel +39 0549 992473.
+
+### LA CREMERIA DEL TITANO (accanto al Caffè Titano, centro storico)
+Gelateria artigianale. Gusti autentici con ingredienti semplici e genuini. Aperta nei mesi caldi.
+
+### LA LOGGIA (piano terra Grand Hotel)
+Piccola bottega con salumi, formaggi, vini e vermouth locali di San Marino e Romagna.
+
 ## LINK E AZIONI (usa SOLO questi, in formato Markdown [Testo](URL))
 
 Prenotazioni ristorante:
