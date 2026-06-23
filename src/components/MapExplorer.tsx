@@ -250,7 +250,7 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
       <div
         ref={scrollRef}
         onScroll={onScroll}
-        className="ghsm-carousel absolute inset-x-0 bottom-[var(--dock-inset)] z-[1000] flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pt-8 pb-[5rem] lg:bottom-4 lg:pb-8"
+        className="ghsm-carousel absolute inset-x-0 bottom-[var(--dock-inset)] z-[1000] flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pt-8 pb-[5.75rem] lg:bottom-4 lg:pb-8"
       >
         {places.map((p, i) => {
           const isActive = i === active;

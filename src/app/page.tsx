@@ -245,7 +245,7 @@ export default function Home() {
           keyboard opens, the dock slides out of the way. */}
       <nav
         aria-label="Primary"
-        className={`fixed left-[var(--dock-inset)] right-[var(--dock-inset)] bottom-[var(--dock-inset)] z-30 mx-auto flex max-w-sm items-stretch gap-1 bg-[var(--color-surface)]/80 p-1.5 shadow-[0_10px_34px_oklch(0.2_0.04_258/0.30)] ring-1 ring-[var(--color-border)] backdrop-blur-xl transition-[transform,opacity] duration-300 lg:hidden ${
+        className={`fixed left-[var(--dock-inset)] right-[var(--dock-inset)] bottom-[var(--dock-inset)] z-30 mx-auto flex max-w-sm items-stretch gap-1 bg-[var(--color-surface)]/80 p-2 shadow-[0_10px_34px_oklch(0.2_0.04_258/0.30)] ring-1 ring-[var(--color-border)] backdrop-blur-xl transition-[transform,opacity] duration-300 lg:hidden ${
           keyboardOpen ? "pointer-events-none translate-y-[160%] opacity-0" : "translate-y-0 opacity-100"
         }`}
         style={{ borderRadius: "calc(var(--screen-radius) - var(--dock-inset))" }}
@@ -258,7 +258,7 @@ export default function Home() {
               onClick={() => setActiveTab(key)}
               aria-current={active ? "page" : undefined}
               aria-label={navLabels[key]}
-              className={`flex items-center justify-center gap-2 rounded-full py-2.5 leading-none transition-colors duration-300 ${
+              className={`flex items-center justify-center gap-2 rounded-full py-3.5 leading-none transition-colors duration-300 ${
                 active
                   ? "flex-none bg-[var(--color-accent-soft)] px-4 text-[0.8125rem] font-semibold text-[var(--color-accent)]"
                   : "flex-1 px-2 text-[var(--color-text-muted)] active:bg-[var(--color-surface-muted)]"
