@@ -229,8 +229,15 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
         })}
       </MapContainer>
 
-      {/* Bottom scrim — fades the map all the way down behind chips + dock (reaches the very bottom) */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[800] h-80 bg-gradient-to-t from-[var(--color-bg)] from-35% via-[var(--color-bg)]/50 via-65% to-transparent" />
+      {/* Bottom scrim — solid behind dock+cards, fades above them. Single stop avoids
+          the visible "step" that multi-stop utilities produce. */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[800]"
+        style={{
+          height: "26rem",
+          background: "linear-gradient(to top, var(--color-bg) 55%, transparent)",
+        }}
+      />
 
       {/* Bottom banners */}
       <div
