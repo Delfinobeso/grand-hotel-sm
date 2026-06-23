@@ -176,6 +176,7 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
         zoom={16}
         scrollWheelZoom={false}
         zoomControl={false}
+        attributionControl={false}
         className="absolute inset-0 h-full w-full"
         zoomSnap={0.25}
       >
@@ -249,7 +250,6 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
       <div
         ref={scrollRef}
         onScroll={onScroll}
-        style={{ background: "#ff00ff" }}
         className="ghsm-carousel absolute inset-x-0 bottom-[var(--dock-inset)] z-[1000] flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pt-8 pb-[5rem] lg:bottom-4 lg:pb-8"
       >
         {places.map((p, i) => {
