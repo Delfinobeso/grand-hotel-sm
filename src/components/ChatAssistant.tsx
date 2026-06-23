@@ -145,7 +145,16 @@ export default function ChatAssistant({
   const [loading, setLoading] = useState(false);
   const [mobile, setMobile] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const pendingRef = useRef("");
+  const releaseTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const vv = useVisualViewport();
+
+  // Clean up release timer on unmount
+  useEffect(() => {
+    return () => {
+      if (releaseTimerRef.current) clearInterval(releaseTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 1023px)");
@@ -158,6 +167,48 @@ export default function ChatAssistant({
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
+
+  // ── Typewriter: release buffered characters at a steady, relaxed pace ──
+  const RELEASE_MS = 28; // ~35 chars/sec — lazy, elegant
+
+  const startRelease = useCallback(() => {
+    if (releaseTimerRef.current) return;
+    releaseTimerRef.current = setInterval(() => {
+      setMessages((prev) => {
+        const copy = [...prev];
+        const last = copy[copy.length - 1];
+        if (!last || last.role !== "assistant") return prev;
+        if (pendingRef.current.length === 0) {
+          // Buffer empty but stream might still be running — keep timer alive
+          return prev;
+        }
+        // Release one character at a time
+        const ch = pendingRef.current[0];
+        pendingRef.current = pendingRef.current.slice(1);
+        copy[copy.length - 1] = { ...last, text: last.text + ch };
+        return copy;
+      });
+    }, RELEASE_MS);
+  }, []);
+
+  const stopRelease = useCallback(() => {
+    if (releaseTimerRef.current) {
+      clearInterval(releaseTimerRef.current);
+      releaseTimerRef.current = null;
+    }
+  }, []);
+
+  const flushPending = useCallback(() => {
+    if (pendingRef.current.length === 0) return;
+    setMessages((prev) => {
+      const copy = [...prev];
+      const last = copy[copy.length - 1];
+      if (!last || last.role !== "assistant") return prev;
+      copy[copy.length - 1] = { ...last, text: last.text + pendingRef.current };
+      return copy;
+    });
+    pendingRef.current = "";
+  }, []);
 
   // Keep the panel full-screen and opaque; only lift the content above the keyboard via
   // bottom padding (= keyboard height). Avoids the background flashing while iOS resizes.
@@ -172,6 +223,9 @@ export default function ChatAssistant({
     setMessages([...history, { role: "assistant", text: "" }]);
     setInput("");
     setLoading(true);
+    pendingRef.current = "";
+    stopRelease();
+    startRelease();
 
     const controller = new AbortController();
     try {
@@ -185,6 +239,7 @@ export default function ChatAssistant({
       });
 
       if (!res.ok) {
+        stopRelease();
         setMessages((prev) => {
           const copy = [...prev];
           copy[copy.length - 1] = { role: "assistant", text: c.error };
@@ -212,6 +267,8 @@ export default function ChatAssistant({
           try {
             const parsed = JSON.parse(data);
             if (parsed.error) {
+              stopRelease();
+              pendingRef.current = "";
               setMessages((prev) => {
                 const copy = [...prev];
                 copy[copy.length - 1] = { role: "assistant", text: parsed.error };
@@ -221,12 +278,7 @@ export default function ChatAssistant({
               return;
             }
             if (parsed.content) {
-              setMessages((prev) => {
-                const copy = [...prev];
-                const last = copy[copy.length - 1];
-                copy[copy.length - 1] = { ...last, text: last.text + parsed.content };
-                return copy;
-              });
+              pendingRef.current += parsed.content;
             }
           } catch {
             // skip unparseable chunks
@@ -235,6 +287,8 @@ export default function ChatAssistant({
       }
     } catch (e: unknown) {
       if ((e as Error).name !== "AbortError") {
+        stopRelease();
+        pendingRef.current = "";
         setMessages((prev) => {
           const copy = [...prev];
           const last = copy[copy.length - 1];
@@ -246,6 +300,14 @@ export default function ChatAssistant({
       }
     } finally {
       setLoading(false);
+      // Let the release timer drain remaining chars, then stop
+      const drain = setInterval(() => {
+        if (pendingRef.current.length === 0) {
+          clearInterval(drain);
+          flushPending();
+          stopRelease();
+        }
+      }, RELEASE_MS * 2);
     }
   };
 
