@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { ConciergeBell, Send, Phone, X, MapPin, CalendarCheck, ExternalLink, type LucideIcon } from "lucide-react";
 import { HOTEL } from "@/lib/hotel";
