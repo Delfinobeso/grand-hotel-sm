@@ -186,18 +186,18 @@ Menu online (da fornire quando l'ospite chiede il menù):
 - Menu La Terrazza: [Visiona il menù](https://linktr.ee/laterrazza)
 - Menu Caffè Titano: [Visiona il menù](https://linktr.ee/caffetitanosanmarino)
 
-Indicazioni mappa (per "come arrivo / dov'è"):
-- Grand Hotel San Marino: [Apri in Mappe](https://maps.apple.com/?ll=43.933581,12.449153&q=Grand%20Hotel%20San%20Marino)
-- Ristorante La Terrazza: [Apri in Mappe](https://maps.apple.com/?ll=43.9353,12.4490&q=Ristorante%20La%20Terrazza)
-- Caffè Titano: [Apri in Mappe](https://maps.apple.com/?ll=43.936071,12.446717&q=Caff%C3%A8%20Titano)
-- La Cremeria del Titano: [Apri in Mappe](https://maps.apple.com/?ll=43.936024,12.446753&q=La%20Cremeria%20del%20Titano)
-- Titano Suites: [Apri in Mappe](https://maps.apple.com/?ll=43.936049,12.446947&q=Titano%20Suites)
-- Piazza della Libertà / Palazzo Pubblico: [Apri in Mappe](https://maps.apple.com/?ll=43.936783,12.446273&q=Piazza%20della%20Libert%C3%A0)
-- Basilica del Santo: [Apri in Mappe](https://maps.apple.com/?ll=43.937147,12.446694&q=Basilica%20del%20Santo)
-- Prima Torre (Rocca Guaita): [Apri in Mappe](https://maps.apple.com/?ll=43.935215,12.449239&q=Rocca%20Guaita)
-- Seconda Torre (Rocca Cesta): [Apri in Mappe](https://maps.apple.com/?ll=43.932623,12.451356&q=Rocca%20Cesta)
-- Funivia di San Marino: [Apri in Mappe](https://maps.apple.com/?ll=43.939070,12.445616&q=Funivia%20San%20Marino)
-- Museo di Stato: [Apri in Mappe](https://maps.apple.com/?ll=43.935991,12.446556&q=Museo%20di%20Stato)
+Indicazioni mappa (per "come arrivo / dov'è" — link universali, funzionano su iPhone, Android e desktop):
+- Grand Hotel San Marino: [Apri in Mappe](https://www.google.com/maps/search/?api=1&query=Grand%20Hotel%20San%20Marino%2043.933581,12.449153)
+- Ristorante La Terrazza: [Apri in Mappe](https://www.google.com/maps/search/?api=1&query=Ristorante%20La%20Terrazza%20San%20Marino%2043.9353,12.4490)
+- Caffè Titano: [Apri in Mappe](https://www.google.com/maps/search/?api=1&query=Caff%C3%A8%20Titano%20San%20Marino%2043.936071,12.446717)
+- La Cremeria del Titano: [Apri in Mappe](https://www.google.com/maps/search/?api=1&query=La%20Cremeria%20del%20Titano%20San%20Marino%2043.936024,12.446753)
+- Titano Suites: [Apri in Mappe](https://www.google.com/maps/search/?api=1&query=Titano%20Suites%20San%20Marino%2043.936049,12.446947)
+- Piazza della Libertà / Palazzo Pubblico: [Apri in Mappe](https://www.google.com/maps/search/?api=1&query=Piazza%20della%20Libert%C3%A0%20San%20Marino%2043.936783,12.446273)
+- Basilica del Santo: [Apri in Mappe](https://www.google.com/maps/search/?api=1&query=Basilica%20del%20Santo%20San%20Marino%2043.937147,12.446694)
+- Prima Torre (Rocca Guaita): [Apri in Mappe](https://www.google.com/maps/search/?api=1&query=Rocca%20Guaita%20San%20Marino%2043.935215,12.449239)
+- Seconda Torre (Rocca Cesta): [Apri in Mappe](https://www.google.com/maps/search/?api=1&query=Rocca%20Cesta%20San%20Marino%2043.932623,12.451356)
+- Funivia di San Marino: [Apri in Mappe](https://www.google.com/maps/search/?api=1&query=Funivia%20San%20Marino%2043.939070,12.445616)
+- Museo di Stato: [Apri in Mappe](https://www.google.com/maps/search/?api=1&query=Museo%20di%20Stato%20San%20Marino%2043.935991,12.446556)
 
 Chiamate (formato [Testo](tel:NUMERO)):
 - Reception Grand Hotel: [Chiama la Reception](tel:+390****2400)

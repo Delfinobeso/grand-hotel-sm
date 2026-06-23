@@ -374,7 +374,8 @@ export function CallButton({
 }
 
 export function mapsUrl(lat: number, lon: number, name: string): string {
-  return `https://maps.apple.com/?ll=${lat},${lon}&q=${encodeURIComponent(name)}`;
+  // Google Maps universal link — works on iOS (opens app), Android, and desktop
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}%20${lat},${lon}`;
 }
 
 export function NavigateButton({

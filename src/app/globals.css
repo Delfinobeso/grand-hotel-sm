@@ -177,11 +177,11 @@ body {
   50% { opacity: 0.15; }
 }
 
-/* Message reveal — fade + slide up, Apple iMessage style but slower and more deliberate */
+/* Message reveal — iOS iMessage-style: snappy scale+fade with spring-like deceleration */
 @keyframes message-reveal {
   from {
     opacity: 0;
-    transform: translateY(14px) scale(0.96);
+    transform: translateY(6px) scale(0.97);
   }
   to {
     opacity: 1;
@@ -189,7 +189,7 @@ body {
   }
 }
 .message-reveal {
-  animation: message-reveal 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: message-reveal 0.28s cubic-bezier(0.17, 0.17, 0, 1) both;
 }
 
 /* ── Leaflet theming ── */
