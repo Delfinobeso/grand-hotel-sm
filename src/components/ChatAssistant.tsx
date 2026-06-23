@@ -271,13 +271,13 @@ export default function ChatAssistant({
               onClick={() => setOpen(false)}
             />
 
-            {/* Panel — full-screen on mobile (keyboard handled by interactive-widget) */}
+            {/* Panel — full-screen on mobile. Header stays anchored at top;
+                only the input bar lifts above the keyboard (via paddingBottom on input area). */}
             <motion.div
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={SHEET_IN}
-              style={panelStyle}
               className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)] lg:inset-auto lg:bottom-6 lg:right-4 lg:h-[34rem] lg:w-96 lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl"
             >
               {/* Header */}
@@ -367,8 +367,11 @@ export default function ChatAssistant({
             <div ref={bottomRef} />
           </div>
 
-          {/* Input */}
-          <div className="shrink-0 border-t border-[var(--color-border)] px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:rounded-b-3xl">
+          {/* Input — lifts above keyboard via paddingBottom from visualViewport */}
+          <div
+            className="shrink-0 border-t border-[var(--color-border)] px-4 pt-3 lg:rounded-b-3xl"
+            style={{ paddingBottom: keyboard || "max(0.75rem, env(safe-area-inset-bottom))" }}
+          >
             <div className="flex items-center gap-2">
               <input
                 type="text"
