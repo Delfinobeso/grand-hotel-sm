@@ -139,27 +139,18 @@ export default function ChatAssistant({
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [mobile, setMobile] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const vv = useVisualViewport();
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1023px)");
-    const u = () => setMobile(mq.matches);
-    u();
-    mq.addEventListener("change", u);
-    return () => mq.removeEventListener("change", u);
-  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Keep the panel full-screen and opaque; only lift the content above the keyboard via
-  // bottom padding (= keyboard height). Avoids the background flashing while iOS resizes.
-  const keyboard =
-    mobile && vv && typeof window !== "undefined" ? Math.max(0, window.innerHeight - vv.height - vv.top) : 0;
-  const panelStyle: React.CSSProperties | undefined = keyboard ? { paddingBottom: keyboard } : undefined;
+  // Keyboard height from visualViewport — only used for input padding
+  const keyboardH = (() => {
+    if (!vv || typeof window === "undefined") return 0;
+    return Math.max(0, window.innerHeight - vv.height - vv.top);
+  })();
 
   const send = async (text: string) => {
     if (!text.trim() || loading) return;
@@ -271,14 +262,22 @@ export default function ChatAssistant({
               onClick={() => setOpen(false)}
             />
 
-            {/* Panel — full-screen on mobile. Header stays anchored at top;
-                only the input bar lifts above the keyboard (via paddingBottom on input area). */}
+            {/* Wrapper: positioned to the visual viewport so the keyboard can't push it off-screen */}
+            <div
+              className="fixed z-50 lg:static lg:inset-auto"
+              style={{
+                top: vv?.top ?? 0,
+                left: 0,
+                right: 0,
+                height: vv?.height ?? "100dvh",
+              }}
+            >
             <motion.div
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={SHEET_IN}
-              className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)] lg:inset-auto lg:bottom-6 lg:right-4 lg:h-[34rem] lg:w-96 lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl"
+              className="absolute inset-0 flex flex-col bg-[var(--color-bg)] lg:relative lg:inset-auto lg:ml-auto lg:h-[34rem] lg:w-96 lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl"
             >
               {/* Header */}
           <div className="flex shrink-0 items-center gap-3 border-b border-[var(--color-border)] px-4 pt-[max(0.875rem,env(safe-area-inset-top))] pb-3.5 lg:rounded-t-3xl">
@@ -367,10 +366,10 @@ export default function ChatAssistant({
             <div ref={bottomRef} />
           </div>
 
-          {/* Input — lifts above keyboard via paddingBottom from visualViewport */}
+          {/* Input — stays above keyboard via paddingBottom from visualViewport */}
           <div
-            className="shrink-0 border-t border-[var(--color-border)] px-4 pt-3 lg:rounded-b-3xl"
-            style={{ paddingBottom: keyboard || "max(0.75rem, env(safe-area-inset-bottom))" }}
+            className="shrink-0 border-t border-[var(--color-border)] px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:rounded-b-3xl"
+            style={keyboardH > 0 ? { paddingBottom: keyboardH } : undefined}
           >
             <div className="flex items-center gap-2">
               <input
@@ -378,7 +377,6 @@ export default function ChatAssistant({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                onFocus={() => setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 350)}
                 placeholder={c.placeholder}
                 className="h-11 flex-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-[0.95rem] text-[var(--color-text)] outline-none transition-colors placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-accent)]"
               />
@@ -392,7 +390,8 @@ export default function ChatAssistant({
               </button>
             </div>
           </div>
-            </motion.div>
+          </motion.div>
+          </div>
           </>
         )}
       </AnimatePresence>
