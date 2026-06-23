@@ -229,17 +229,24 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
         })}
       </MapContainer>
 
-      {/* Bottom scrim — the lower region stays near-opaque (hides the map behind the
-          dock and the strip below the cards) then fades smoothly near the top. The
-          "64%" is a color-interpolation hint, not a stop: it shifts the fade midpoint
-          without introducing a slope discontinuity, so there is no hard line (Mach
-          band) the way a solid plateau would. Fades to --color-bg-0 (same color, 0
-          alpha) so the transition never tints toward grey/black. */}
+      {/* Bottom scrim — explicit color stops (no color-interpolation hint, which iOS
+          Safari can reject and drop the whole background → transparent). The lower
+          ~45% stays near-opaque so the strip between the cards and the dock is fully
+          covered; opacity then eases off smoothly with no sharp slope change (no Mach
+          line). color-mix(... transparent) keeps each stop the bg colour at a reduced
+          alpha (theme-aware, no grey/black tint). */}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[800]"
         style={{
-          height: "24rem",
-          background: "linear-gradient(to top, var(--color-bg), 64%, var(--color-bg-0))",
+          height: "26rem",
+          background:
+            "linear-gradient(to top," +
+            " var(--color-bg) 0%," +
+            " color-mix(in srgb, var(--color-bg) 97%, transparent) 25%," +
+            " color-mix(in srgb, var(--color-bg) 88%, transparent) 45%," +
+            " color-mix(in srgb, var(--color-bg) 66%, transparent) 62%," +
+            " color-mix(in srgb, var(--color-bg) 34%, transparent) 80%," +
+            " var(--color-bg-0) 100%)",
         }}
       />
 
