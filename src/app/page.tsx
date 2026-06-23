@@ -31,11 +31,32 @@ const TABS: { key: TabKey; icon: LucideIcon }[] = [
   { key: "explore", icon: MapIcon },
 ];
 
+/** Detect keyboard open on iOS via visualViewport. */
+function useKeyboardOpen() {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const check = () => {
+      setOpen(vv.height < window.innerHeight - 60);
+    };
+    check();
+    vv.addEventListener("resize", check);
+    vv.addEventListener("scroll", check);
+    return () => {
+      vv.removeEventListener("resize", check);
+      vv.removeEventListener("scroll", check);
+    };
+  }, []);
+  return open;
+}
+
 export default function Home() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [lang, setLang] = useState<Lang>("it");
   const [activeTab, setActiveTab] = useState<TabKey>("oggi");
   const [chatOpen, setChatOpen] = useState(false);
+  const keyboardOpen = useKeyboardOpen();
 
   // One-time sync from localStorage after mount. The inline THEME_SCRIPT in layout.tsx
   // already set data-theme/lang on <html> pre-paint; this only updates React-rendered
@@ -197,9 +218,15 @@ export default function Home() {
 
       {/* ── FLOATING DOCK (mobile/tablet) ──
           Inset from the edges; corner radius is concentric with the iPhone screen
-          radius (--screen-radius − inset) so the dock nests inside the display corners. */}
+          radius (--screen-radius − inset). When keyboard is open on iOS, the dock
+          keeps its margins symmetrical by ignoring the safe-area bottom (keyboard
+          replaces the home indicator area). */}
       <nav
-        className="fixed inset-x-[var(--dock-inset)] bottom-[calc(env(safe-area-inset-bottom)+var(--dock-inset))] z-30 mx-auto flex max-w-md items-stretch gap-0.5 bg-[var(--color-surface)]/80 p-1.5 shadow-[0_8px_30px_oklch(0.2_0.04_258/0.28)] ring-1 ring-[var(--color-border)] backdrop-blur-xl lg:hidden"
+        className={`fixed inset-x-[var(--dock-inset)] z-30 mx-auto flex max-w-md items-stretch gap-0.5 bg-[var(--color-surface)]/80 p-1.5 shadow-[0_8px_30px_oklch(0.2_0.04_258/0.28)] ring-1 ring-[var(--color-border)] backdrop-blur-xl transition-all duration-200 lg:hidden ${
+          keyboardOpen
+            ? "bottom-[var(--dock-inset)]"
+            : "bottom-[calc(env(safe-area-inset-bottom)+var(--dock-inset))]"
+        }`}
         style={{ borderRadius: "calc(var(--screen-radius) - var(--dock-inset))" }}
       >
         {TABS.map(({ key, icon: Icon }) => {
