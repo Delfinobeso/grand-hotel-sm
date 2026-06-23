@@ -58,7 +58,7 @@ export function DiningSection({ t }: { t: HotelContent }) {
         {d.venues.map((v) => {
           const pin = GHSM_VENUES.find((p) => p.id === v.id);
           return (
-            <div key={v.id} className="rounded-2xl bg-[var(--color-surface)] px-4 py-4 lg:px-5 lg:py-5">
+            <div key={v.id} id={`venue-${v.id}`} className="rounded-2xl bg-[var(--color-surface)] px-4 py-4 lg:px-5 lg:py-5">
               {VENUE_IMG[v.id] && <CardImage src={VENUE_IMG[v.id]} alt={v.name} />}
               <h4 className="font-display text-xl font-semibold text-[var(--color-text)]">{v.name}</h4>
               {pin?.walkMinutes && (

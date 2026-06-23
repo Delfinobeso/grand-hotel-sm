@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Phone,
@@ -55,8 +55,10 @@ export default function Home() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [lang, setLang] = useState<Lang>("it");
   const [activeTab, setActiveTab] = useState<TabKey>("oggi");
+  const [pendingSection, setPendingSection] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const keyboardOpen = useKeyboardOpen();
+  const mainRef = useRef<HTMLElement>(null);
 
   // One-time sync from localStorage after mount. The inline THEME_SCRIPT in layout.tsx
   // already set data-theme/lang on <html> pre-paint; this only updates React-rendered
@@ -75,10 +77,23 @@ export default function Home() {
     setLang(storedLang === "en" ? "en" : "it");
   }, []);
 
-  // Scroll to top when switching pillar.
+  // Scroll to top (or to a section) when switching pillar.
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "auto" });
-  }, [activeTab]);
+    const el = mainRef.current;
+    if (!el) return;
+    if (pendingSection) {
+      // Wait one frame for the new tab's DOM to paint, then scroll to target.
+      requestAnimationFrame(() => {
+        const target = el.querySelector<HTMLElement>(`#${pendingSection}`);
+        if (target) {
+          el.scrollTo({ top: target.offsetTop - 16, behavior: "smooth" });
+        }
+        setPendingSection(null);
+      });
+    } else {
+      el.scrollTop = 0;
+    }
+  }, [activeTab, pendingSection]);
 
   const toggleTheme = () => {
     const next = theme === "light" ? "dark" : "light";
@@ -107,8 +122,13 @@ export default function Home() {
     explore: t.nav.explore,
   };
 
+  const navigateTo = (tab: TabKey, sectionId?: string) => {
+    if (sectionId) setPendingSection(sectionId);
+    setActiveTab(tab);
+  };
+
   const sections: Record<TabKey, React.ReactNode> = {
-    oggi: <OggiSection t={t} onOpenChat={() => setChatOpen(true)} onNavigate={setActiveTab} />,
+    oggi: <OggiSection t={t} onOpenChat={() => setChatOpen(true)} onNavigate={navigateTo} />,
     hotel: <HotelSection t={t} />,
     dining: <DiningSection t={t} />,
     wellness: <WellnessSection t={t} />,
@@ -200,7 +220,7 @@ export default function Home() {
         {activeTab === "explore" ? (
           <main className="min-h-0 flex-1 overflow-hidden">{sections.explore}</main>
         ) : (
-          <main className="min-h-0 flex-1 overflow-y-auto px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:pt-2 lg:pb-0">
+          <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:pt-2 lg:pb-0">
             <motion.div
               key={activeTab}
               initial={{ opacity: 0, y: 10 }}

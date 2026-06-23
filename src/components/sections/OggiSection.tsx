@@ -25,11 +25,11 @@ import type { TabKey } from "@/lib/nav";
 import type { ServiceHours } from "@/lib/hours";
 
 /* ── GHSM Group strip ── */
-const GROUP: { name: string; sub: string; img: string; tab: TabKey }[] = [
+const GROUP: { name: string; sub: string; img: string; tab: TabKey; sectionId?: string }[] = [
   { name: "Centro Mességué", sub: "Benessere", img: "/images/wellness.webp", tab: "wellness" },
-  { name: "Ristorante La Terrazza", sub: "Ristorante", img: "/images/venue-laterrazza.webp", tab: "dining" },
-  { name: "Caffè Titano", sub: "Caffè", img: "/images/venue-caffetitano.webp", tab: "dining" },
-  { name: "La Cremeria del Titano", sub: "Gelateria", img: "/images/venue-cremeria.webp", tab: "dining" },
+  { name: "Ristorante La Terrazza", sub: "Ristorante", img: "/images/venue-laterrazza.webp", tab: "dining", sectionId: "venue-laTerrazza" },
+  { name: "Caffè Titano", sub: "Caffè", img: "/images/venue-caffetitano.webp", tab: "dining", sectionId: "venue-caffeTitano" },
+  { name: "La Cremeria del Titano", sub: "Gelateria", img: "/images/venue-cremeria.webp", tab: "dining", sectionId: "venue-cremeria" },
   { name: "Titano Suites", sub: "Suites", img: "/images/suite.webp", tab: "explore" },
 ];
 
@@ -62,7 +62,7 @@ export function OggiSection({
 }: {
   t: HotelContent;
   onOpenChat: () => void;
-  onNavigate: (tab: TabKey) => void;
+  onNavigate: (tab: TabKey, sectionId?: string) => void;
 }) {
   const h = t.home;
   const [active, setActive] = useState<string | null>(null);
@@ -154,7 +154,7 @@ export function OggiSection({
             {GROUP.map((g) => (
               <li key={g.name} className="w-40 shrink-0">
                 <button
-                  onClick={() => onNavigate(g.tab)}
+                  onClick={() => onNavigate(g.tab, g.sectionId)}
                   className="group block w-full text-left"
                 >
                   <div className="overflow-hidden rounded-2xl bg-[var(--color-surface-muted)]">
