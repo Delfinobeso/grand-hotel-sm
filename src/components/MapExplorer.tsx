@@ -235,7 +235,7 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[800]"
         style={{
           height: "26rem",
-          background: "linear-gradient(to top, var(--color-bg) 55%, transparent)",
+          background: "linear-gradient(to top, var(--color-bg) 75%, transparent)",
         }}
       />
 

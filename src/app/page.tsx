@@ -236,18 +236,15 @@ export default function Home() {
         )}
       </div>
 
-      {/* ── FLOATING DOCK (mobile/tablet) ──
-          Inset from the edges; corner radius is concentric with the iPhone screen
-          radius (--screen-radius − inset). When keyboard is open on iOS, the dock
-          keeps its margins symmetrical by ignoring the safe-area bottom (keyboard
-          replaces the home indicator area). */}
+      {/* ── TAB BAR (mobile/tablet) ──
+          Full-width, extends to the screen bottom edge. Content is padded above
+          the home indicator via pb-[env(safe-area-inset-bottom)] so the gesture
+          area is never obscured. This avoids the asymmetric-margin issue of the
+          floating pill (safe-area adds ~34px below that can't be balanced laterally). */}
       <nav
-        className={`fixed inset-x-[var(--dock-inset)] z-30 mx-auto flex max-w-md items-stretch gap-0.5 bg-[var(--color-surface)]/80 p-1.5 shadow-[0_8px_30px_oklch(0.2_0.04_258/0.28)] ring-1 ring-[var(--color-border)] backdrop-blur-xl transition-all duration-200 lg:hidden ${
-          keyboardOpen
-            ? "bottom-[var(--dock-inset)]"
-            : "bottom-[calc(env(safe-area-inset-bottom)+var(--dock-inset))]"
+        className={`fixed inset-x-0 bottom-0 z-30 flex items-stretch bg-[var(--color-surface)]/85 pt-2 backdrop-blur-xl transition-all duration-200 lg:hidden ${
+          keyboardOpen ? "pb-2" : "pb-[max(0.5rem,env(safe-area-inset-bottom))]"
         }`}
-        style={{ borderRadius: "calc(var(--screen-radius) - var(--dock-inset))" }}
       >
         {TABS.map(({ key, icon: Icon }) => {
           const active = activeTab === key;
@@ -256,7 +253,9 @@ export default function Home() {
               key={key}
               onClick={() => setActiveTab(key)}
               aria-current={active ? "page" : undefined}
-              className={`flex flex-1 flex-col items-center gap-1 rounded-[1.4rem] py-2 text-[0.625rem] font-medium leading-none transition-colors duration-200 ${
+              className="flex flex-1 justify-center"
+            >
+            <div className={`flex flex-col items-center gap-1 rounded-full px-3 py-1.5 text-[0.625rem] font-medium leading-none transition-colors duration-200 ${
                 active
                   ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
                   : "text-[var(--color-text-muted)] active:bg-[var(--color-surface-muted)]"
@@ -264,6 +263,7 @@ export default function Home() {
             >
               <Icon size={20} strokeWidth={active ? 2.25 : 1.75} />
               <span className="max-w-full truncate px-0.5">{navLabels[key]}</span>
+            </div>
             </button>
           );
         })}
