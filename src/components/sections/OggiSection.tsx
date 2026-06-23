@@ -136,7 +136,7 @@ export function OggiSection({
               "linear-gradient(180deg, oklch(0% 0 0 / 0.22) 0%, transparent 26%, transparent 52%, oklch(0% 0 0 / 0.55) 100%)",
           }}
         />
-        <div className="relative flex min-h-[clamp(280px,48svh,420px)] flex-col items-center justify-end gap-1.5 px-6 pb-8 pt-[max(2rem,env(safe-area-inset-top))] text-center lg:px-9 lg:pb-10">
+        <div className="relative flex h-[409px] flex-col items-center justify-end gap-1.5 px-6 pb-8 pt-[max(2rem,env(safe-area-inset-top))] text-center lg:px-9 lg:pb-10">
           <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-white/85">{h.eyebrow}</p>
           <h2 className="font-display text-[2.25rem] font-semibold leading-[1.04] text-white lg:text-[3rem]">
             {h.titleMain}
