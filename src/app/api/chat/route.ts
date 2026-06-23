@@ -252,6 +252,7 @@ export async function POST(req: NextRequest) {
         messages: [{ role: "system", content: SYSTEM_PROMPT }, ...history],
         temperature: 0.4,
         max_tokens: 500,
+        stream: true,
       }),
     });
 
@@ -261,10 +262,64 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Errore del servizio" }, { status: 502 });
     }
 
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content?.trim() ?? "Mi scusi, non riesco a rispondere. La invito a contattare la Reception.";
+    // Stream SSE chunks back to the client
+    const reader = response.body?.getReader();
+    if (!reader) {
+      return NextResponse.json({ error: "Stream non disponibile" }, { status: 502 });
+    }
 
-    return NextResponse.json({ reply });
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        const decoder = new TextDecoder();
+        let buffer = "";
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            // Process complete SSE lines
+            const lines = buffer.split("\n");
+            buffer = lines.pop() ?? "";
+            for (const line of lines) {
+              if (line.startsWith("data: ")) {
+                const data = line.slice(6);
+                if (data === "[DONE]") {
+                  controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                  continue;
+                }
+                try {
+                  const parsed = JSON.parse(data);
+                  const content = parsed.choices?.[0]?.delta?.content;
+                  if (content) {
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
+                  }
+                } catch {
+                  // skip unparseable chunks
+                }
+              }
+            }
+          }
+          controller.close();
+        } catch (e) {
+          console.error("Stream error:", e);
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({ error: "Per questa informazione La invito a contattare la Reception al tasto 9." })}\n\n`,
+            ),
+          );
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
   } catch (error) {
     console.error("Chat API error:", error);
     return NextResponse.json(

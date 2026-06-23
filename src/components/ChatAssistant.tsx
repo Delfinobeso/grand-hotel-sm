@@ -85,7 +85,7 @@ const COPY = {
   it: {
     title: "Concierge",
     fab: "Apri il Concierge",
-    greeting: "Buongiorno. Sono il Concierge digitale del Grand Hotel. Come posso aiutarla?",
+    greeting: "Sono il Concierge digitale del Grand Hotel. Come posso aiutarla?",
     placeholder: "Scrivi un messaggio…",
     reception: "Reception",
     error: "Per questa informazione La invito a contattare la Reception al tasto 9.",
@@ -99,7 +99,7 @@ const COPY = {
   en: {
     title: "Concierge",
     fab: "Open the Concierge",
-    greeting: "Hello. I'm the Grand Hotel digital Concierge. How may I help you?",
+    greeting: "I'm the Grand Hotel digital Concierge. How may I help you?",
     placeholder: "Type a message…",
     reception: "Reception",
     error: "For this information, please contact Reception by dialling 9.",
@@ -152,9 +152,11 @@ export default function ChatAssistant({
     if (!text.trim() || loading) return;
     const userMsg: Message = { role: "user", text: text.trim() };
     const history = [...messages, userMsg];
-    setMessages(history);
+    setMessages([...history, { role: "assistant", text: "" }]);
     setInput("");
     setLoading(true);
+
+    const controller = new AbortController();
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -162,11 +164,69 @@ export default function ChatAssistant({
         body: JSON.stringify({
           messages: history.map((m) => ({ role: m.role, content: m.text })),
         }),
+        signal: controller.signal,
       });
-      const data = await res.json();
-      setMessages((prev) => [...prev, { role: "assistant", text: data.reply ?? c.error }]);
-    } catch {
-      setMessages((prev) => [...prev, { role: "assistant", text: c.error }]);
+
+      if (!res.ok) {
+        setMessages((prev) => {
+          const copy = [...prev];
+          copy[copy.length - 1] = { role: "assistant", text: c.error };
+          return copy;
+        });
+        return;
+      }
+
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("No stream");
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.slice(6);
+          if (data === "[DONE]") continue;
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.error) {
+              setMessages((prev) => {
+                const copy = [...prev];
+                copy[copy.length - 1] = { role: "assistant", text: parsed.error };
+                return copy;
+              });
+              controller.abort();
+              return;
+            }
+            if (parsed.content) {
+              setMessages((prev) => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                copy[copy.length - 1] = { ...last, text: last.text + parsed.content };
+                return copy;
+              });
+            }
+          } catch {
+            // skip unparseable chunks
+          }
+        }
+      }
+    } catch (e: unknown) {
+      if ((e as Error).name !== "AbortError") {
+        setMessages((prev) => {
+          const copy = [...prev];
+          const last = copy[copy.length - 1];
+          if (last && last.text === "") {
+            copy[copy.length - 1] = { role: "assistant", text: c.error };
+          }
+          return copy;
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -188,7 +248,7 @@ export default function ChatAssistant({
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.6, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.34, 1.56, 0.64, 1] }}
+            transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
             onClick={() => setOpen(true)}
             aria-label={c.fab}
             className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-[0_8px_24px_oklch(0.2_0.04_258/0.35)] active:scale-95 lg:bottom-6"
