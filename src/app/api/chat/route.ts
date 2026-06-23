@@ -216,13 +216,29 @@ Cucina italiana tradizionale. Pasta fatta in casa dallo Chef Pastaio: lasagne, r
 Orari: Colazione 07:00-10:00, Pranzo 12:00-14:30, Cena 19:00-21:30.
 
 ### CAFFÈ TITANO (Piazzetta del Titano 4, centro storico)
-Caffetteria contemporanea con dehors sulla piazzetta medievale. WiFi gratuito.
+Caffetteria contemporanea con dehors sulla piazzetta medievale. WiFi gratuito. Menu completo con piadine fatte a mano, cassoni, panini, insalate, cocktail. Aperto tutto il giorno.
 
-- **Colazione:** cappuccini, caffè speciali, brioches artigianali (produzione propria), muffin, biscotti.
-- **Pranzo:** Lunch Break Menu (cambia ogni giorno): primo caldo o zuppa, secondo o insalatona. In alternativa: piadine, panini farciti, focacce, pizzette. Vini locali, birre.
-- **Merenda:** oltre 30 gusti di cioccolata, 40 tipi di tè, torte, pasticceria artigianale, crêpes, bomboloni caldi.
-- **Aperitivo / Happy Hour.**
-- Consegna a domicilio disponibile. Tel +39 0549 992473.
+**Caffetteria:** Espresso €1.90, Cappuccino €2.30, Caffè Montebianco/Marocchino €3, Caffè shakerato €4, Americano €2.50. Latte di soia/riso disponibile. Tè Lipton/Eraclea €3-4, Cioccolata calda Eraclea €5-5.50. Brioches farcite €2.
+
+**Caffè speciali:** Viennese €6.50, Irish Coffee €7.50, Punch Coffee €6.50, Jamaica €7.50, Amore €7.50.
+
+**Bibite:** Acqua 50cl €2, bibite €3.50, spremute fresche €4. Cocktail analcolici alla frutta €6.50.
+
+**Birre:** alla spina Forst Kronen (20cl €3.80, 40cl €5.50), in bottiglia da €6. Birre artigianali di San Marino (Chiara, Ambrata, La Rossa) €6.
+
+**Sparkling drinks e cocktail:** Spritz Aperol/Campari €6.50, Bellini/Rossini/Mimosa €6.50. Cocktail della casa €8.50, cocktail internazionali €8 (Negroni, Mojito, Margarita, Moscow Mule, Old Fashioned, Cosmopolitan, ecc.).
+
+**Piadine e cassoni (fatti a mano):** Classiche (crudo+stracchino €7.50, stracchino+rucola €7), Speciali (salmone tataki €8.50, alici+stracciatella €8.50, carpaccio carne salada €8.50). Cassoni (rosso, verde, contadino) €7.
+
+**Panini e tramezzini:** Gran focaccia al tonno €7, Panino ai cereali (prosciutto Parma 24 mesi €7, bresaola €7, tacchino €7, mortadella+pistacchio €7), L'Americano (toast) €5. Tramezzini classici e speciali €5.50.
+
+**Insalate €9:** Classica (tonno+mozzarella), radicchio+arance+noci+grana, iceberg+tacchino+uovo, salmone+feta.
+
+**Dessert:** Macedonia fresca €6.50 (con gelato €8), ananas €6.50, crêpes Nutella €4.50, waffle Nutella €5.50 (con gelato €6.50).
+
+**Vini al calice €5.50:** Chianti Classico, Barbera d'Asti, Primitivo, Sangiovese Superiore RSM, Valdragone Rosso, Rebola, Grillo, Gewürztraminer, Passerina BIO, Valdragone Bianco. Franciacorta €8, Prosecco €6.50.
+
+Consegna a domicilio disponibile. Tel +39 0549 992473, caffetitano@ghsmgroup.sm.
 
 ### LA CREMERIA DEL TITANO (accanto al Caffè Titano, centro storico)
 Gelateria artigianale. Gusti autentici con ingredienti semplici e genuini. Aperta nei mesi caldi.

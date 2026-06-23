@@ -8,7 +8,7 @@
 
 **Fonti attuali (verificate 2026-06-23):**
 - **La Terrazza**: Linktree `https://linktr.ee/laterrazza` → Google Drive PDF (link etichettato "VINI" ma contiene il menu cibo; il link "MENÙ" contiene la carta vini)
-- **Caffè Titano**: `https://www.ghsmgroup.sm/en/caffe-titano` (HTML, nessun PDF)
+- **Caffè Titano**: Linktree `https://linktr.ee/caffetitanosanmarino` → Google Drive PDF
 - **L'Arengo**: nessuna fonte online stabile — contenuto statico
 
 ⚠️ **Quirk scoperto**: su Linktree, il bottone "VINI" punta al PDF del menu cibo, il bottone "MENÙ" punta alla carta vini. Lo script deve scaricare ENTRAMBI i PDF e determinare quale contiene piatti (keyword: "Antipasti", "Primi", "Tagliatella").
