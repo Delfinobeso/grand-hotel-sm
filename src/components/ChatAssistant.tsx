@@ -58,6 +58,20 @@ function actionIcon(url: string): LucideIcon {
   return ExternalLink;
 }
 
+/** Convert basic markdown formatting to HTML for chat rendering.
+ *  Handles **bold**, *italic*, and ~~strikethrough~~.
+ *  Performed AFTER parseActions strips links, so only text formatting remains. */
+function renderMarkdown(text: string): string {
+  let html = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
+  html = html.replace(/~~(.+?)~~/g, "<del>$1</del>");
+  return html;
+}
+
 function ChatActions({ actions }: { actions: ChatAction[] }) {
   if (actions.length === 0) return null;
   return (
@@ -340,7 +354,10 @@ export default function ChatAssistant({
               return (
                 <div key={i} className="flex justify-start">
                   <div className="max-w-[88%] rounded-2xl rounded-tl-md bg-[var(--color-surface)] px-3.5 py-2.5">
-                    <p className="whitespace-pre-line text-[0.95rem] leading-relaxed text-[var(--color-text)]">{clean}</p>
+                  <div
+                    className="whitespace-pre-line text-[0.95rem] leading-relaxed text-[var(--color-text)] [&_strong]:font-semibold [&_em]:italic"
+                    dangerouslySetInnerHTML={{ __html: renderMarkdown(clean) }}
+                  />
                     <ChatActions actions={actions} />
                   </div>
                 </div>

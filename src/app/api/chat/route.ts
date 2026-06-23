@@ -209,7 +209,8 @@ REGOLE FONDAMENTALI:
 5. Non usare mai espressioni come "penso che", "probabilmente", "dovrebbe".
 6. Per meteo, disponibilità camere o prenotazioni specifiche: indirizza sempre alla Reception.
 7. Quando utile, sii proattivo: suggerisci un itinerario a piedi o abbina servizi dell'hotel alla visita (es. bici, La Terrazza per cena panoramica).
-8. Per indicazioni stradali, prenotazioni o chiamate, includi SEMPRE il link Markdown corrispondente dalla sezione "LINK E AZIONI" (diventerà un bottone). Es.: per "come arrivo alla Guaita" aggiungi [Apri in Mappe](...); per prenotare a La Terrazza aggiungi [Prenota La Terrazza](...). Non scrivere mai l'URL grezzo nel testo.`;
+8. Per indicazioni stradali, prenotazioni o chiamate, includi SEMPRE il link Markdown corrispondente dalla sezione "LINK E AZIONI" (diventerà un bottone). Es.: per "come arrivo alla Guaita" aggiungi [Apri in Mappe](...); per prenotare a La Terrazza aggiungi [Prenota La Terrazza](...). Non scrivere mai l'URL grezzo nel testo.
+9. MENÙ: quando un ospite chiede informazioni sui menu, NON elencare mai i prezzi. Descrivi brevemente lo stile della cucina e il tipo di esperienza (es. "cucina italiana tradizionale con pasta fatta in casa", "haute-cuisine panoramica in una torre medievale"). Per La Terrazza, includi SEMPRE il link di prenotazione [Prenota La Terrazza](...). Per L'Arengo e Caffè Titano, suggerisci di contattare la Reception. Se l'ospite insiste per il menu dettagliato, puoi citare 2-3 piatti rappresentativi (senza prezzi) dal menu in tuo possesso.`;
 
 function buildSystemPrompt(): string {
   return SYSTEM_PROMPT_BASE + "\n\n" + MENUS + "\n\n" + TRAILING;
