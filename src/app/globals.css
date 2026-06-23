@@ -62,9 +62,11 @@
   --font-serif: ui-serif, "New York", Georgia, "Times New Roman", serif;
 
   /* iPhone 17 Pro display corner radius; the bottom dock uses a concentric radius
-     (--screen-radius − --dock-inset) so its corners nest inside the screen corners. */
+     (--screen-radius − --dock-inset) so its corners nest inside the screen corners.
+     --dock-inset is the equal gap on all sides of the floating dock; it sits above
+     the home indicator (~13px) with clearance. */
   --screen-radius: 55px;
-  --dock-inset: 0.375rem;
+  --dock-inset: 1.125rem;
 }
 
 * {

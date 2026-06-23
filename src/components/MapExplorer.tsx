@@ -229,13 +229,15 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
         })}
       </MapContainer>
 
-      {/* Bottom scrim — solid behind dock+cards, fades above them. Single stop avoids
-          the visible "step" that multi-stop utilities produce. */}
+      {/* Bottom scrim — a PURE two-stop linear gradient (constant alpha slope) so the
+          map fades behind the cards/dock with no perceptible edge. A solid plateau
+          (e.g. "var(--color-bg) 75%, transparent") introduces a slope discontinuity
+          that the eye reads as a hard line (Mach band) — avoided here entirely. */}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[800]"
         style={{
-          height: "26rem",
-          background: "linear-gradient(to top, var(--color-bg) 75%, transparent)",
+          height: "22rem",
+          background: "linear-gradient(to top, var(--color-bg), transparent)",
         }}
       />
 
@@ -243,7 +245,7 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
       <div
         ref={scrollRef}
         onScroll={onScroll}
-        className="ghsm-carousel absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] z-[1000] flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-2 lg:bottom-4"
+        className="ghsm-carousel absolute inset-x-0 bottom-[calc(var(--dock-inset)+4.5rem)] z-[1000] flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-2 lg:bottom-4"
       >
         {places.map((p, i) => {
           const isActive = i === active;

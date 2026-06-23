@@ -236,15 +236,19 @@ export default function Home() {
         )}
       </div>
 
-      {/* ── TAB BAR (mobile/tablet) ──
-          Full-width, extends to the screen bottom edge. Content is padded above
-          the home indicator via pb-[env(safe-area-inset-bottom)] so the gesture
-          area is never obscured. This avoids the asymmetric-margin issue of the
-          floating pill (safe-area adds ~34px below that can't be balanced laterally). */}
+      {/* ── FLOATING DOCK (mobile/tablet) ──
+          Equal gap on all sides (--dock-inset) so the pill sits parallel to the
+          iPhone screen edges; corner radius is concentric (screen radius − gap)
+          so its corners nest inside the screen's rounded corners. The gap alone
+          clears the home indicator — we do NOT add env(safe-area-inset-bottom),
+          which is what made the bottom margin far larger than the sides. When the
+          keyboard opens, the dock slides out of the way. */}
       <nav
-        className={`fixed inset-x-0 bottom-0 z-30 flex items-stretch bg-[var(--color-surface)]/85 pt-2 backdrop-blur-xl transition-all duration-200 lg:hidden ${
-          keyboardOpen ? "pb-2" : "pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+        aria-label="Primary"
+        className={`fixed left-[var(--dock-inset)] right-[var(--dock-inset)] bottom-[var(--dock-inset)] z-30 mx-auto flex max-w-sm items-stretch gap-1 bg-[var(--color-surface)]/80 p-1.5 shadow-[0_10px_34px_oklch(0.2_0.04_258/0.30)] ring-1 ring-[var(--color-border)] backdrop-blur-xl transition-[transform,opacity] duration-300 lg:hidden ${
+          keyboardOpen ? "pointer-events-none translate-y-[160%] opacity-0" : "translate-y-0 opacity-100"
         }`}
+        style={{ borderRadius: "calc(var(--screen-radius) - var(--dock-inset))" }}
       >
         {TABS.map(({ key, icon: Icon }) => {
           const active = activeTab === key;
@@ -253,17 +257,14 @@ export default function Home() {
               key={key}
               onClick={() => setActiveTab(key)}
               aria-current={active ? "page" : undefined}
-              className="flex flex-1 justify-center"
-            >
-            <div className={`flex flex-col items-center gap-1 rounded-full px-3 py-1.5 text-[0.625rem] font-medium leading-none transition-colors duration-200 ${
+              className={`flex flex-1 flex-col items-center gap-1 rounded-full py-2 text-[0.625rem] font-medium leading-none transition-colors duration-200 ${
                 active
                   ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
                   : "text-[var(--color-text-muted)] active:bg-[var(--color-surface-muted)]"
               }`}
             >
               <Icon size={20} strokeWidth={active ? 2.25 : 1.75} />
-              <span className="max-w-full truncate px-0.5">{navLabels[key]}</span>
-            </div>
+              <span className="max-w-full truncate px-1">{navLabels[key]}</span>
             </button>
           );
         })}
