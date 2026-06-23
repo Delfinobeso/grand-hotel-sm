@@ -4,6 +4,7 @@
 :root,
 [data-theme="light"] {
   --color-bg: oklch(0.972 0.006 83);
+  --color-bg-0: oklch(0.972 0.006 83 / 0); /* same color, 0 alpha — for tint-free scrim fades */
   --color-surface: oklch(0.992 0.004 83);
   --color-surface-muted: oklch(0.93 0.009 83);
   --color-surface-2: oklch(0.955 0.007 83);
@@ -26,6 +27,7 @@
 
 [data-theme="dark"] {
   --color-bg: oklch(0.17 0.005 75);
+  --color-bg-0: oklch(0.17 0.005 75 / 0); /* same color, 0 alpha — for tint-free scrim fades */
   --color-surface: oklch(0.215 0.006 75);
   --color-surface-muted: oklch(0.27 0.007 75);
   --color-surface-2: oklch(0.195 0.006 75);
@@ -66,7 +68,7 @@
      --dock-inset is the equal gap on all sides of the floating dock; it sits above
      the home indicator (~13px) with clearance. */
   --screen-radius: 55px;
-  --dock-inset: 1.125rem;
+  --dock-inset: 1.375rem;
 }
 
 * {

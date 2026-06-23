@@ -257,13 +257,13 @@ export default function Home() {
               key={key}
               onClick={() => setActiveTab(key)}
               aria-current={active ? "page" : undefined}
-              className={`flex flex-1 flex-col items-center gap-1 rounded-full py-2 text-[0.625rem] font-medium leading-none transition-colors duration-200 ${
+              className={`flex flex-1 flex-col items-center gap-1.5 rounded-full py-2.5 text-[0.6875rem] font-medium leading-none transition-colors duration-200 ${
                 active
                   ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
                   : "text-[var(--color-text-muted)] active:bg-[var(--color-surface-muted)]"
               }`}
             >
-              <Icon size={20} strokeWidth={active ? 2.25 : 1.75} />
+              <Icon size={22} strokeWidth={active ? 2.25 : 1.75} />
               <span className="max-w-full truncate px-1">{navLabels[key]}</span>
             </button>
           );

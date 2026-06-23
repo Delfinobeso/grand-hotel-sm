@@ -229,15 +229,17 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
         })}
       </MapContainer>
 
-      {/* Bottom scrim — a PURE two-stop linear gradient (constant alpha slope) so the
-          map fades behind the cards/dock with no perceptible edge. A solid plateau
-          (e.g. "var(--color-bg) 75%, transparent") introduces a slope discontinuity
-          that the eye reads as a hard line (Mach band) — avoided here entirely. */}
+      {/* Bottom scrim — the lower region stays near-opaque (hides the map behind the
+          dock and the strip below the cards) then fades smoothly near the top. The
+          "64%" is a color-interpolation hint, not a stop: it shifts the fade midpoint
+          without introducing a slope discontinuity, so there is no hard line (Mach
+          band) the way a solid plateau would. Fades to --color-bg-0 (same color, 0
+          alpha) so the transition never tints toward grey/black. */}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[800]"
         style={{
-          height: "22rem",
-          background: "linear-gradient(to top, var(--color-bg), transparent)",
+          height: "24rem",
+          background: "linear-gradient(to top, var(--color-bg), 64%, var(--color-bg-0))",
         }}
       />
 
@@ -245,7 +247,7 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
       <div
         ref={scrollRef}
         onScroll={onScroll}
-        className="ghsm-carousel absolute inset-x-0 bottom-[calc(var(--dock-inset)+4.5rem)] z-[1000] flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-2 lg:bottom-4"
+        className="ghsm-carousel absolute inset-x-0 bottom-[calc(var(--dock-inset)+5rem)] z-[1000] flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-2 lg:bottom-4"
       >
         {places.map((p, i) => {
           const isActive = i === active;
