@@ -59,31 +59,15 @@ function actionIcon(url: string): LucideIcon {
 }
 
 /** Convert basic markdown formatting to HTML for chat rendering.
- *  Handles **bold**, *italic*, and ~~strikethrough~~.
- *  During streaming, strips ALL markdown syntax so the user only sees clean text.
- *  When complete, applies formatting and appends a pulsing cursor if streaming. */
-function renderMarkdown(text: string, streaming?: boolean): string {
-  let html = text;
-  if (streaming) {
-    // Strip markdown syntax that would look broken mid-typewriter
-    html = html.replace(/\*\*(.+?)\*\*?/g, "$1");  // bold
-    html = html.replace(/(?<!\*)\*(?!\*)(.+?)\*?/g, "$1");  // italic
-    html = html.replace(/\[([^\]]*)\]\([^)]*\)?/g, "$1");  // links → label only
-    html = html.replace(/~~(.+?)~~?/g, "$1");  // strikethrough
-    // Escape HTML
-    html = html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  } else {
-    html = html
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-    html = html.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
-    html = html.replace(/\*([\s\S]+?)\*/g, "<em>$1</em>");
-    html = html.replace(/~~([\s\S]+?)~~/g, "<del>$1</del>");
-  }
-  if (streaming && text.length > 0) {
-    html += ' <span class="streaming-cursor">▌</span>';
-  }
+ *  Handles **bold**, *italic*, and ~~strikethrough~~. */
+function renderMarkdown(text: string): string {
+  let html = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  html = html.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/\*([\s\S]+?)\*/g, "<em>$1</em>");
+  html = html.replace(/~~([\s\S]+?)~~/g, "<del>$1</del>");
   return html;
 }
 
@@ -157,16 +141,7 @@ export default function ChatAssistant({
   const [loading, setLoading] = useState(false);
   const [mobile, setMobile] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const pendingRef = useRef("");
-  const releaseTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const vv = useVisualViewport();
-
-  // Clean up release timer on unmount
-  useEffect(() => {
-    return () => {
-      if (releaseTimerRef.current) clearInterval(releaseTimerRef.current);
-    };
-  }, []);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 1023px)");
@@ -180,48 +155,6 @@ export default function ChatAssistant({
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // ── Typewriter: release buffered characters at a steady, relaxed pace ──
-  const RELEASE_MS = 28; // ~35 chars/sec — lazy, elegant
-
-  const startRelease = useCallback(() => {
-    if (releaseTimerRef.current) return;
-    releaseTimerRef.current = setInterval(() => {
-      setMessages((prev) => {
-        const copy = [...prev];
-        const last = copy[copy.length - 1];
-        if (!last || last.role !== "assistant") return prev;
-        if (pendingRef.current.length === 0) {
-          // Buffer empty but stream might still be running — keep timer alive
-          return prev;
-        }
-        // Release one character at a time
-        const ch = pendingRef.current[0];
-        pendingRef.current = pendingRef.current.slice(1);
-        copy[copy.length - 1] = { ...last, text: last.text + ch };
-        return copy;
-      });
-    }, RELEASE_MS);
-  }, []);
-
-  const stopRelease = useCallback(() => {
-    if (releaseTimerRef.current) {
-      clearInterval(releaseTimerRef.current);
-      releaseTimerRef.current = null;
-    }
-  }, []);
-
-  const flushPending = useCallback(() => {
-    if (pendingRef.current.length === 0) return;
-    setMessages((prev) => {
-      const copy = [...prev];
-      const last = copy[copy.length - 1];
-      if (!last || last.role !== "assistant") return prev;
-      copy[copy.length - 1] = { ...last, text: last.text + pendingRef.current };
-      return copy;
-    });
-    pendingRef.current = "";
-  }, []);
-
   // Keep the panel full-screen and opaque; only lift the content above the keyboard via
   // bottom padding (= keyboard height). Avoids the background flashing while iOS resizes.
   const keyboard =
@@ -232,13 +165,12 @@ export default function ChatAssistant({
     if (!text.trim() || loading) return;
     const userMsg: Message = { role: "user", text: text.trim() };
     const history = [...messages, userMsg];
-    setMessages([...history, { role: "assistant", text: "" }]);
+    // Don't add an empty assistant bubble — show typing dots instead
+    setMessages(history);
     setInput("");
     setLoading(true);
-    pendingRef.current = "";
-    stopRelease();
-    startRelease();
 
+    let fullReply = "";
     const controller = new AbortController();
     try {
       const res = await fetch("/api/chat", {
@@ -251,12 +183,8 @@ export default function ChatAssistant({
       });
 
       if (!res.ok) {
-        stopRelease();
-        setMessages((prev) => {
-          const copy = [...prev];
-          copy[copy.length - 1] = { role: "assistant", text: c.error };
-          return copy;
-        });
+        setLoading(false);
+        setMessages((prev) => [...prev, { role: "assistant", text: c.error }]);
         return;
       }
 
@@ -279,18 +207,12 @@ export default function ChatAssistant({
           try {
             const parsed = JSON.parse(data);
             if (parsed.error) {
-              stopRelease();
-              pendingRef.current = "";
-              setMessages((prev) => {
-                const copy = [...prev];
-                copy[copy.length - 1] = { role: "assistant", text: parsed.error };
-                return copy;
-              });
+              fullReply = parsed.error;
               controller.abort();
-              return;
+              break;
             }
             if (parsed.content) {
-              pendingRef.current += parsed.content;
+              fullReply += parsed.content;
             }
           } catch {
             // skip unparseable chunks
@@ -299,27 +221,14 @@ export default function ChatAssistant({
       }
     } catch (e: unknown) {
       if ((e as Error).name !== "AbortError") {
-        stopRelease();
-        pendingRef.current = "";
-        setMessages((prev) => {
-          const copy = [...prev];
-          const last = copy[copy.length - 1];
-          if (last && last.text === "") {
-            copy[copy.length - 1] = { role: "assistant", text: c.error };
-          }
-          return copy;
-        });
+        fullReply = fullReply || c.error;
       }
     } finally {
       setLoading(false);
-      // Let the release timer drain remaining chars, then stop
-      const drain = setInterval(() => {
-        if (pendingRef.current.length === 0) {
-          clearInterval(drain);
-          flushPending();
-          stopRelease();
-        }
-      }, RELEASE_MS * 2);
+      // Reveal the complete message all at once with animation
+      if (fullReply) {
+        setMessages((prev) => [...prev, { role: "assistant", text: fullReply }]);
+      }
     }
   };
 
@@ -421,20 +330,20 @@ export default function ChatAssistant({
               if (m.role === "user") {
                 return (
                   <div key={i} className="flex justify-end">
-                    <div className="chat-bubble max-w-[85%] whitespace-pre-line rounded-2xl rounded-tr-md bg-[var(--color-accent)] px-3.5 py-2.5 text-[0.95rem] leading-relaxed text-[var(--color-on-accent)]">
+                    <div className="max-w-[85%] whitespace-pre-line rounded-2xl rounded-tr-md bg-[var(--color-accent)] px-3.5 py-2.5 text-[0.95rem] leading-relaxed text-[var(--color-on-accent)]">
                       {m.text}
                     </div>
                   </div>
                 );
               }
               const { clean, actions } = parseActions(m.text);
-              const isStreaming = loading && i === messages.length - 1;
+              const isLast = i === messages.length - 1;
               return (
                 <div key={i} className="flex justify-start">
-                  <div className={`chat-bubble max-w-[88%] rounded-2xl rounded-tl-md bg-[var(--color-surface)] px-3.5 py-2.5 shadow-sm transition-all duration-300 ease-out ${isStreaming && clean.length === 0 ? "chat-bubble-entering" : ""}`}>
+                  <div className={`max-w-[88%] rounded-2xl rounded-tl-md bg-[var(--color-surface)] px-3.5 py-2.5 shadow-sm ${isLast ? "message-reveal" : ""}`}>
                   <div
                     className="whitespace-pre-line text-[0.95rem] leading-relaxed text-[var(--color-text)] [&_strong]:font-semibold [&_em]:italic"
-                    dangerouslySetInnerHTML={{ __html: renderMarkdown(clean, isStreaming) }}
+                    dangerouslySetInnerHTML={{ __html: renderMarkdown(clean) }}
                   />
                     <ChatActions actions={actions} />
                   </div>
