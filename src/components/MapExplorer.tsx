@@ -239,14 +239,7 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[800]"
         style={{
           height: "26rem",
-          background:
-            "linear-gradient(to top," +
-            " var(--color-bg) 0%," +
-            " color-mix(in srgb, var(--color-bg) 97%, transparent) 25%," +
-            " color-mix(in srgb, var(--color-bg) 88%, transparent) 45%," +
-            " color-mix(in srgb, var(--color-bg) 66%, transparent) 62%," +
-            " color-mix(in srgb, var(--color-bg) 34%, transparent) 80%," +
-            " var(--color-bg-0) 100%)",
+          background: "#00ff00",
         }}
       />
 
