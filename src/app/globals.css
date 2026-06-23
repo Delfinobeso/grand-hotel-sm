@@ -64,7 +64,7 @@
   /* iPhone 17 Pro display corner radius; the bottom dock uses a concentric radius
      (--screen-radius − --dock-inset) so its corners nest inside the screen corners. */
   --screen-radius: 55px;
-  --dock-inset: 0.75rem;
+  --dock-inset: 0.375rem;
 }
 
 * {
