@@ -236,11 +236,8 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
           line). color-mix(... transparent) keeps each stop the bg colour at a reduced
           alpha (theme-aware, no grey/black tint). */}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[800]"
-        style={{
-          height: "26rem",
-          background: "#00ff00",
-        }}
+        className="map-scrim pointer-events-none absolute inset-x-0 bottom-0 z-[800]"
+        style={{ height: "26rem" }}
       />
 
       {/* Bottom banners */}

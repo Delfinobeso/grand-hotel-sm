@@ -349,6 +349,34 @@ body {
   transform: translateZ(0);
 }
 
+/* Map bottom scrim. Built from plain oklch-with-alpha stops only — this device's
+   iOS Safari drops the whole background when the value contains color-mix() or a
+   color-interpolation hint, so we avoid both. Lower ~45% stays near-opaque (covers
+   the strip between cards and dock) then eases to fully transparent with no sharp
+   slope change (no Mach line). Each stop is --color-bg's colour at a lower alpha. */
+.map-scrim {
+  background: linear-gradient(
+    to top,
+    oklch(0.972 0.006 83 / 1) 0%,
+    oklch(0.972 0.006 83 / 0.97) 25%,
+    oklch(0.972 0.006 83 / 0.88) 45%,
+    oklch(0.972 0.006 83 / 0.66) 62%,
+    oklch(0.972 0.006 83 / 0.34) 80%,
+    oklch(0.972 0.006 83 / 0) 100%
+  );
+}
+[data-theme="dark"] .map-scrim {
+  background: linear-gradient(
+    to top,
+    oklch(0.17 0.005 75 / 1) 0%,
+    oklch(0.17 0.005 75 / 0.97) 25%,
+    oklch(0.17 0.005 75 / 0.88) 45%,
+    oklch(0.17 0.005 75 / 0.66) 62%,
+    oklch(0.17 0.005 75 / 0.34) 80%,
+    oklch(0.17 0.005 75 / 0) 100%
+  );
+}
+
 /* Explore tab: give the map a definite height (Leaflet needs one). */
 .map-fill {
   height: calc(100svh - 5rem - env(safe-area-inset-top));
