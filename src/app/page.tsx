@@ -96,9 +96,15 @@ export default function Home() {
 
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-[var(--color-bg)]">
-      <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden lg:flex-row lg:gap-6 lg:px-6 lg:py-6 xl:max-w-6xl xl:gap-8 xl:px-8 xl:py-8">
-        {/* ── HEADER / SIDEBAR ── */}
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-[var(--color-bg)]/85 px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur-md lg:top-6 lg:w-64 lg:shrink-0 lg:flex-col lg:items-stretch lg:gap-6 lg:self-start lg:rounded-3xl lg:border lg:bg-[var(--color-surface-2)] lg:p-6 lg:backdrop-blur-none xl:w-72">
+      <div className="relative mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden lg:flex-row lg:gap-6 lg:px-6 lg:py-6 xl:max-w-6xl xl:gap-8 xl:px-8 xl:py-8">
+        {/* ── HEADER / SIDEBAR ── on the map it floats over the full-bleed map with a gradient (no hard line) */}
+        <header
+          className={`z-20 flex items-center justify-between gap-3 px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 lg:w-64 lg:shrink-0 lg:flex-col lg:items-stretch lg:gap-6 lg:self-start lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:bg-[var(--color-surface-2)] lg:bg-none lg:p-6 lg:pb-6 lg:backdrop-blur-none lg:[mask-image:none] xl:w-72 lg:sticky lg:top-6 ${
+            activeTab === "explore"
+              ? "absolute inset-x-0 top-0 bg-gradient-to-b from-[var(--color-bg)] via-[var(--color-bg)]/70 to-transparent pb-10"
+              : "sticky top-0 border-b border-[var(--color-border)] bg-[var(--color-bg)]/85 backdrop-blur-md"
+          }`}
+        >
           {/* Logo */}
           <div className="min-w-0 lg:flex lg:justify-center">
             <h1 className="sr-only">
@@ -190,7 +196,7 @@ export default function Home() {
           Inset from the edges; corner radius is concentric with the iPhone screen
           radius (--screen-radius − inset) so the dock nests inside the display corners. */}
       <nav
-        className="fixed inset-x-[var(--dock-inset)] bottom-[max(var(--dock-inset),env(safe-area-inset-bottom))] z-30 mx-auto flex max-w-md items-stretch gap-0.5 border border-[var(--color-border)] bg-[var(--color-surface)]/80 p-1.5 shadow-[0_12px_36px_oklch(0.2_0.04_258/0.24)] backdrop-blur-xl lg:hidden"
+        className="fixed inset-x-[var(--dock-inset)] bottom-[calc(env(safe-area-inset-bottom)+var(--dock-inset))] z-30 mx-auto flex max-w-md items-stretch gap-0.5 bg-[var(--color-surface)]/80 p-1.5 shadow-[0_8px_30px_oklch(0.2_0.04_258/0.28)] ring-1 ring-[var(--color-border)] backdrop-blur-xl lg:hidden"
         style={{ borderRadius: "calc(var(--screen-radius) - var(--dock-inset))" }}
       >
         {TABS.map(({ key, icon: Icon }) => {

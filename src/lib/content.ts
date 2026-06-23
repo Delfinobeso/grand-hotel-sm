@@ -44,6 +44,8 @@ export interface HotelContent {
     callValetLabel: string;
     youAreHere: string;
     minWalk: string;
+    byCar: string;
+    airport: string;
     floorGround: string;
     floorThird: string;
     floorThirdMessegue: string;
@@ -235,6 +237,8 @@ const it: HotelContent = {
     callValetLabel: "Chiama il Valet",
     youAreHere: "Ti trovi qui",
     minWalk: "min a piedi",
+    byCar: "in auto",
+    airport: "Aeroporto",
     floorGround: "Piano Terra",
     floorThird: "3° piano",
     floorThirdMessegue: "3° piano · Centro Mességué",
@@ -616,6 +620,8 @@ const en: HotelContent = {
     callValetLabel: "Call Valet",
     youAreHere: "You are here",
     minWalk: "min walk",
+    byCar: "by car",
+    airport: "Airport",
     floorGround: "Ground floor",
     floorThird: "3rd floor",
     floorThirdMessegue: "3rd floor · Mességué Centre",

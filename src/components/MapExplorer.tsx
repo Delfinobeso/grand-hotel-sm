@@ -4,21 +4,24 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Tooltip, Polyline, useMap } from "react-leaflet";
-import { Navigation, Footprints, ChevronRight } from "lucide-react";
-import { HOTEL, GHSM_VENUES, POINTS_OF_INTEREST } from "@/lib/hotel";
+import { Navigation, Footprints, Car, ChevronRight } from "lucide-react";
+import { HOTEL, GHSM_VENUES, POINTS_OF_INTEREST, AIRPORTS } from "@/lib/hotel";
 import type { HotelContent } from "@/lib/content";
 import { mapsUrl } from "@/components/ui";
 
 type LatLng = [number, number];
+type Kind = "poi" | "venue" | "airport";
 
 interface Place {
   id: string;
   name: string;
   lat: number;
   lon: number;
-  walk: number;
   desc: string;
-  kind: "venue" | "poi";
+  kind: Kind;
+  mode: "walk" | "drive";
+  walk?: number;
+  km?: number;
 }
 
 function buildPlaces(t: HotelContent): Place[] {
@@ -29,26 +32,20 @@ function buildPlaces(t: HotelContent): Place[] {
   const poiDesc: Record<string, string> = Object.fromEntries(t.info.pois.map((p) => [p.id, p.body]));
 
   const pois: Place[] = POINTS_OF_INTEREST.map((p) => ({
-    id: p.id,
-    name: p.name,
-    lat: p.lat,
-    lon: p.lon,
-    walk: p.walkMinutes,
-    desc: poiDesc[p.id] ?? "",
-    kind: "poi",
+    id: p.id, name: p.name, lat: p.lat, lon: p.lon, desc: poiDesc[p.id] ?? "", kind: "poi", mode: "walk", walk: p.walkMinutes,
   }));
   const venues: Place[] = GHSM_VENUES.map((v) => ({
-    id: v.id,
-    name: v.name,
-    lat: v.lat,
-    lon: v.lon,
-    walk: v.walkMinutes ?? 5,
-    desc: venueDesc[v.id] ?? "",
-    kind: "venue",
+    id: v.id, name: v.name, lat: v.lat, lon: v.lon, desc: venueDesc[v.id] ?? "", kind: "venue", mode: "walk", walk: v.walkMinutes ?? 5,
   }));
-  // POIs first (the sightseeing focus), then group venues.
-  return [...pois, ...venues];
+  const airports: Place[] = AIRPORTS.map((a) => ({
+    id: a.id, name: `${a.name} ${a.code}`, lat: a.lat, lon: a.lon,
+    desc: t.info.airports.note, kind: "airport", mode: "drive", km: a.distanceKm,
+  }));
+  // Sightseeing first, then group venues, then airports (reachable by car).
+  return [...pois, ...venues, ...airports];
 }
+
+const KIND_COLOR: Record<Kind, string> = { poi: "#0a2444", venue: "#b88746", airport: "#3f7d6e" };
 
 const hotelIcon = L.divIcon({
   className: "",
@@ -57,19 +54,14 @@ const hotelIcon = L.divIcon({
   iconAnchor: [13, 13],
 });
 
-function placeIcon(active: boolean, kind: Place["kind"]): L.DivIcon {
-  const color = kind === "venue" ? "#b88746" : "#0a2444";
+function placeIcon(active: boolean, kind: Kind): L.DivIcon {
+  const color = KIND_COLOR[kind];
   const size = active ? 22 : 14;
   const inner = active
     ? `<span class="ghsm-place-pin-active" style="--pin:${color}"></span>`
     : `<span style="display:block;width:14px;height:14px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)"></span>`;
   return L.divIcon({ className: "", html: inner, iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
 }
-
-const BOUNDS: L.LatLngBoundsExpression = [
-  [43.931, 12.442],
-  [43.942, 12.456],
-];
 
 /** Leaflet renders blank if its container had no size at init; fix size after mount. */
 function InvalidateSize() {
@@ -86,7 +78,7 @@ function InvalidateSize() {
   return null;
 }
 
-/** Drives camera + walking route whenever the active place changes. */
+/** Drives camera + route whenever the active place changes (walking or driving). */
 function MapDriver({ active, onRoute }: { active: Place; onRoute: (r: LatLng[]) => void }) {
   const map = useMap();
 
@@ -96,18 +88,19 @@ function MapDriver({ active, onRoute }: { active: Place; onRoute: (r: LatLng[]) 
       [HOTEL.lat, HOTEL.lon],
       [active.lat, active.lon],
     ];
-    // Frame the whole route (hotel → place); large bottom padding keeps it above the banner.
+    // Frame the whole route; large bottom padding keeps it visible above the banners.
     const frame = (coords: LatLng[]) => {
       onRoute(coords);
       map.flyToBounds(L.latLngBounds(coords), {
-        paddingTopLeft: [36, 96],
-        paddingBottomRight: [36, 300],
+        paddingTopLeft: [28, 100],
+        paddingBottomRight: [28, 290],
         maxZoom: 17,
         duration: 0.9,
         easeLinearity: 0.24,
       });
     };
-    const url = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${HOTEL.lon},${HOTEL.lat};${active.lon},${active.lat}?overview=full&geometries=geojson`;
+    const profile = active.mode === "drive" ? "routed-car/route/v1/driving" : "routed-foot/route/v1/foot";
+    const url = `https://routing.openstreetmap.de/${profile}/${HOTEL.lon},${HOTEL.lat};${active.lon},${active.lat}?overview=full&geometries=geojson`;
     fetch(url, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => {
@@ -132,7 +125,6 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
 
   const onRoute = useCallback((r: LatLng[]) => setRoute(r), []);
 
-  // Scroll the carousel to a card (used when a marker is tapped).
   const scrollToCard = useCallback((i: number) => {
     const el = scrollRef.current;
     if (!el) return;
@@ -143,7 +135,6 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
     window.setTimeout(() => (programmatic.current = false), 600);
   }, []);
 
-  // Detect the centered card on user scroll → set active.
   const onScroll = useCallback(() => {
     if (programmatic.current) return;
     cancelAnimationFrame(rafId.current);
@@ -176,12 +167,13 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
 
   const activePlace = places[active];
 
+  const badgeFor = (k: Kind) => (k === "venue" ? "GHSM Group" : k === "airport" ? t.common.airport : t.info.poiLabel);
+
   return (
     <div className="relative h-full w-full overflow-hidden isolate">
       <MapContainer
         center={[HOTEL.lat, HOTEL.lon]}
         zoom={16}
-        maxBounds={BOUNDS}
         scrollWheelZoom={false}
         zoomControl={false}
         className="absolute inset-0 h-full w-full"
@@ -194,12 +186,18 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
         <InvalidateSize />
         <MapDriver active={activePlace} onRoute={onRoute} />
 
-        {/* Walking route */}
+        {/* Route */}
         {route.length > 1 && (
           <Polyline
             key={activePlace.id}
             positions={route}
-            pathOptions={{ color: "#0a2444", weight: 4, opacity: 0.9, lineCap: "round", className: "ghsm-walk-route" }}
+            pathOptions={{
+              color: activePlace.mode === "drive" ? "#3f7d6e" : "#0a2444",
+              weight: 4,
+              opacity: 0.9,
+              lineCap: "round",
+              className: activePlace.mode === "drive" ? "ghsm-drive-route" : "ghsm-walk-route",
+            }}
           />
         )}
 
@@ -235,15 +233,17 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
       <div
         ref={scrollRef}
         onScroll={onScroll}
-        className="ghsm-carousel absolute inset-x-0 bottom-[calc(6rem+env(safe-area-inset-bottom))] z-[1000] flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-1 lg:bottom-4"
+        className="ghsm-carousel absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] z-[1000] flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-2 lg:bottom-4"
       >
         {places.map((p, i) => {
           const isActive = i === active;
           return (
             <article
               key={p.id}
-              className={`ghsm-card snap-center shrink-0 rounded-3xl border bg-[var(--color-surface)]/95 p-4 shadow-[0_10px_30px_oklch(0.2_0.04_258/0.25)] backdrop-blur-xl transition-[border-color,transform] duration-300 ${
-                isActive ? "border-[var(--color-accent)]" : "border-[var(--color-border)]"
+              className={`ghsm-card snap-center shrink-0 rounded-3xl bg-[var(--color-surface)]/95 p-4 backdrop-blur-xl transition-shadow duration-300 ${
+                isActive
+                  ? "shadow-[0_16px_44px_oklch(0.2_0.04_258/0.32)]"
+                  : "shadow-[0_8px_24px_oklch(0.2_0.04_258/0.18)]"
               }`}
               style={{ width: "min(82vw, 22rem)", willChange: "transform" }}
             >
@@ -251,15 +251,30 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
                 <span
                   className="rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide"
                   style={{
-                    color: p.kind === "venue" ? "#9a6f33" : "var(--color-accent)",
-                    background: p.kind === "venue" ? "oklch(0.72 0.09 75 / 0.16)" : "var(--color-accent-soft)",
+                    color:
+                      p.kind === "venue" ? "#9a6f33" : p.kind === "airport" ? "#2f6356" : "var(--color-accent)",
+                    background:
+                      p.kind === "venue"
+                        ? "oklch(0.72 0.09 75 / 0.16)"
+                        : p.kind === "airport"
+                          ? "oklch(0.55 0.07 165 / 0.16)"
+                          : "var(--color-accent-soft)",
                   }}
                 >
-                  {p.kind === "venue" ? "GHSM Group" : t.info.poiLabel}
+                  {badgeFor(p.kind)}
                 </span>
                 <span className="ml-auto inline-flex items-center gap-1 text-[0.8rem] font-medium text-[var(--color-text-muted)]">
-                  <Footprints size={14} strokeWidth={2} />
-                  {p.walk} {t.common.minWalk}
+                  {p.mode === "drive" ? (
+                    <>
+                      <Car size={14} strokeWidth={2} />
+                      {p.km} km {t.common.byCar}
+                    </>
+                  ) : (
+                    <>
+                      <Footprints size={14} strokeWidth={2} />
+                      {p.walk} {t.common.minWalk}
+                    </>
+                  )}
                 </span>
               </div>
               <h3 className="mt-2 font-display text-[1.15rem] font-semibold leading-snug text-[var(--color-text)]">
