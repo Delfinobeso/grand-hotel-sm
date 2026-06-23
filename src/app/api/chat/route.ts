@@ -180,36 +180,33 @@ Tutte con vista panoramica:
 Menu alla carta dello Chef Saverio Guida. Coperto €3,50 (include entrée e pane fatto in casa).
 
 **Antipasti:**
-- Uovo C.B.T., spuma di fossa e spinaci — €15
-- Tartare di manzo, barbabietola e lamponi — €16
-- Mortadella, peperoni rossi e robiola — €16
-- Radicchio brasato, cipollotto, arancia e noci — €15
+- Calamaro alla marinara, nero di seppia e salsetta di pane — €17
+- Lattuga con chimichurri di peperone rosso, mais e capperi — €15
+- Tartare di manzo con maionese affumicata all'erba cipollina e verdure in agrodolce — €16
+- Uovo CBT con pesto di zucchine e menta, salsa al pecorino toscano — €15
 
 **Primi:**
 - Tagliatella al ragù della tradizione romagnola — €15
-- Gnocchi di zucca, caramello di zucca, porcini e maggiorana — €17
 - Cappellacci ricotta, mascarpone, spinaci, salsa al pomodoro e olio al basilico — €18
-- Bottoni di agnello, brodo di verza e parmigiano — €18
-- Pasta secca con bietola, baccalà e acciuga — €18
+- Tagliolino con canocchie, limone e mandorle — €18
+- Pappardelle integrali con funghi e stridoli — €17
+- Ravioli d'agnello con parmigiano, aceto balsamico e cicoria — €18
 
 **Secondi:**
-- Cavolfiore, spuma di patate e glassa vegetale (vegetariano) — €15
-- Pollo con cime di rapa e lime — €19
-- Pescato del giorno, zucchine, pompelmo e ponzu — €20
-- Manzo o agnello con radicchio, vino rosso e topinambur — €22
+- Manzo o agnello con fondo, susine fermentate e grigliate con chips di grano saraceno — €22
+- Pescato del giorno con cetrioli, pomodoro e ponzu — €22
+- Pollo con cipollotti e spinaci grill e albicocca — €20
+- Melanzana fondente con pinoli, menta e vino rosso (vegetariano) — €16
 
 **Contorni:** Patate arrosto alle erbe aromatiche €6, Insalata mista di stagione €7, Erbetta di campo ripassate €7.
 
 **Menu degustazione:**
-- Percorso del Territorio (tradizionale locale): 4 portate — €35 a persona
-- Percorso Degustazione (chef): 5 portate — €45 a persona
-- Menù Bambino: tagliatella al ragù + cotoletta + gelato artigianale — €15
+- Percorso del Territorio (tradizionale locale): 4 portate — €40 a persona
+- Percorso Degustazione (chef): 5 portate (con pre-dessert) — €50 a persona
+- Green Gourmet (vegetariano): 4 portate — €45 a persona
+- Menù Bambino: tagliatella al ragù + cotoletta + gelato Cremeria del Titano — €16
 
-**Dolci:**
-- Pan dolce alle pesche con crema pasticciera vaniglia Madagascar — €8
-- Mezza sfera popcorn, caramello, lampone e mandorla — €8
-- Tarte tatin alle mele e spuma alla cannella — €8
-- Gelato artigianale della Cremeria del Titano
+**Dolci:** Dolce Tentazione (menu degustazione), Banana Split (menu Green Gourmet), gelato artigianale della Cremeria del Titano.
 
 Prenotazione online disponibile. Per prenotare fornisci SEMPRE [Prenota La Terrazza](https://widget.thefork.com/it/bdef5000-1a1c-435f-9501-170ed277ac99).
 
