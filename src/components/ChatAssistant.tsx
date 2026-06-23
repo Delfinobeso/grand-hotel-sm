@@ -66,9 +66,9 @@ function renderMarkdown(text: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
-  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
-  html = html.replace(/~~(.+?)~~/g, "<del>$1</del>");
+  html = html.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/\*([\s\S]+?)\*/g, "<em>$1</em>");
+  html = html.replace(/~~([\s\S]+?)~~/g, "<del>$1</del>");
   return html;
 }
 

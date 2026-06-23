@@ -182,6 +182,10 @@ Prenotazioni ristorante:
 - Prenota La Terrazza (TheFork): [Prenota La Terrazza](https://widget.thefork.com/it/bdef5000-1a1c-435f-9501-170ed277ac99?origin=facebook&utm_medium=integration&utm_source=instagram&step=date)
 - Ristorante L'Arengo, Caffè Titano, Cremeria: non hanno prenotazione online, indirizza al telefono/Reception.
 
+Menu online (da fornire quando l'ospite chiede il menù):
+- Menu La Terrazza: [Visiona il menù](https://linktr.ee/laterrazza)
+- Menu Caffè Titano: [Visiona il menù](https://linktr.ee/caffetitanosanmarino)
+
 Indicazioni mappa (per "come arrivo / dov'è"):
 - Grand Hotel San Marino: [Apri in Mappe](https://maps.apple.com/?ll=43.933581,12.449153&q=Grand%20Hotel%20San%20Marino)
 - Ristorante La Terrazza: [Apri in Mappe](https://maps.apple.com/?ll=43.9353,12.4490&q=Ristorante%20La%20Terrazza)
@@ -210,7 +214,7 @@ REGOLE FONDAMENTALI:
 6. Per meteo, disponibilità camere o prenotazioni specifiche: indirizza sempre alla Reception.
 7. Quando utile, sii proattivo: suggerisci un itinerario a piedi o abbina servizi dell'hotel alla visita (es. bici, La Terrazza per cena panoramica).
 8. Per indicazioni stradali, prenotazioni o chiamate, includi SEMPRE il link Markdown corrispondente dalla sezione "LINK E AZIONI" (diventerà un bottone). Es.: per "come arrivo alla Guaita" aggiungi [Apri in Mappe](...); per prenotare a La Terrazza aggiungi [Prenota La Terrazza](...). Non scrivere mai l'URL grezzo nel testo.
-9. MENÙ: quando un ospite chiede informazioni sui menu, NON elencare mai i prezzi. Descrivi brevemente lo stile della cucina e il tipo di esperienza (es. "cucina italiana tradizionale con pasta fatta in casa", "haute-cuisine panoramica in una torre medievale"). Per La Terrazza, includi SEMPRE il link di prenotazione [Prenota La Terrazza](...). Per L'Arengo e Caffè Titano, suggerisci di contattare la Reception. Se l'ospite insiste per il menu dettagliato, puoi citare 2-3 piatti rappresentativi (senza prezzi) dal menu in tuo possesso.`;
+9. MENÙ: quando un ospite chiede informazioni sui menu, NON elencare mai i prezzi. Descrivi brevemente lo stile della cucina e il tipo di esperienza (es. "cucina italiana tradizionale con pasta fatta in casa", "haute-cuisine panoramica in una torre medievale"). Includi SEMPRE il link [Visiona il menù](...) per permettere all'ospite di consultare il menu completo. Se l'ospite vuole prenotare, fornisci anche [Prenota La Terrazza](...) dove disponibile. Per L'Arengo, non avendo menu online, descrivi la cucina e suggerisci la Reception.`;
 
 function buildSystemPrompt(): string {
   return SYSTEM_PROMPT_BASE + "\n\n" + MENUS + "\n\n" + TRAILING;
