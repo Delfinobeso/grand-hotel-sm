@@ -15,11 +15,12 @@ export default function InstallPrompt() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    // Android: intercept beforeinstallprompt
+    // Android: intercept beforeinstallprompt (delay to let splash finish)
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setShowAndroid(true);
+      // Splash screen runs for 2.5s — wait until it's gone
+      setTimeout(() => setShowAndroid(true), 2800);
     };
     window.addEventListener("beforeinstallprompt", handler);
 

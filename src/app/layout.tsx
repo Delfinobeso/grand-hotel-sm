@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}var l=localStorage.getItem('lang');if(l==='en'){document.documentElement.lang='en';}}catch(e){}})();`;
 
 import InstallPrompt from "@/components/InstallPrompt";
+import SplashScreen from "@/components/SplashScreen";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body>
+        <SplashScreen />
         {children}
         <InstallPrompt />
       </body>
