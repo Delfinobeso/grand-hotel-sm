@@ -229,6 +229,9 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
         })}
       </MapContainer>
 
+      {/* Bottom scrim — fades the map all the way down behind chips + dock (reaches the very bottom) */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[800] h-52 bg-gradient-to-t from-[var(--color-bg)] via-[var(--color-bg)]/45 to-transparent" />
+
       {/* Bottom banners */}
       <div
         ref={scrollRef}

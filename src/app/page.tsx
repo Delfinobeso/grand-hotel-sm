@@ -94,19 +94,22 @@ export default function Home() {
     explore: <ExploreSection t={t} />,
   };
 
+  // Home and map are visual surfaces: header floats over them (controls only, no logo/bg).
+  const visualHeader = activeTab === "oggi" || activeTab === "explore";
+
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-[var(--color-bg)]">
       <div className="relative mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden lg:flex-row lg:gap-6 lg:px-6 lg:py-6 xl:max-w-6xl xl:gap-8 xl:px-8 xl:py-8">
         {/* ── HEADER / SIDEBAR ── on the map it floats over the full-bleed map with a gradient (no hard line) */}
         <header
-          className={`z-20 flex items-center justify-between gap-3 px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 lg:w-64 lg:shrink-0 lg:flex-col lg:items-stretch lg:gap-6 lg:self-start lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:bg-[var(--color-surface-2)] lg:bg-none lg:p-6 lg:pb-6 lg:backdrop-blur-none lg:[mask-image:none] xl:w-72 lg:sticky lg:top-6 ${
-            activeTab === "explore"
-              ? "absolute inset-x-0 top-0 bg-gradient-to-b from-[var(--color-bg)] via-[var(--color-bg)]/70 to-transparent pb-10"
+          className={`z-20 flex items-center justify-between gap-3 px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 lg:sticky lg:top-6 lg:w-64 lg:shrink-0 lg:flex-col lg:items-stretch lg:gap-6 lg:self-start lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:bg-[var(--color-surface-2)] lg:bg-none lg:p-6 lg:pb-6 lg:backdrop-blur-none xl:w-72 ${
+            visualHeader
+              ? "pointer-events-none absolute inset-x-0 top-0"
               : "sticky top-0 border-b border-[var(--color-border)] bg-[var(--color-bg)]/85 backdrop-blur-md"
           }`}
         >
-          {/* Logo */}
-          <div className="min-w-0 lg:flex lg:justify-center">
+          {/* Logo (hidden on the visual surfaces where the hero/map carries the brand) */}
+          <div className={`min-w-0 lg:flex lg:justify-center ${visualHeader ? "hidden lg:flex" : ""}`}>
             <h1 className="sr-only">
               {t.home.titleMain} {t.home.titleAccent}
             </h1>
@@ -124,7 +127,7 @@ export default function Home() {
           </div>
 
           {/* Toggles */}
-          <div className="flex shrink-0 items-center gap-1.5 lg:order-last lg:mt-auto lg:w-full">
+          <div className="pointer-events-auto ml-auto flex shrink-0 items-center gap-1.5 lg:order-last lg:ml-0 lg:mt-auto lg:w-full">
             <button
               onClick={toggleLang}
               aria-label={t.common.languageLabel}

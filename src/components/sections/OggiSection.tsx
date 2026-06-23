@@ -133,17 +133,16 @@ export function OggiSection({
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, oklch(0.2 0.05 258 / 0.35) 0%, oklch(0.2 0.05 258 / 0.18) 40%, var(--hero-tint) 100%)",
+              "linear-gradient(180deg, oklch(0% 0 0 / 0.22) 0%, transparent 26%, transparent 52%, oklch(0% 0 0 / 0.55) 100%)",
           }}
         />
-        <div className="relative flex min-h-[clamp(300px,50svh,440px)] flex-col justify-end gap-3 px-6 pb-7 pt-[max(2rem,env(safe-area-inset-top))] lg:px-9 lg:pb-9">
-          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-white/80">{h.eyebrow}</p>
-          <h2 className="font-display text-[2.25rem] font-semibold leading-[1.05] text-white lg:text-[3rem]">
+        <div className="relative flex min-h-[clamp(280px,48svh,420px)] flex-col items-center justify-end gap-1.5 px-6 pb-8 pt-[max(2rem,env(safe-area-inset-top))] text-center lg:px-9 lg:pb-10">
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-white/85">{h.eyebrow}</p>
+          <h2 className="font-display text-[2.25rem] font-semibold leading-[1.04] text-white lg:text-[3rem]">
             {h.titleMain}
             <br />
             {h.titleAccent}
           </h2>
-          <p className="max-w-md text-[0.95rem] leading-relaxed text-white/85">{h.welcomeBody}</p>
         </div>
       </section>
 

@@ -142,9 +142,11 @@ export default function ChatAssistant({
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // On mobile, pin the panel to the visual viewport (above the keyboard).
-  const panelStyle: React.CSSProperties | undefined =
-    mobile && vv ? { position: "fixed", top: vv.top, left: 0, right: 0, height: vv.height } : undefined;
+  // Keep the panel full-screen and opaque; only lift the content above the keyboard via
+  // bottom padding (= keyboard height). Avoids the background flashing while iOS resizes.
+  const keyboard =
+    mobile && vv && typeof window !== "undefined" ? Math.max(0, window.innerHeight - vv.height - vv.top) : 0;
+  const panelStyle: React.CSSProperties | undefined = keyboard ? { paddingBottom: keyboard } : undefined;
 
   const send = async (text: string) => {
     if (!text.trim() || loading) return;

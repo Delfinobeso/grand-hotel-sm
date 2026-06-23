@@ -38,7 +38,7 @@ export function ExploreSection({ t }: { t: HotelContent }) {
       {/* Info / events trigger */}
       <button
         onClick={() => setSheet(true)}
-        className="absolute right-3 top-[calc(env(safe-area-inset-top)+4.25rem)] z-20 inline-flex h-11 items-center gap-1.5 rounded-full bg-[var(--color-surface)]/90 px-4 text-[0.85rem] font-semibold text-[var(--color-text)] shadow-[0_6px_20px_oklch(0.2_0.04_258/0.22)] ring-1 ring-[var(--color-border)] backdrop-blur-xl transition-transform duration-200 active:scale-95 lg:top-3"
+        className="absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-20 inline-flex h-11 items-center gap-1.5 rounded-full bg-[var(--color-surface)]/90 px-4 text-[0.85rem] font-semibold text-[var(--color-text)] shadow-[0_6px_20px_oklch(0.2_0.04_258/0.22)] ring-1 ring-[var(--color-border)] backdrop-blur-xl transition-transform duration-200 active:scale-95 lg:left-auto lg:right-3 lg:top-3"
       >
         <Info size={16} strokeWidth={2} />
         {info.sheetLabel}
