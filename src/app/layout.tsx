@@ -23,7 +23,6 @@ export const metadata: Metadata = {
 // Apply persisted theme before paint to avoid a flash; only sets <html data-theme>.
 const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}var l=localStorage.getItem('lang');if(l==='en'){document.documentElement.lang='en';}}catch(e){}})();`;
 
-import InstallPrompt from "@/components/InstallPrompt";
 import SplashScreen from "@/components/SplashScreen";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -38,7 +37,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SplashScreen />
         {children}
-        <InstallPrompt />
       </body>
     </html>
   );
