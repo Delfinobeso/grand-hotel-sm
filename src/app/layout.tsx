@@ -23,6 +23,8 @@ export const metadata: Metadata = {
 // Apply persisted theme before paint to avoid a flash; only sets <html data-theme>.
 const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}var l=localStorage.getItem('lang');if(l==='en'){document.documentElement.lang='en';}}catch(e){}})();`;
 
+import InstallPrompt from "@/components/InstallPrompt";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="it" suppressHydrationWarning>
@@ -32,7 +34,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/apple-icon-180.png" />
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <InstallPrompt />
+      </body>
     </html>
   );
 }
