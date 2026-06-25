@@ -232,6 +232,17 @@ export default function Home() {
             <p className="mt-10 text-center text-xs text-[var(--color-text-muted)]">
               {t.footer} · © {new Date().getFullYear()}
             </p>
+            <p className="mt-1.5 text-center text-xs text-[var(--color-text-muted)]">
+              {t.poweredBy}{" "}
+              <a
+                href="https://blasat.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-[var(--color-text-secondary)] underline-offset-2 hover:underline"
+              >
+                Blasat
+              </a>
+            </p>
           </main>
         )}
       </div>

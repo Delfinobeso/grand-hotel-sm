@@ -169,6 +169,7 @@ export interface HotelContent {
     contactsLabel: string;
   };
   footer: string;
+  poweredBy: string;
 }
 
 const TV_CHANNELS = [
@@ -592,6 +593,7 @@ const it: HotelContent = {
     backLabel: "Tutti i servizi",
   },
   footer: "Grand Hotel San Marino",
+  poweredBy: "Realizzata da",
 };
 
 const en: HotelContent = {
@@ -975,6 +977,7 @@ const en: HotelContent = {
     backLabel: "All Services",
   },
   footer: "Grand Hotel San Marino",
+  poweredBy: "Built by",
 };
 
 export const content: Record<Lang, HotelContent> = { it, en };

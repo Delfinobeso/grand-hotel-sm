@@ -389,6 +389,17 @@ export default function ChatAssistant({
                 <Send size={17} strokeWidth={1.875} />
               </button>
             </div>
+            <p className="mt-2 text-center text-[0.6875rem] text-[var(--color-text-muted)]">
+              Powered by{" "}
+              <a
+                href="https://blasat.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-[var(--color-text-secondary)] underline-offset-2 hover:underline"
+              >
+                Blasat AI
+              </a>
+            </p>
           </div>
           </motion.div>
           </div>
