@@ -243,6 +243,14 @@ export default function Home() {
                 Blasat
               </a>
             </p>
+            <p className="mt-2.5 text-center">
+              <a
+                href="/feedback"
+                className="text-xs text-[var(--color-text-muted)] underline-offset-2 hover:text-[var(--color-text-secondary)] transition-colors duration-150"
+              >
+                {t.feedback}
+              </a>
+            </p>
           </main>
         )}
       </div>
