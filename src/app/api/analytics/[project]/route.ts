@@ -4,7 +4,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.BLASAT_ANALYTICS_URL || 'https://rev-provinces-emacs-squad.trycloudflare.com';
+const BACKEND_URL = process.env.BLASAT_ANALYTICS_URL || 'https://brand-mile-ver-pearl.trycloudflare.com';
 
 export async function GET(
   request: NextRequest,
