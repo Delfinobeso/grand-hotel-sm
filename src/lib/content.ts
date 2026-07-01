@@ -1,7 +1,7 @@
 import type { StatusLabels } from "@/lib/hours";
 import type { EventDate } from "@/lib/ics";
 
-export type Lang = "it" | "en";
+export type Lang = "it" | "en" | "fr" | "de" | "es";
 
 export interface HoursRow {
   label: string;
@@ -34,6 +34,7 @@ export interface HotelContent {
   };
   common: {
     receptionCta: string;
+    receptionLabel: string;
     languageLabel: string;
     status: StatusLabels;
     callLabel: string;
@@ -64,6 +65,7 @@ export interface HotelContent {
     nowLabel: string;
     quickLabel: string;
     groupLabel: string;
+    groupCategories: { wellness: string; dining: string; cafe: string; gelato: string; suites: string };
     quick: {
       wifi: { label: string; value: string; note: string; copyDone: string };
       breakfast: { label: string; note: string };
@@ -222,6 +224,7 @@ const it: HotelContent = {
   },
   common: {
     receptionCta: "Chiama la Reception",
+    receptionLabel: "Reception",
     languageLabel: "Lingua",
     status: {
       open: "Aperto",
@@ -259,6 +262,7 @@ const it: HotelContent = {
     nowLabel: "In questo momento",
     quickLabel: "Azioni rapide",
     groupLabel: "Scopri il GHSM Group",
+    groupCategories: { wellness: "Benessere", dining: "Ristorante", cafe: "Caffè", gelato: "Gelateria", suites: "Suites" },
     quick: {
       wifi: {
         label: "Wi-Fi",
@@ -453,6 +457,11 @@ const it: HotelContent = {
         name: "La Cremeria del Titano",
         body: "Proprio accanto al Caffè Titano. Aperta nei mesi più caldi, per una fresca e gustosa sosta accompagnata da un buon gelato artigianale.",
       },
+      {
+        id: "laLoggia",
+        name: "La Loggia",
+        body: "Una bottega nel cuore del centro storico, in Piazzetta Garibaldi: formaggi, salumi e taglieri, vini e vermouth artigianali, dolci tipici sammarinesi e birre locali, selezionati per raccontare i sapori più autentici della nostra terra.",
+      },
     ],
   },
   wellness: {
@@ -606,6 +615,7 @@ const en: HotelContent = {
   },
   common: {
     receptionCta: "Call Reception",
+    receptionLabel: "Reception",
     languageLabel: "Language",
     status: {
       open: "Open",
@@ -643,6 +653,7 @@ const en: HotelContent = {
     nowLabel: "Right now",
     quickLabel: "Quick actions",
     groupLabel: "Discover the GHSM Group",
+    groupCategories: { wellness: "Wellness", dining: "Restaurant", cafe: "Café", gelato: "Ice cream", suites: "Suites" },
     quick: {
       wifi: {
         label: "Wi-Fi",
@@ -837,6 +848,11 @@ const en: HotelContent = {
         name: "La Cremeria del Titano",
         body: "Right next to Caffè Titano. Open during the warmer months, the perfect place for a refreshing and delicious break with artisanal gelato.",
       },
+      {
+        id: "laLoggia",
+        name: "La Loggia",
+        body: "A boutique in the heart of the historic centre, on Piazzetta Garibaldi: local cheeses, cured meats and charcuterie boards, artisan wines and vermouth, traditional Sammarinese sweets and local craft beers, selected to capture the most authentic flavours of our land.",
+      },
     ],
   },
   wellness: {
@@ -980,4 +996,1177 @@ const en: HotelContent = {
   poweredBy: "Built by",
 };
 
-export const content: Record<Lang, HotelContent> = { it, en };
+const fr: HotelContent = {
+  nav: {
+    oggi: "Aujourd'hui",
+    hotel: "Hôtel",
+    dining: "Restaurant",
+    wellness: "Bien-être",
+    explore: "Saint-Marin",
+  },
+  common: {
+    receptionCta: "Appeler la réception",
+    receptionLabel: "Réception",
+    languageLabel: "Langue",
+    status: {
+      open: "Ouvert",
+      closed: "Fermé",
+      onRequest: "Sur demande",
+      closesAt: "jusqu'à",
+      opensAt: "rouvre à",
+    },
+    callLabel: "Appeler",
+    bookLabel: "Réserver",
+    navigateLabel: "Naviguer",
+    openInMapsLabel: "Ouvrir dans Plans",
+    addToCalendarLabel: "Ajouter au calendrier",
+    callValetLabel: "Appeler le voiturier",
+    youAreHere: "Vous êtes ici",
+    minWalk: "min à pied",
+    byCar: "en voiture",
+    airport: "Aéroport",
+    floorGround: "Rez-de-chaussée",
+    floorThird: "3e étage",
+    floorThirdMessegue: "3e étage · Centre Mességué",
+    floorBasement: "-1 · Garage",
+  },
+  home: {
+    eyebrow: "Bienvenue au",
+    titleMain: "Grand Hotel",
+    titleAccent: "San Marino",
+    stayLabel: "Votre séjour",
+    welcomeTitle: "Nous vous souhaitons la bienvenue",
+    welcomeBody:
+      "Cette application est votre guide de séjour : demandez le room service, consultez les horaires des services, découvrez le restaurant et le spa, et explorez les incontournables de Saint-Marin.",
+    checkIn: { label: "Arrivée", value: "À partir de 14h00" },
+    checkOut: { label: "Départ", value: "Jusqu'à 11h00" },
+    lateCheckout: "Départ tardif possible selon disponibilité, avec supplément.",
+    nowLabel: "En ce moment",
+    quickLabel: "Actions rapides",
+    groupLabel: "Découvrez le GHSM Group",
+    groupCategories: { wellness: "Bien-être", dining: "Restaurant", cafe: "Café", gelato: "Glacier", suites: "Suites" },
+    quick: {
+      wifi: {
+        label: "Wi-Fi",
+        value: "GRANDHOTELRSM",
+        note: "Gratuit dans tout l'hôtel. Sélectionnez le réseau et attendez la page de connexion.",
+        copyDone: "Copié",
+      },
+      breakfast: {
+        label: "Petit-déjeuner",
+        note: "Restaurant L'Arengo · 07h00 – 10h00. En chambre avec un supplément de 6,00 €.",
+      },
+      checkout: {
+        label: "Départ",
+        note: "Jusqu'à 11h00. Départ tardif sur demande à la réception.",
+      },
+      reception: {
+        label: "Réception",
+        note: "Ouverte 24h/24. Depuis le téléphone de la chambre, touche 9.",
+      },
+      tv: {
+        label: "Chaînes TV",
+        note: "37 chaînes disponibles dans la chambre, du n° 1 au 831.",
+        cta: "Voir toutes les chaînes",
+      },
+    },
+    askLabel: "Concierge digital",
+    askBody: "Une question sur votre séjour ou sur Saint-Marin ? Demandez, je vous réponds tout de suite.",
+    askCta: "Ouvrir le Concierge",
+    highlightsLabel: "Actions rapides",
+    highlightsSeeAll: "Tout voir",
+    chatPlaceholder: "Posez votre question à notre Concierge digital…",
+    highlights: [
+      {
+        title: "Wi-Fi",
+        body: "Réseau GRANDHOTELRSM — sélectionnez-le, attendez la notification et connectez-vous gratuitement dans tout l'hôtel.",
+      },
+      {
+        title: "Réception",
+        body: "Ouverte 24h/24. Composez le 9 depuis le téléphone de la chambre pour toute demande.",
+      },
+      {
+        title: "Petit-déjeuner",
+        body: "Servi au Restaurant L'Arengo de 07h00 à 10h00. Room service disponible avec un supplément de 6,00 €.",
+      },
+    ],
+    hoursLabel: "Horaires des services",
+    hours: [
+      { label: "Réception", value: "24h/24" },
+      { label: "Petit-déjeuner · Restaurant L'Arengo", value: "07h00 – 10h00" },
+      { label: "Déjeuner · Restaurant L'Arengo", value: "12h00 – 14h30" },
+      { label: "Dîner · Restaurant L'Arengo", value: "19h00 – 21h30" },
+      { label: "Room Service", value: "07h00 – 23h00 (+ 6,00 €)" },
+      { label: "Blanchisserie", value: "08h30 – 16h00" },
+      { label: "Salle de sport", value: "08h00 – 20h00" },
+    ],
+  },
+  room: {
+    label: "Services en chambre",
+    intro: "Tout le nécessaire pour un confort optimal : réception, room service, blanchisserie, Wi-Fi et chaînes TV.",
+    servicesLabel: "Contacts et confort",
+    services: [
+      {
+        title: "Réception et Room Service",
+        subtitle: "Touche 9",
+        body: "Pour toute demande, appelez la Réception ou le Room Service en composant le 9 depuis le téléphone de la chambre.",
+      },
+      {
+        title: "Centre Mességué",
+        subtitle: "Touche 471",
+        body: "Pour informations et réservations au Centre Médical Maurice Mességué, composez le 471.",
+      },
+      {
+        title: "Coffre-fort",
+        subtitle: "Touche R + code + #",
+        body: "Pour régler le coffre-fort, appuyez sur la touche R, saisissez un nouveau code personnel de 4 à 10 chiffres et confirmez avec la touche #.",
+      },
+      {
+        title: "Climatisation",
+        subtitle: "Panneau dans la chambre",
+        body: "La climatisation se règle depuis le panneau de la chambre. Elle se coupe automatiquement à l'ouverture de la fenêtre.",
+      },
+      {
+        title: "Ne pas déranger",
+        subtitle: "Écriteau sur la poignée",
+        body: "Pour ne pas être dérangé, accrochez l'écriteau prévu à cet effet à la poignée extérieure de la porte.",
+      },
+    ],
+    roomServiceLabel: "Room Service",
+    roomService: {
+      body: "Petits-déjeuners, encas et repas peuvent être servis directement dans la chambre.",
+      hours: "Tous les jours, 07h00 – 23h00",
+      supplement: "Supplément de 6,00 € par commande.",
+    },
+    laundryLabel: "Blanchisserie",
+    laundry: {
+      body: "Les coûts et délais dépendent du type de tissu et de lavage demandé. Le formulaire de demande se trouve dans l'armoire de la chambre.",
+      hours: "08h30 – 16h00",
+    },
+    wifiLabel: "Wi-Fi",
+    wifi: {
+      network: "GRANDHOTELRSM",
+      body: "1. Ouvrez Réglages → Wi-Fi\n2. Sélectionnez le réseau GRANDHOTELRSM\n3. Touchez la notification d'enregistrement\n\nSi la notification n'apparaît pas, patientez quelques secondes. Vous trouverez les captures d'écran pas à pas dans le classeur de la chambre.",
+    },
+    tvLabel: "Chaînes TV",
+    tvIntro: "La sélection de chaînes disponibles dans la chambre :",
+    channels: TV_CHANNELS,
+    petsLabel: "Animaux de compagnie",
+    pets: {
+      body: "Les animaux de petite taille sont admis. Un supplément de 4,00 € par jour est prévu pour le nettoyage supplémentaire de la chambre.",
+    },
+  },
+  facility: {
+    label: "Services de l'établissement",
+    intro: "Parking, concierge et les espaces de l'établissement — salle de sport et vélos — pour votre séjour à Saint-Marin.",
+    parkingLabel: "Parking",
+    garage: {
+      title: "Garage privé",
+      body: [
+        "19,00 € par nuit.",
+        "Service voiturier de 7h00 à 23h00 : nous vous conseillons de demander votre véhicule au moins 30 minutes à l'avance.",
+        "Une borne de recharge pour véhicules électriques est disponible, avec supplément.",
+      ],
+    },
+    publicParking: {
+      title: "Parking public",
+      body: "Des tickets à 4,00 € par jour sont disponibles à la Réception, valables jusqu'à 12h00 le lendemain dans les zones bleues.",
+    },
+    conciergeLabel: "Concierge",
+    taxiLabel: "Taxi",
+    taxi: {
+      body: "Pour réserver un taxi, contactez la Réception en indiquant la date, l'heure, le nombre de personnes, le type de véhicule souhaité et la destination.",
+    },
+    wakeUpLabel: "Réveil",
+    wakeUp: {
+      body: "Pour demander un réveil, contactez la Réception en composant le 9.",
+    },
+    cardLabel: "TuttoSanMarino Card",
+    card: {
+      body: "La carte TuttoSanMarino offre des réductions dans les musées, boutiques et restaurants partenaires. Elle peut être demandée à la Réception.",
+    },
+    hairdresserLabel: "Coiffeur",
+    hairdresser: {
+      body: "La Réception se tient à votre disposition pour toute information sur les salons de coiffure à proximité.",
+    },
+    meetingsLabel: "Salles de réunion",
+    meetings: {
+      body: "Le Grand Hotel San Marino dispose de 5 salles de réunion modulables, pour des événements de 2 à 200 personnes, avec équipements technologiques et un personnel qualifié à disposition pour organiser réunions sur mesure, petits-déjeuners et dîners de travail, événements privés, célébrations et banquets.",
+    },
+    gymBikeLabel: "Salle de sport et vélos",
+    gymLabel: "Salle de sport",
+    gym: {
+      body: "Une petite salle de sport donnant sur la vallée du Montefeltro, avec des équipements fitness de base, située au sein du Centre Mességué au 3e étage. Accès libre, sans réservation, de 08h00 à 20h00.",
+    },
+    bikeLabel: "À vélo",
+    bike: {
+      body: "Saint-Marin propose des itinéraires routiers et hors route parmi les 9 châteaux de la République, idéaux pour des excursions à vélo. Pour la location de vélos, renseignez-vous à la Réception.",
+    },
+  },
+  dining: {
+    label: "Restaurant",
+    intro: "La cuisine du Grand Hotel San Marino et les autres adresses du groupe GHSM. Pour le Room Service directement en chambre, consultez la section Chambre.",
+    arengoLabel: "Restaurant L'Arengo",
+    arengo: {
+      hours: [
+        { label: "Petit-déjeuner", value: "07h00 – 10h00" },
+        { label: "Déjeuner", value: "12h00 – 14h30" },
+        { label: "Dîner", value: "19h00 – 21h30" },
+      ],
+      paragraphs: [
+        "Le pain et les pâtes sont faits maison, grâce au travail de nos Chef Pâtissier et Chef Pastaio dédiés.",
+        "En cuisine se transmettent les recettes de la tradition locale : lasagnes, raviolis et tortellacci préparés selon des recettes familiales.",
+        "Sur demande, des menus spéciaux hypocaloriques ou adaptés aux intolérances alimentaires et pathologies particulières sont disponibles, grâce à la synergie avec le Centre Médical Mességué et à l'utilisation de matières premières d'origine certifiée.",
+      ],
+      reservation: "La réservation est recommandée.",
+    },
+    groupLabel: "Le groupe GHSM",
+    groupIntro:
+      "Le Grand Hotel San Marino fait partie du GHSM Group, qui représente l'hospitalité à Saint-Marin depuis 1894. Voici les autres adresses du groupe où manger et boire.",
+    venues: [
+      {
+        id: "laTerrazza",
+        name: "Restaurant La Terrazza",
+        body: "Dîner entre les créneaux d'une tour médiévale, suspendu entre ciel et terre, avec un horizon qui s'étend à perte de vue — La Terrazza est une expérience que peu d'endroits au monde peuvent offrir. Cuisine gastronomique de haut niveau avec des produits locaux.",
+      },
+      {
+        id: "caffeTitano",
+        name: "Caffè Titano",
+        body: "En venant à Saint-Marin, impossible de ne pas s'y arrêter : en plein centre historique, donnant sur une charmante petite place médiévale, dans l'un des coins les plus pittoresques de la vieille ville.",
+      },
+      {
+        id: "cremeria",
+        name: "La Cremeria del Titano",
+        body: "Juste à côté du Caffè Titano. Ouvert pendant les mois les plus chauds, pour une pause fraîche et gourmande accompagnée d'une bonne glace artisanale.",
+      },
+      {
+        id: "laLoggia",
+        name: "La Loggia",
+        body: "Une boutique au cœur du centre historique, sur la Piazzetta Garibaldi : fromages, charcuteries et planches, vins et vermouths artisanaux, douceurs typiques saint-marinaises et bières locales, sélectionnés pour raconter les saveurs les plus authentiques de notre terre.",
+      },
+    ],
+  },
+  wellness: {
+    label: "Bien-être",
+    intro: "Le Centre Médical Maurice Mességué et la liste des soins pour votre détente.",
+    messegueLabel: "Centre Médical Maurice Mességué",
+    messegue: {
+      paragraphs: [
+        "Depuis plus de 30 ans, le Centre Médical Maurice Mességué est une référence italienne pour la santé, l'amincissement et les vacances bien-être : une clinique minceur et une oasis de santé qui allie régime, activité physique et soins phytothérapiques.",
+        "Le centre propose des soins esthétiques pour le visage et le corps, avec des formulations spécialisées et des rituels de remise en forme sur mesure pour chaque hôte.",
+      ],
+      quote: "C'est la nature qui a raison.",
+      quoteAuthor: "Maurice Mességué",
+      callNote: "Pour informations et réservations, composez le 471 depuis le téléphone de la chambre.",
+    },
+    priceListLabel: "Liste des soins",
+    priceListNote: "Prix et durées des soins disponibles au Centre Mességué.",
+    massages: [
+      { name: "Massage relaxant", variants: [{ duration: "30'", price: "50,00 €" }] },
+      { name: "Massage décontractant", variants: [{ duration: "50'", price: "90,00 €" }] },
+      { name: "Massage classique", variants: [{ duration: "30'", price: "50,00 €" }] },
+      {
+        name: "Massage en duo",
+        variants: [
+          { duration: "30'", price: "95,00 €" },
+          { duration: "50'", price: "165,00 €" },
+        ],
+      },
+      { name: "Hot-Stone", variants: [{ duration: "50'", price: "90,00 €" }] },
+      { name: "Massage ayurvédique", variants: [{ duration: "50'", price: "90,00 €" }] },
+      { name: "Massage à l'argile verte", variants: [{ duration: "75'", price: "145,00 €" }] },
+      {
+        name: "Drainage lymphatique",
+        variants: [
+          { label: "Visage", duration: "30'", price: "45,00 €" },
+          { label: "Corps", duration: "50'", price: "90,00 €" },
+        ],
+      },
+      { name: "Épilation partielle", variants: [{ price: "40,00 €" }] },
+      { name: "Épilation totale jambes", variants: [{ price: "55,00 €" }] },
+      { name: "Nettoyage du visage", variants: [{ duration: "60'", price: "75,00 €" }] },
+      { name: "Soin Anti-Age classique", variants: [{ duration: "45'", price: "104,00 €" }] },
+      { name: "Lift Summum (Anti-Age Plus)", variants: [{ duration: "50'", price: "135,00 €" }] },
+      { name: "Radiofréquence (Anti-Age Deluxe)", variants: [{ duration: "75'", price: "135,00 €" }] },
+      { name: "Manucure", variants: [{ price: "38,00 €" }] },
+      { name: "Pédicure", variants: [{ price: "48,00 €" }] },
+    ],
+  },
+  info: {
+    label: "Explorer",
+    intro: "La carte de la zone, les adresses du groupe GHSM, les lieux à ne pas manquer à Saint-Marin et comment se déplacer en ville.",
+    sheetLabel: "Événements et infos",
+    ghsmLabel: "Adresses GHSM à proximité",
+    poiLabel: "À ne pas manquer à Saint-Marin",
+    pois: [
+      {
+        id: "palazzoPubblico",
+        name: "Palazzo Pubblico",
+        body: "Le palais du Gouvernement, siège des institutions de la République, domine la Piazza della Libertà. Un parcours de visite raconte l'histoire institutionnelle de Saint-Marin.",
+      },
+      {
+        id: "basilica",
+        name: "Basilica del Santo",
+        body: "De style néoclassique, elle conserve les reliques de saint Marin, le saint qui a donné naissance à la plus ancienne République du monde.",
+      },
+      {
+        id: "museoStato",
+        name: "Musée d'État",
+        body: "Il rassemble des vestiges archéologiques, des œuvres d'art et des témoignages historiques de la République, de la préhistoire à l'époque moderne.",
+      },
+      {
+        id: "guaita",
+        name: "Première Tour · Forteresse Guaita",
+        body: "La plus ancienne et la plus célèbre des Trois Tours, construite au XIe siècle. Depuis les chemins de ronde, la vue s'étend jusqu'à la mer Adriatique.",
+      },
+      {
+        id: "cesta",
+        name: "Deuxième Tour · Forteresse Cesta",
+        body: "Elle abrite le Musée des Armes Anciennes, avec une collection d'armures et d'armes du XIIe au XIXe siècle.",
+      },
+      {
+        id: "funivia",
+        name: "Téléphérique de Saint-Marin",
+        body: "Il relie en quelques minutes le centre historique à Borgo Maggiore, avec une vue panoramique sur la vallée du Montefeltro.",
+      },
+    ],
+    airportsLabel: "Aéroports",
+    airports: {
+      list: ["Rimini", "Ancône", "Forlì", "Bologne"],
+      note: "Un service de location de voiture avec chauffeur est disponible sur demande.",
+    },
+    reachLabel: "Comment se déplacer",
+    reach: {
+      transit: {
+        title: "Transports publics",
+        body: "Bonelli Bus relie Saint-Marin à la gare ferroviaire et à l'aéroport de Rimini avec des liaisons régulières en journée.",
+      },
+      taxi: {
+        title: "Taxi",
+        body: "Pour se rendre à l'aéroport ou dans d'autres localités, la Réception est à votre disposition pour réserver un taxi ou un service avec chauffeur.",
+      },
+      walk: {
+        title: "À pied",
+        body: "Le centre historique est piétonnier et se rejoint depuis l'hôtel en quelques minutes, entre ruelles et escaliers typiques : des chaussures confortables sont recommandées.",
+      },
+    },
+  },
+  about: {
+    label: "Informations",
+    intro: "Le groupe GHSM, les événements à Saint-Marin et tous les contacts du Grand Hotel.",
+    groupLabel: "GHSM Group",
+    group: {
+      intro: "GHSM Group représente l'hospitalité à Saint-Marin depuis 1894.",
+      titanoSuites: {
+        name: "Titano Suites",
+        body: "Un palais de la fin du XIXe siècle au cœur de Saint-Marin, qui abrite la Suite Montefeltro avec bain à remous sur sa terrasse panoramique.",
+      },
+    },
+    eventsLabel: "Événements à Saint-Marin",
+    events: [
+      {
+        name: "Investiture des Capitaines Régents",
+        date: "1er avril et 1er octobre",
+        dates: [{ month: 4, day: 1 }, { month: 10, day: 1 }],
+      },
+      { name: "Fête Nationale", date: "3 septembre", dates: [{ month: 9, day: 3 }] },
+      { name: "SMIAF", date: "Premières semaines d'août" },
+      { name: "San Marino Comics", date: "Dernières semaines d'août" },
+      { name: "Rally Legend", date: "Mi-octobre" },
+      { name: "MotoGP", date: "Début septembre" },
+      { name: "Marchés de Noël", date: "Période de Noël" },
+    ],
+    contactsLabel: "Adresse et contacts",
+  },
+  services: {
+    label: "Tous les services",
+    quickLabel: "Accès rapide",
+    backLabel: "Tous les services",
+  },
+  footer: "Grand Hotel San Marino",
+  poweredBy: "Créée par",
+};
+
+const de: HotelContent = {
+  nav: {
+    oggi: "Heute",
+    hotel: "Hotel",
+    dining: "Restaurant",
+    wellness: "Wellness",
+    explore: "San Marino",
+  },
+  common: {
+    receptionCta: "Rezeption anrufen",
+    receptionLabel: "Rezeption",
+    languageLabel: "Sprache",
+    status: {
+      open: "Geöffnet",
+      closed: "Geschlossen",
+      onRequest: "Auf Anfrage",
+      closesAt: "bis",
+      opensAt: "öffnet wieder um",
+    },
+    callLabel: "Anrufen",
+    bookLabel: "Buchen",
+    navigateLabel: "Navigieren",
+    openInMapsLabel: "In Karten öffnen",
+    addToCalendarLabel: "Zum Kalender hinzufügen",
+    callValetLabel: "Voiturier anrufen",
+    youAreHere: "Sie sind hier",
+    minWalk: "Min. zu Fuß",
+    byCar: "mit dem Auto",
+    airport: "Flughafen",
+    floorGround: "Erdgeschoss",
+    floorThird: "3. Stock",
+    floorThirdMessegue: "3. Stock · Mességué-Zentrum",
+    floorBasement: "-1 · Garage",
+  },
+  home: {
+    eyebrow: "Willkommen im",
+    titleMain: "Grand Hotel",
+    titleAccent: "San Marino",
+    stayLabel: "Ihr Aufenthalt",
+    welcomeTitle: "Herzlich willkommen",
+    welcomeBody:
+      "Diese App ist Ihr Begleiter für den Aufenthalt: bestellen Sie den Zimmerservice, sehen Sie die Öffnungszeiten der Services ein, entdecken Sie Restaurant und Spa und erfahren Sie, was San Marino zu bieten hat.",
+    checkIn: { label: "Check-in", value: "Ab 14:00 Uhr" },
+    checkOut: { label: "Check-out", value: "Bis 11:00 Uhr" },
+    lateCheckout: "Später Check-out je nach Verfügbarkeit gegen Aufpreis.",
+    nowLabel: "Gerade jetzt",
+    quickLabel: "Schnellzugriff",
+    groupLabel: "Entdecken Sie die GHSM Group",
+    groupCategories: { wellness: "Wellness", dining: "Restaurant", cafe: "Café", gelato: "Eisdiele", suites: "Suiten" },
+    quick: {
+      wifi: {
+        label: "Wi-Fi",
+        value: "GRANDHOTELRSM",
+        note: "Kostenlos im gesamten Hotel. Wählen Sie das Netzwerk aus und warten Sie auf die Anmeldeseite.",
+        copyDone: "Kopiert",
+      },
+      breakfast: {
+        label: "Frühstück",
+        note: "Restaurant L'Arengo · 07:00 – 10:00 Uhr. Auf dem Zimmer gegen Aufpreis von 6,00 €.",
+      },
+      checkout: {
+        label: "Check-out",
+        note: "Bis 11:00 Uhr. Später Check-out auf Anfrage an der Rezeption.",
+      },
+      reception: {
+        label: "Rezeption",
+        note: "Rund um die Uhr geöffnet. Vom Zimmertelefon aus Taste 9 wählen.",
+      },
+      tv: {
+        label: "TV-Sender",
+        note: "37 Sender im Zimmer verfügbar, von Nr. 1 bis 831.",
+        cta: "Alle Sender ansehen",
+      },
+    },
+    askLabel: "Digitaler Concierge",
+    askBody: "Eine Frage zu Ihrem Aufenthalt oder zu San Marino? Fragen Sie einfach, ich antworte sofort.",
+    askCta: "Concierge öffnen",
+    highlightsLabel: "Schnellzugriff",
+    highlightsSeeAll: "Alle anzeigen",
+    chatPlaceholder: "Fragen Sie unseren digitalen Concierge…",
+    highlights: [
+      {
+        title: "Wi-Fi",
+        body: "Netzwerk GRANDHOTELRSM – auswählen, auf die Benachrichtigung warten und sich kostenlos im gesamten Hotel verbinden.",
+      },
+      {
+        title: "Rezeption",
+        body: "Rund um die Uhr geöffnet. Wählen Sie für jedes Anliegen die Taste 9 am Zimmertelefon.",
+      },
+      {
+        title: "Frühstück",
+        body: "Serviert im Restaurant L'Arengo von 07:00 bis 10:00 Uhr. Zimmerservice gegen Aufpreis von 6,00 € verfügbar.",
+      },
+    ],
+    hoursLabel: "Öffnungszeiten der Services",
+    hours: [
+      { label: "Rezeption", value: "Rund um die Uhr" },
+      { label: "Frühstück · Restaurant L'Arengo", value: "07:00 – 10:00 Uhr" },
+      { label: "Mittagessen · Restaurant L'Arengo", value: "12:00 – 14:30 Uhr" },
+      { label: "Abendessen · Restaurant L'Arengo", value: "19:00 – 21:30 Uhr" },
+      { label: "Zimmerservice", value: "07:00 – 23:00 Uhr (+ 6,00 €)" },
+      { label: "Wäscheservice", value: "08:30 – 16:00 Uhr" },
+      { label: "Fitnessraum", value: "08:00 – 20:00 Uhr" },
+    ],
+  },
+  room: {
+    label: "Zimmerservice",
+    intro: "Alles für höchsten Komfort: Rezeption, Zimmerservice, Wäscheservice, WLAN und TV-Sender.",
+    servicesLabel: "Kontakte & Komfort",
+    services: [
+      {
+        title: "Rezeption und Zimmerservice",
+        subtitle: "Taste 9",
+        body: "Wählen Sie bei jedem Anliegen Taste 9 am Zimmertelefon, um Rezeption oder Zimmerservice zu erreichen.",
+      },
+      {
+        title: "Mességué-Zentrum",
+        subtitle: "Taste 471",
+        body: "Für Informationen und Buchungen im Maurice-Mességué-Gesundheitszentrum wählen Sie die 471.",
+      },
+      {
+        title: "Safe",
+        subtitle: "Taste R + Code + #",
+        body: "Um den Safe einzustellen, drücken Sie die Taste R, geben Sie einen neuen persönlichen Code aus 4-10 Ziffern ein und bestätigen Sie mit der Taste #.",
+      },
+      {
+        title: "Klimaanlage",
+        subtitle: "Bedienfeld im Zimmer",
+        body: "Die Klimaanlage wird über das Bedienfeld im Zimmer geregelt. Sie schaltet sich automatisch aus, sobald das Fenster geöffnet wird.",
+      },
+      {
+        title: "Bitte nicht stören",
+        subtitle: "Türanhänger",
+        body: "Um nicht gestört zu werden, hängen Sie das entsprechende Schild an die Außenklinke der Tür.",
+      },
+    ],
+    roomServiceLabel: "Zimmerservice",
+    roomService: {
+      body: "Frühstück, Snacks und Mahlzeiten können direkt auf das Zimmer serviert werden.",
+      hours: "Täglich, 07:00 – 23:00 Uhr",
+      supplement: "Aufpreis von 6,00 € pro Bestellung.",
+    },
+    laundryLabel: "Wäscheservice",
+    laundry: {
+      body: "Kosten und Bearbeitungszeiten hängen von Stoffart und gewünschter Wäsche ab. Das Anfrageformular finden Sie im Kleiderschrank des Zimmers.",
+      hours: "08:30 – 16:00 Uhr",
+    },
+    wifiLabel: "Wi-Fi",
+    wifi: {
+      network: "GRANDHOTELRSM",
+      body: "1. Öffnen Sie Einstellungen → WLAN\n2. Wählen Sie das Netzwerk GRANDHOTELRSM\n3. Tippen Sie auf die Anmeldebenachrichtigung\n\nWenn die Benachrichtigung nicht erscheint, warten Sie einige Sekunden. Schritt-für-Schritt-Screenshots finden Sie im Zimmerordner.",
+    },
+    tvLabel: "TV-Sender",
+    tvIntro: "Die im Zimmer verfügbaren Sender:",
+    channels: TV_CHANNELS,
+    petsLabel: "Haustiere",
+    pets: {
+      body: "Kleine Haustiere sind willkommen. Für die zusätzliche Zimmerreinigung wird ein Aufpreis von 4,00 € pro Tag berechnet.",
+    },
+  },
+  facility: {
+    label: "Hoteleinrichtungen",
+    intro: "Parkplatz, Concierge und die hoteleigenen Bereiche – Fitnessraum und Fahrräder – für Ihren Aufenthalt in San Marino.",
+    parkingLabel: "Parkplatz",
+    garage: {
+      title: "Privatgarage",
+      body: [
+        "19,00 € pro Nacht.",
+        "Voiturier-Service von 7:00 bis 23:00 Uhr: Bitte fordern Sie Ihr Fahrzeug mindestens 30 Minuten im Voraus an.",
+        "Eine Ladestation für Elektrofahrzeuge steht gegen Aufpreis zur Verfügung.",
+      ],
+    },
+    publicParking: {
+      title: "Öffentlicher Parkplatz",
+      body: "Tickets zu 4,00 € pro Tag sind an der Rezeption erhältlich, gültig bis 12:00 Uhr des Folgetags in den blauen Parkzonen.",
+    },
+    conciergeLabel: "Concierge",
+    taxiLabel: "Taxi",
+    taxi: {
+      body: "Um ein Taxi zu buchen, wenden Sie sich an die Rezeption und geben Sie Datum, Uhrzeit, Personenzahl, gewünschten Fahrzeugtyp und Ziel an.",
+    },
+    wakeUpLabel: "Weckruf",
+    wakeUp: {
+      body: "Für einen Weckruf wenden Sie sich an die Rezeption unter Taste 9.",
+    },
+    cardLabel: "TuttoSanMarino Card",
+    card: {
+      body: "Die TuttoSanMarino Card bietet Ermäßigungen in Partnermuseen, -geschäften und -restaurants. Die Karte kann an der Rezeption angefragt werden.",
+    },
+    hairdresserLabel: "Friseur",
+    hairdresser: {
+      body: "Die Rezeption informiert Sie gerne über Friseursalons in der Nähe.",
+    },
+    meetingsLabel: "Tagungsräume",
+    meetings: {
+      body: "Das Grand Hotel San Marino verfügt über 5 modulare Tagungsräume für Veranstaltungen von 2 bis 200 Personen, mit technischer Ausstattung und qualifiziertem Personal, das maßgeschneiderte Meetings, Arbeitsfrühstücke und -abendessen, private Veranstaltungen, Feiern und Bankette organisiert.",
+    },
+    gymBikeLabel: "Fitness & Fahrrad",
+    gymLabel: "Fitnessraum",
+    gym: {
+      body: "Ein kleiner Fitnessraum mit Blick auf das Montefeltro-Tal und grundlegenden Fitnessgeräten, im Mességué-Zentrum im 3. Stock. Freier Zugang ohne Reservierung, von 08:00 bis 20:00 Uhr.",
+    },
+    bikeLabel: "Mit dem Fahrrad",
+    bike: {
+      body: "San Marino bietet Straßen- und Offroad-Strecken zwischen den 9 Burgen der Republik, ideal für Radausflüge. Informationen zum Fahrradverleih erhalten Sie an der Rezeption.",
+    },
+  },
+  dining: {
+    label: "Restaurant",
+    intro: "Die Küche des Grand Hotel San Marino und die weiteren Adressen der GHSM Group. Für den Zimmerservice direkt aufs Zimmer siehe den Bereich Zimmer.",
+    arengoLabel: "Restaurant L'Arengo",
+    arengo: {
+      hours: [
+        { label: "Frühstück", value: "07:00 – 10:00 Uhr" },
+        { label: "Mittagessen", value: "12:00 – 14:30 Uhr" },
+        { label: "Abendessen", value: "19:00 – 21:30 Uhr" },
+      ],
+      paragraphs: [
+        "Brot und Pasta werden im Haus hergestellt, dank der Arbeit unserer eigenen Konditor- und Pasta-Chefs.",
+        "In der Küche werden die Rezepte der lokalen Tradition weitergegeben: Lasagne, Ravioli und Tortellacci nach Familienrezepten zubereitet.",
+        "Auf Anfrage sind spezielle kalorienarme Menüs oder Menüs für Lebensmittelunverträglichkeiten und besondere Erkrankungen erhältlich, dank der Zusammenarbeit mit dem Mességué-Gesundheitszentrum und der Verwendung zertifizierter Zutaten.",
+      ],
+      reservation: "Eine Reservierung wird empfohlen.",
+    },
+    groupLabel: "Die GHSM Group",
+    groupIntro:
+      "Das Grand Hotel San Marino gehört zur GHSM Group, die seit 1894 für Gastfreundschaft in San Marino steht. Hier sind die weiteren Adressen der Gruppe zum Essen und Trinken.",
+    venues: [
+      {
+        id: "laTerrazza",
+        name: "Restaurant La Terrazza",
+        body: "Dinieren zwischen den Zinnen eines mittelalterlichen Turms, schwebend zwischen Himmel und Erde, mit einem Horizont, der sich endlos erstreckt — La Terrazza bietet ein Erlebnis, das nur wenige Orte der Welt bieten können. Hochwertige Küche mit regionalen Produkten.",
+      },
+      {
+        id: "caffeTitano",
+        name: "Caffè Titano",
+        body: "Bei einem Besuch in San Marino darf ein Halt hier nicht fehlen: mitten in der Altstadt, mit Blick auf einen malerischen mittelalterlichen Platz, an einer der schönsten Ecken der Altstadt.",
+      },
+      {
+        id: "cremeria",
+        name: "La Cremeria del Titano",
+        body: "Direkt neben dem Caffè Titano. In den wärmeren Monaten geöffnet, für eine erfrischende und köstliche Pause mit handwerklich hergestelltem Eis.",
+      },
+      {
+        id: "laLoggia",
+        name: "La Loggia",
+        body: "Eine Boutique im Herzen der Altstadt, an der Piazzetta Garibaldi: Käse, Wurstwaren und Vesperplatten, handwerklich hergestellte Weine und Wermut, typische sammarinesische Süßigkeiten und lokale Craft-Biere, ausgewählt, um die authentischsten Aromen unserer Heimat zu erzählen.",
+      },
+    ],
+  },
+  wellness: {
+    label: "Wellness",
+    intro: "Das Maurice-Mességué-Gesundheitszentrum und die Behandlungsliste für Ihre Entspannung.",
+    messegueLabel: "Maurice-Mességué-Gesundheitszentrum",
+    messegue: {
+      paragraphs: [
+        "Seit über 30 Jahren ist das Maurice-Mességué-Gesundheitszentrum ein italienischer Bezugspunkt für Gesundheit, Abnehmen und Wellnessurlaub: eine Schlankheitsklinik und eine Gesundheitsoase, die Diät, körperliche Aktivität und Phytotherapie vereint.",
+        "Das Zentrum bietet kosmetische Behandlungen für Gesicht und Körper, mit spezialisierten Formulierungen und maßgeschneiderten Remise-en-forme-Ritualen für jeden Gast.",
+      ],
+      quote: "Die Natur hat immer recht.",
+      quoteAuthor: "Maurice Mességué",
+      callNote: "Für Informationen und Buchungen wählen Sie die 471 am Zimmertelefon.",
+    },
+    priceListLabel: "Preisliste der Behandlungen",
+    priceListNote: "Preise und Dauer der im Mességué-Zentrum verfügbaren Behandlungen.",
+    massages: [
+      { name: "Entspannungsmassage", variants: [{ duration: "30'", price: "50,00 €" }] },
+      { name: "Lösende Massage", variants: [{ duration: "50'", price: "90,00 €" }] },
+      { name: "Klassische Massage", variants: [{ duration: "30'", price: "50,00 €" }] },
+      {
+        name: "Paarmassage",
+        variants: [
+          { duration: "30'", price: "95,00 €" },
+          { duration: "50'", price: "165,00 €" },
+        ],
+      },
+      { name: "Hot-Stone", variants: [{ duration: "50'", price: "90,00 €" }] },
+      { name: "Ayurvedische Massage", variants: [{ duration: "50'", price: "90,00 €" }] },
+      { name: "Grüne-Tonerde-Massage", variants: [{ duration: "75'", price: "145,00 €" }] },
+      {
+        name: "Lymphdrainage",
+        variants: [
+          { label: "Gesicht", duration: "30'", price: "45,00 €" },
+          { label: "Körper", duration: "50'", price: "90,00 €" },
+        ],
+      },
+      { name: "Teilenthaarung", variants: [{ price: "40,00 €" }] },
+      { name: "Ganzbeinenthaarung", variants: [{ price: "55,00 €" }] },
+      { name: "Gesichtsreinigung", variants: [{ duration: "60'", price: "75,00 €" }] },
+      { name: "Klassische Anti-Age-Behandlung", variants: [{ duration: "45'", price: "104,00 €" }] },
+      { name: "Lift Summum (Anti-Age Plus)", variants: [{ duration: "50'", price: "135,00 €" }] },
+      { name: "Radiofrequenz (Anti-Age Deluxe)", variants: [{ duration: "75'", price: "135,00 €" }] },
+      { name: "Maniküre", variants: [{ price: "38,00 €" }] },
+      { name: "Pediküre", variants: [{ price: "48,00 €" }] },
+    ],
+  },
+  info: {
+    label: "Entdecken",
+    intro: "Die Karte der Umgebung, die Adressen der GHSM Group, die Sehenswürdigkeiten in San Marino und wie man sich in der Stadt fortbewegt.",
+    sheetLabel: "Veranstaltungen & Infos",
+    ghsmLabel: "GHSM-Adressen in der Nähe",
+    poiLabel: "Sehenswürdigkeiten in San Marino",
+    pois: [
+      {
+        id: "palazzoPubblico",
+        name: "Palazzo Pubblico",
+        body: "Der Regierungspalast, Sitz der Institutionen der Republik, überragt die zentrale Piazza della Libertà. Ein Rundgang erzählt die institutionelle Geschichte San Marinos.",
+      },
+      {
+        id: "basilica",
+        name: "Basilica del Santo",
+        body: "Im neoklassizistischen Stil erbaut, bewahrt sie die Reliquien des heiligen Marinus, der der ältesten Republik der Welt ihren Namen gab.",
+      },
+      {
+        id: "museoStato",
+        name: "Staatsmuseum",
+        body: "Es beherbergt archäologische Funde, Kunstwerke und historische Zeugnisse der Republik, von der Vorgeschichte bis in die Neuzeit.",
+      },
+      {
+        id: "guaita",
+        name: "Erster Turm · Festung Guaita",
+        body: "Der älteste und berühmteste der Drei Türme, erbaut im 11. Jahrhundert. Von den Wehrgängen reicht der Blick bis zur Adria.",
+      },
+      {
+        id: "cesta",
+        name: "Zweiter Turm · Festung Cesta",
+        body: "Hier befindet sich das Museum der antiken Waffen mit einer Sammlung von Rüstungen und Waffen vom 12. bis 19. Jahrhundert.",
+      },
+      {
+        id: "funivia",
+        name: "Seilbahn von San Marino",
+        body: "Sie verbindet die Altstadt in wenigen Minuten mit Borgo Maggiore und bietet einen Panoramablick auf das Montefeltro-Tal.",
+      },
+    ],
+    airportsLabel: "Flughäfen",
+    airports: {
+      list: ["Rimini", "Ancona", "Forlì", "Bologna"],
+      note: "Auf Anfrage steht ein Mietwagenservice mit Fahrer zur Verfügung.",
+    },
+    reachLabel: "Fortbewegung",
+    reach: {
+      transit: {
+        title: "Öffentliche Verkehrsmittel",
+        body: "Bonelli Bus verbindet San Marino tagsüber mit regelmäßigen Fahrten mit dem Bahnhof und dem Flughafen von Rimini.",
+      },
+      taxi: {
+        title: "Taxi",
+        body: "Für Fahrten zu Flughäfen oder anderen Orten steht Ihnen die Rezeption zur Verfügung, um ein Taxi oder einen Fahrdienst zu buchen.",
+      },
+      walk: {
+        title: "Zu Fuß",
+        body: "Die Altstadt ist eine Fußgängerzone und vom Hotel aus in wenigen Minuten über charakteristische Gassen und Treppen erreichbar: bequeme Schuhe werden empfohlen.",
+      },
+    },
+  },
+  about: {
+    label: "Informationen",
+    intro: "Die GHSM Group, die anstehenden Veranstaltungen in San Marino und alle Kontaktdaten des Grand Hotel.",
+    groupLabel: "GHSM Group",
+    group: {
+      intro: "Die GHSM Group steht seit 1894 für Gastfreundschaft in San Marino.",
+      titanoSuites: {
+        name: "Titano Suites",
+        body: "Ein Palazzo aus dem späten 19. Jahrhundert im Herzen San Marinos, der die Suite Montefeltro mit Whirlpool auf der Panoramaterrasse beherbergt.",
+      },
+    },
+    eventsLabel: "Veranstaltungen in San Marino",
+    events: [
+      {
+        name: "Investitur der Kapitänsregenten",
+        date: "1. April und 1. Oktober",
+        dates: [{ month: 4, day: 1 }, { month: 10, day: 1 }],
+      },
+      { name: "Nationalfeiertag", date: "3. September", dates: [{ month: 9, day: 3 }] },
+      { name: "SMIAF", date: "Erste Augustwochen" },
+      { name: "San Marino Comics", date: "Letzte Augustwochen" },
+      { name: "Rally Legend", date: "Mitte Oktober" },
+      { name: "MotoGP", date: "Anfang September" },
+      { name: "Weihnachtsmärkte", date: "Weihnachtszeit" },
+    ],
+    contactsLabel: "Adresse & Kontakte",
+  },
+  services: {
+    label: "Alle Services",
+    quickLabel: "Schnellzugriff",
+    backLabel: "Alle Services",
+  },
+  footer: "Grand Hotel San Marino",
+  poweredBy: "Erstellt von",
+};
+
+const es: HotelContent = {
+  nav: {
+    oggi: "Hoy",
+    hotel: "Hotel",
+    dining: "Restaurante",
+    wellness: "Bienestar",
+    explore: "San Marino",
+  },
+  common: {
+    receptionCta: "Llamar a recepción",
+    receptionLabel: "Recepción",
+    languageLabel: "Idioma",
+    status: {
+      open: "Abierto",
+      closed: "Cerrado",
+      onRequest: "Bajo petición",
+      closesAt: "hasta las",
+      opensAt: "reabre a las",
+    },
+    callLabel: "Llamar",
+    bookLabel: "Reservar",
+    navigateLabel: "Navegar",
+    openInMapsLabel: "Abrir en Mapas",
+    addToCalendarLabel: "Añadir al calendario",
+    callValetLabel: "Llamar al valet",
+    youAreHere: "Está aquí",
+    minWalk: "min a pie",
+    byCar: "en coche",
+    airport: "Aeropuerto",
+    floorGround: "Planta baja",
+    floorThird: "3ª planta",
+    floorThirdMessegue: "3ª planta · Centro Mességué",
+    floorBasement: "-1 · Garaje",
+  },
+  home: {
+    eyebrow: "Bienvenidos al",
+    titleMain: "Grand Hotel",
+    titleAccent: "San Marino",
+    stayLabel: "Su estancia",
+    welcomeTitle: "Les damos la bienvenida",
+    welcomeBody:
+      "Esta app es su guía durante la estancia: solicite el servicio de habitaciones, consulte los horarios de los servicios, descubra el restaurante y el spa, y explore qué ver en San Marino.",
+    checkIn: { label: "Check-in", value: "Desde las 14:00 h" },
+    checkOut: { label: "Check-out", value: "Hasta las 11:00 h" },
+    lateCheckout: "Late check-out sujeto a disponibilidad, con suplemento.",
+    nowLabel: "En este momento",
+    quickLabel: "Acciones rápidas",
+    groupLabel: "Descubra el GHSM Group",
+    groupCategories: { wellness: "Bienestar", dining: "Restaurante", cafe: "Café", gelato: "Heladería", suites: "Suites" },
+    quick: {
+      wifi: {
+        label: "Wi-Fi",
+        value: "GRANDHOTELRSM",
+        note: "Gratuito en todo el hotel. Seleccione la red y espere a la página de acceso.",
+        copyDone: "Copiado",
+      },
+      breakfast: {
+        label: "Desayuno",
+        note: "Restaurante L'Arengo · 07:00 – 10:00. En la habitación con un suplemento de 6,00 €.",
+      },
+      checkout: {
+        label: "Check-out",
+        note: "Hasta las 11:00. Late check-out bajo petición en recepción.",
+      },
+      reception: {
+        label: "Recepción",
+        note: "Abierta las 24 horas. Desde el teléfono de la habitación, marque el 9.",
+      },
+      tv: {
+        label: "Canales de TV",
+        note: "37 canales disponibles en la habitación, del n.º 1 al 831.",
+        cta: "Ver todos los canales",
+      },
+    },
+    askLabel: "Concierge digital",
+    askBody: "¿Alguna pregunta sobre su estancia o sobre San Marino? Pregunte, le respondo enseguida.",
+    askCta: "Abrir el Concierge",
+    highlightsLabel: "Acciones rápidas",
+    highlightsSeeAll: "Ver todo",
+    chatPlaceholder: "Pregunte a nuestro Concierge digital…",
+    highlights: [
+      {
+        title: "Wi-Fi",
+        body: "Red GRANDHOTELRSM: selecciónela, espere la notificación y conéctese gratis en todo el hotel.",
+      },
+      {
+        title: "Recepción",
+        body: "Abierta las 24 horas. Marque el 9 desde el teléfono de la habitación para cualquier necesidad.",
+      },
+      {
+        title: "Desayuno",
+        body: "Servido en el Restaurante L'Arengo de 07:00 a 10:00. Servicio de habitaciones disponible con un suplemento de 6,00 €.",
+      },
+    ],
+    hoursLabel: "Horarios de los servicios",
+    hours: [
+      { label: "Recepción", value: "24 horas" },
+      { label: "Desayuno · Restaurante L'Arengo", value: "07:00 – 10:00" },
+      { label: "Almuerzo · Restaurante L'Arengo", value: "12:00 – 14:30" },
+      { label: "Cena · Restaurante L'Arengo", value: "19:00 – 21:30" },
+      { label: "Servicio de habitaciones", value: "07:00 – 23:00 (+ 6,00 €)" },
+      { label: "Lavandería", value: "08:30 – 16:00" },
+      { label: "Gimnasio", value: "08:00 – 20:00" },
+    ],
+  },
+  room: {
+    label: "Servicios en la habitación",
+    intro: "Todo lo necesario para el máximo confort: recepción, servicio de habitaciones, lavandería, Wi-Fi y canales de TV.",
+    servicesLabel: "Contactos y comodidades",
+    services: [
+      {
+        title: "Recepción y Room Service",
+        subtitle: "Tecla 9",
+        body: "Para cualquier necesidad, llame a Recepción o al Room Service marcando el 9 desde el teléfono de la habitación.",
+      },
+      {
+        title: "Centro Mességué",
+        subtitle: "Tecla 471",
+        body: "Para información y reservas en el Centro Médico Maurice Mességué, marque el 471.",
+      },
+      {
+        title: "Caja fuerte",
+        subtitle: "Tecla R + código + #",
+        body: "Para configurar la caja fuerte, pulse la tecla R, introduzca un nuevo código personal de 4 a 10 dígitos y confirme con la tecla #.",
+      },
+      {
+        title: "Aire acondicionado",
+        subtitle: "Panel en la habitación",
+        body: "El aire acondicionado se regula desde el panel de la habitación. Se desactiva automáticamente al abrir la ventana.",
+      },
+      {
+        title: "No molestar",
+        subtitle: "Tarjeta en el picaporte",
+        body: "Para no ser molestado, cuelgue la tarjeta correspondiente en el picaporte exterior de la puerta.",
+      },
+    ],
+    roomServiceLabel: "Servicio de habitaciones",
+    roomService: {
+      body: "Desayunos, tentempiés y comidas pueden servirse directamente en la habitación.",
+      hours: "Todos los días, 07:00 – 23:00",
+      supplement: "Suplemento de 6,00 € por pedido.",
+    },
+    laundryLabel: "Lavandería",
+    laundry: {
+      body: "Los costes y plazos dependen del tipo de tejido y lavado solicitado. El formulario de solicitud se encuentra en el armario de la habitación.",
+      hours: "08:30 – 16:00",
+    },
+    wifiLabel: "Wi-Fi",
+    wifi: {
+      network: "GRANDHOTELRSM",
+      body: "1. Abra Ajustes → Wi-Fi\n2. Seleccione la red GRANDHOTELRSM\n3. Toque la notificación de registro\n\nSi no ve la notificación, espere unos segundos. En la carpeta de la habitación encontrará las capturas paso a paso.",
+    },
+    tvLabel: "Canales de TV",
+    tvIntro: "La selección de canales disponibles en la habitación:",
+    channels: TV_CHANNELS,
+    petsLabel: "Mascotas",
+    pets: {
+      body: "Se admiten mascotas de pequeño tamaño. Se aplica un suplemento de 4,00 € al día por la limpieza extra de la habitación.",
+    },
+  },
+  facility: {
+    label: "Servicios del establecimiento",
+    intro: "Aparcamiento, concierge y los espacios del establecimiento —gimnasio y bicicletas— para su estancia en San Marino.",
+    parkingLabel: "Aparcamiento",
+    garage: {
+      title: "Garaje privado",
+      body: [
+        "19,00 € por noche.",
+        "Servicio de valet de 7:00 a 23:00: se recomienda solicitar el vehículo con al menos 30 minutos de antelación.",
+        "Hay disponible un punto de recarga para vehículos eléctricos, con suplemento.",
+      ],
+    },
+    publicParking: {
+      title: "Aparcamiento público",
+      body: "Hay tickets de 4,00 € al día disponibles en Recepción, válidos hasta las 12:00 del día siguiente en las zonas azules.",
+    },
+    conciergeLabel: "Concierge",
+    taxiLabel: "Taxi",
+    taxi: {
+      body: "Para reservar un taxi, contacte con Recepción indicando fecha, hora, número de personas, tipo de vehículo deseado y destino.",
+    },
+    wakeUpLabel: "Servicio despertador",
+    wakeUp: {
+      body: "Para solicitar un servicio despertador, contacte con Recepción marcando el 9.",
+    },
+    cardLabel: "TuttoSanMarino Card",
+    card: {
+      body: "La tarjeta TuttoSanMarino ofrece descuentos en museos, tiendas y restaurantes asociados. Puede solicitarse en Recepción.",
+    },
+    hairdresserLabel: "Peluquería",
+    hairdresser: {
+      body: "Recepción está a su disposición para informarle sobre las peluquerías cercanas.",
+    },
+    meetingsLabel: "Salas de reuniones",
+    meetings: {
+      body: "El Grand Hotel San Marino cuenta con 5 salas de reuniones modulables, para eventos de 2 a 200 personas, con soporte tecnológico y personal cualificado disponible para organizar reuniones a medida, desayunos y cenas de trabajo, eventos privados, celebraciones y banquetes.",
+    },
+    gymBikeLabel: "Gimnasio y bicicletas",
+    gymLabel: "Gimnasio",
+    gym: {
+      body: "Un pequeño gimnasio con vistas al valle de Montefeltro, con equipamiento fitness básico, situado dentro del Centro Mességué en la 3ª planta. Acceso libre, sin reserva, de 08:00 a 20:00.",
+    },
+    bikeLabel: "En bicicleta",
+    bike: {
+      body: "San Marino ofrece rutas de carretera y off-road entre los 9 castillos de la República, ideales para excursiones en bicicleta. Para el alquiler de bicicletas, consulte en Recepción.",
+    },
+  },
+  dining: {
+    label: "Restaurante",
+    intro: "La cocina del Grand Hotel San Marino y los demás locales del grupo GHSM. Para el Room Service directamente en la habitación, consulte la sección Habitación.",
+    arengoLabel: "Restaurante L'Arengo",
+    arengo: {
+      hours: [
+        { label: "Desayuno", value: "07:00 – 10:00" },
+        { label: "Almuerzo", value: "12:00 – 14:30" },
+        { label: "Cena", value: "19:00 – 21:30" },
+      ],
+      paragraphs: [
+        "El pan y la pasta se elaboran de forma artesanal, gracias al trabajo de nuestros chefs pastelero y pastero dedicados.",
+        "En la cocina se transmiten las recetas de la tradición local: lasañas, raviolis y tortellacci preparados según recetas familiares.",
+        "Bajo petición hay disponibles menús especiales hipocalóricos o pensados para intolerancias alimentarias y patologías particulares, gracias a la sinergia con el Centro Médico Mességué y al uso de materias primas de origen certificado.",
+      ],
+      reservation: "Se recomienda reserva.",
+    },
+    groupLabel: "El grupo GHSM",
+    groupIntro:
+      "El Grand Hotel San Marino forma parte de GHSM Group, que desde 1894 representa la hospitalidad en San Marino. Estas son las demás direcciones del grupo donde comer y beber.",
+    venues: [
+      {
+        id: "laTerrazza",
+        name: "Restaurante La Terrazza",
+        body: "Cenar entre las almenas de una torre medieval, suspendido entre el cielo y la tierra, con un horizonte que se abre hasta donde alcanza la vista — La Terrazza es una experiencia que pocos lugares en el mundo pueden ofrecer. Cocina gastronómica de alto nivel con productos locales.",
+      },
+      {
+        id: "caffeTitano",
+        name: "Caffè Titano",
+        body: "Al venir a San Marino no se puede dejar de parar aquí: en pleno Centro Histórico, con vistas a una encantadora plazoleta medieval, en uno de los rincones más sugerentes del casco antiguo.",
+      },
+      {
+        id: "cremeria",
+        name: "La Cremeria del Titano",
+        body: "Justo al lado del Caffè Titano. Abierta en los meses más calurosos, para una parada fresca y sabrosa acompañada de un buen helado artesanal.",
+      },
+      {
+        id: "laLoggia",
+        name: "La Loggia",
+        body: "Una tienda en el corazón del centro histórico, en la Piazzetta Garibaldi: quesos, embutidos y tablas, vinos y vermús artesanales, dulces típicos sanmarinenses y cervezas artesanales locales, seleccionados para contar los sabores más auténticos de nuestra tierra.",
+      },
+    ],
+  },
+  wellness: {
+    label: "Bienestar",
+    intro: "El Centro Médico Maurice Mességué y la lista de tratamientos para su relax.",
+    messegueLabel: "Centro Médico Maurice Mességué",
+    messegue: {
+      paragraphs: [
+        "Desde hace más de 30 años, el Centro Médico Maurice Mességué es un referente italiano en salud, adelgazamiento y vacaciones de bienestar: una clínica de adelgazamiento y un oasis de salud que combina dieta, actividad física y tratamientos de fitoterapia.",
+        "El centro ofrece tratamientos estéticos para rostro y cuerpo, con formulaciones especializadas y rituales de remise en forme a medida para cada huésped.",
+      ],
+      quote: "La naturaleza siempre tiene razón.",
+      quoteAuthor: "Maurice Mességué",
+      callNote: "Para información y reservas, marque el 471 desde el teléfono de la habitación.",
+    },
+    priceListLabel: "Lista de tratamientos",
+    priceListNote: "Precios y duración de los tratamientos disponibles en el Centro Mességué.",
+    massages: [
+      { name: "Masaje relajante", variants: [{ duration: "30'", price: "50,00 €" }] },
+      { name: "Masaje descontracturante", variants: [{ duration: "50'", price: "90,00 €" }] },
+      { name: "Masaje clásico", variants: [{ duration: "30'", price: "50,00 €" }] },
+      {
+        name: "Masaje en pareja",
+        variants: [
+          { duration: "30'", price: "95,00 €" },
+          { duration: "50'", price: "165,00 €" },
+        ],
+      },
+      { name: "Hot-Stone", variants: [{ duration: "50'", price: "90,00 €" }] },
+      { name: "Masaje ayurvédico", variants: [{ duration: "50'", price: "90,00 €" }] },
+      { name: "Masaje de arcilla verde", variants: [{ duration: "75'", price: "145,00 €" }] },
+      {
+        name: "Drenaje linfático",
+        variants: [
+          { label: "Rostro", duration: "30'", price: "45,00 €" },
+          { label: "Cuerpo", duration: "50'", price: "90,00 €" },
+        ],
+      },
+      { name: "Depilación parcial", variants: [{ price: "40,00 €" }] },
+      { name: "Depilación total de piernas", variants: [{ price: "55,00 €" }] },
+      { name: "Limpieza facial", variants: [{ duration: "60'", price: "75,00 €" }] },
+      { name: "Tratamiento Anti Age clásico", variants: [{ duration: "45'", price: "104,00 €" }] },
+      { name: "Lift Summum (Anti Age Plus)", variants: [{ duration: "50'", price: "135,00 €" }] },
+      { name: "Radiofrecuencia (Anti Age Deluxe)", variants: [{ duration: "75'", price: "135,00 €" }] },
+      { name: "Manicura", variants: [{ price: "38,00 €" }] },
+      { name: "Pedicura", variants: [{ price: "48,00 €" }] },
+    ],
+  },
+  info: {
+    label: "Explorar",
+    intro: "El mapa de la zona, las direcciones del grupo GHSM, los lugares imprescindibles de San Marino y cómo moverse por la ciudad.",
+    sheetLabel: "Eventos e información",
+    ghsmLabel: "Direcciones GHSM cercanas",
+    poiLabel: "Imprescindibles en San Marino",
+    pois: [
+      {
+        id: "palazzoPubblico",
+        name: "Palazzo Pubblico",
+        body: "El palacio del Gobierno, sede de las instituciones de la República, domina la céntrica Piazza della Libertà. Se puede visitar con un recorrido que narra la historia institucional de San Marino.",
+      },
+      {
+        id: "basilica",
+        name: "Basilica del Santo",
+        body: "De estilo neoclásico, custodia las reliquias de San Marino, el santo que dio origen a la república más antigua del mundo.",
+      },
+      {
+        id: "museoStato",
+        name: "Museo de Estado",
+        body: "Reúne restos arqueológicos, obras de arte y testimonios históricos de la República, desde la prehistoria hasta la edad moderna.",
+      },
+      {
+        id: "guaita",
+        name: "Primera Torre · Fortaleza Guaita",
+        body: "La más antigua y famosa de las Tres Torres, construida en el siglo XI. Desde sus caminos de ronda la vista se abre hasta el mar Adriático.",
+      },
+      {
+        id: "cesta",
+        name: "Segunda Torre · Fortaleza Cesta",
+        body: "Alberga el Museo de las Armas Antiguas, con una colección de armaduras y armas del siglo XII al XIX.",
+      },
+      {
+        id: "funivia",
+        name: "Teleférico de San Marino",
+        body: "Conecta en pocos minutos el centro histórico con Borgo Maggiore, con una vista panorámica sobre el valle de Montefeltro.",
+      },
+    ],
+    airportsLabel: "Aeropuertos",
+    airports: {
+      list: ["Rímini", "Ancona", "Forlì", "Bolonia"],
+      note: "Bajo petición está disponible el servicio de alquiler de coche con conductor.",
+    },
+    reachLabel: "Cómo moverse",
+    reach: {
+      transit: {
+        title: "Transporte público",
+        body: "Bonelli Bus conecta San Marino con la estación de tren y el aeropuerto de Rímini con servicios regulares durante el día.",
+      },
+      taxi: {
+        title: "Taxi",
+        body: "Para desplazamientos a aeropuertos u otras localidades, Recepción está a su disposición para reservar un taxi o un servicio con conductor.",
+      },
+      walk: {
+        title: "A pie",
+        body: "El centro histórico es peatonal y se llega desde el hotel en pocos minutos, entre callejuelas y escalinatas características: se recomienda calzado cómodo.",
+      },
+    },
+  },
+  about: {
+    label: "Información",
+    intro: "El grupo GHSM, los eventos programados en San Marino y todos los contactos del Grand Hotel.",
+    groupLabel: "GHSM Group",
+    group: {
+      intro: "GHSM Group representa la hospitalidad en San Marino desde 1894.",
+      titanoSuites: {
+        name: "Titano Suites",
+        body: "Un palacio de finales del siglo XIX en el corazón de San Marino, que alberga la Suite Montefeltro con bañera de hidromasaje en su terraza panorámica.",
+      },
+    },
+    eventsLabel: "Eventos en San Marino",
+    events: [
+      {
+        name: "Investidura de los Capitanes Regentes",
+        date: "1 de abril y 1 de octubre",
+        dates: [{ month: 4, day: 1 }, { month: 10, day: 1 }],
+      },
+      { name: "Fiesta Nacional", date: "3 de septiembre", dates: [{ month: 9, day: 3 }] },
+      { name: "SMIAF", date: "Primeras semanas de agosto" },
+      { name: "San Marino Comics", date: "Últimas semanas de agosto" },
+      { name: "Rally Legend", date: "Mediados de octubre" },
+      { name: "MotoGP", date: "Principios de septiembre" },
+      { name: "Mercadillos de Navidad", date: "Época navideña" },
+    ],
+    contactsLabel: "Dirección y contactos",
+  },
+  services: {
+    label: "Todos los servicios",
+    quickLabel: "Acceso rápido",
+    backLabel: "Todos los servicios",
+  },
+  footer: "Grand Hotel San Marino",
+  poweredBy: "Creada por",
+};
+
+export const content: Record<Lang, HotelContent> = { it, en, fr, de, es };

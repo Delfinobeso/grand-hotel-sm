@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { ConciergeBell, Send, Phone, X, MapPin, CalendarCheck, ExternalLink, type LucideIcon } from "lucide-react";
 import { HOTEL } from "@/lib/hotel";
+import type { Lang } from "@/lib/content";
 
 const EASE_IOS = [0.2, 0, 0, 1] as const;
 const SHEET_IN: Transition = { duration: 0.42, ease: EASE_IOS };
@@ -123,6 +124,48 @@ const COPY = {
       "How do I reach the old town?",
     ],
   },
+  fr: {
+    title: "Concierge",
+    fab: "Ouvrir le Concierge",
+    greeting: "Je suis le Concierge digital du Grand Hotel. Comment puis-je vous aider ?",
+    placeholder: "Écrivez un message…",
+    reception: "Réception",
+    error: "Pour cette information, je vous invite à contacter la Réception en composant le 9.",
+    suggestions: [
+      "À quelle heure est le petit-déjeuner ?",
+      "Comment fonctionne le Wi-Fi ?",
+      "Où se trouve la salle de sport ?",
+      "Comment rejoindre le centre historique ?",
+    ],
+  },
+  de: {
+    title: "Concierge",
+    fab: "Concierge öffnen",
+    greeting: "Ich bin der digitale Concierge des Grand Hotel. Wie kann ich Ihnen helfen?",
+    placeholder: "Nachricht schreiben…",
+    reception: "Rezeption",
+    error: "Für diese Information wenden Sie sich bitte an die Rezeption unter Taste 9.",
+    suggestions: [
+      "Um wie viel Uhr ist Frühstück?",
+      "Wie funktioniert das WLAN?",
+      "Wo ist der Fitnessraum?",
+      "Wie komme ich zur Altstadt?",
+    ],
+  },
+  es: {
+    title: "Concierge",
+    fab: "Abrir el Concierge",
+    greeting: "Soy el Concierge digital del Grand Hotel. ¿En qué puedo ayudarle?",
+    placeholder: "Escriba un mensaje…",
+    reception: "Recepción",
+    error: "Para esta información, le invito a contactar con Recepción marcando el 9.",
+    suggestions: [
+      "¿A qué hora es el desayuno?",
+      "¿Cómo funciona el Wi-Fi?",
+      "¿Dónde está el gimnasio?",
+      "¿Cómo llego al centro histórico?",
+    ],
+  },
 };
 
 export default function ChatAssistant({
@@ -130,7 +173,7 @@ export default function ChatAssistant({
   open,
   onOpenChange,
 }: {
-  lang: "it" | "en";
+  lang: Lang;
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {

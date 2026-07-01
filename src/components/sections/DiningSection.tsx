@@ -18,6 +18,7 @@ const VENUE_IMG: Record<string, string> = {
   laTerrazza: "/images/venue-laterrazza.webp",
   caffeTitano: "/images/venue-caffetitano.webp",
   cremeria: "/images/venue-cremeria.webp",
+  laLoggia: "/images/venue-laloggia.webp",
 };
 
 export function DiningSection({ t }: { t: HotelContent }) {
@@ -47,7 +48,7 @@ export function DiningSection({ t }: { t: HotelContent }) {
 
         <HoursTable rows={d.arengo.hours} />
 
-        <CallButton href={HOTEL.phoneHref} label={t.common.bookLabel} />
+        <CallButton href={HOTEL.phoneHref} label={t.common.bookLabel} trackLabel="prenota-larengo" />
       </section>
 
       {/* ── GHSM Group venues ── */}
@@ -69,16 +70,17 @@ export function DiningSection({ t }: { t: HotelContent }) {
               <p className="mt-2 text-[0.95rem] leading-relaxed text-[var(--color-text-secondary)]">{v.body}</p>
               {pin && (
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {pin.bookingUrl && <BookButton href={pin.bookingUrl} label={t.common.bookLabel} />}
+                  {pin.bookingUrl && <BookButton href={pin.bookingUrl} label={t.common.bookLabel} trackLabel={`prenota-${v.id}`} />}
                   <NavigateButton
                     lat={pin.lat}
                     lon={pin.lon}
                     name={v.name}
                     label={t.common.openInMapsLabel}
                     variant={pin.bookingUrl ? "outline" : "solid"}
+                    trackLabel={`mappe-${v.id}`}
                   />
                   {pin.phoneHref && (
-                    <CallButton href={pin.phoneHref} label={t.common.callLabel} variant="outline" />
+                    <CallButton href={pin.phoneHref} label={t.common.callLabel} variant="outline" trackLabel={`chiama-${v.id}`} />
                   )}
                 </div>
               )}

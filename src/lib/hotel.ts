@@ -65,6 +65,15 @@ export const GHSM_VENUES: MapPin[] = [
     phoneHref: "tel:+390549992473",
     walkMinutes: 5,
   },
+  {
+    id: "laLoggia",
+    name: "La Loggia",
+    lat: 43.935803,
+    lon: 12.447041,
+    phone: "+39 0549 946284",
+    phoneHref: "tel:+390549946284",
+    walkMinutes: 5,
+  },
 ];
 
 export interface PointOfInterest {

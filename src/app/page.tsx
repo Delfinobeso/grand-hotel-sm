@@ -11,11 +11,13 @@ import {
   UtensilsCrossed,
   Flower2,
   Map as MapIcon,
+  ChevronDown,
   type LucideIcon,
 } from "lucide-react";
 import { content, type Lang } from "@/lib/content";
 import { HOTEL } from "@/lib/hotel";
 import type { TabKey } from "@/lib/nav";
+import { setTab as analyticsSetTab } from "@/lib/analytics/tracker";
 import { OggiSection } from "@/components/sections/OggiSection";
 import { HotelSection } from "@/components/sections/HotelSection";
 import { DiningSection } from "@/components/sections/DiningSection";
@@ -74,7 +76,8 @@ export default function Home() {
       ?.setAttribute("content", initialTheme === "dark" ? "#1d1c1a" : "#f4f1ea");
 
     const storedLang = localStorage.getItem("lang");
-    setLang(storedLang === "en" ? "en" : "it");
+    const validLangs: Lang[] = ["it", "en", "fr", "de", "es"];
+    setLang(validLangs.includes(storedLang as Lang) ? (storedLang as Lang) : "it");
   }, []);
 
   // Scroll to top (or to a section) when switching pillar.
@@ -93,6 +96,7 @@ export default function Home() {
     } else {
       el.scrollTop = 0;
     }
+    analyticsSetTab(activeTab);
   }, [activeTab, pendingSection]);
 
   const toggleTheme = () => {
@@ -105,8 +109,7 @@ export default function Home() {
       ?.setAttribute("content", next === "dark" ? "#1d1c1a" : "#f4f1ea");
   };
 
-  const toggleLang = () => {
-    const next: Lang = lang === "it" ? "en" : "it";
+  const changeLang = (next: Lang) => {
     setLang(next);
     document.documentElement.lang = next;
     localStorage.setItem("lang", next);
@@ -169,13 +172,21 @@ export default function Home() {
 
           {/* Toggles */}
           <div className="pointer-events-auto ml-auto flex shrink-0 items-center gap-1.5 lg:order-last lg:ml-0 lg:mt-auto lg:w-full">
-            <button
-              onClick={toggleLang}
-              aria-label={t.common.languageLabel}
-              className="flex h-9 items-center gap-1.5 rounded-full bg-[var(--color-surface-muted)] px-3 text-[0.8125rem] font-semibold uppercase tracking-wide text-[var(--color-text)] transition-colors duration-200 hover:bg-[var(--color-border)] lg:h-10 lg:flex-1 lg:justify-center"
-            >
-              {lang === "it" ? "EN" : "IT"}
-            </button>
+            <div className="relative flex h-9 items-center lg:h-10 lg:flex-1">
+              <select
+                value={lang}
+                onChange={(e) => changeLang(e.target.value as Lang)}
+                aria-label={t.common.languageLabel}
+                className="h-9 w-full appearance-none rounded-full bg-[var(--color-surface-muted)] pl-3 pr-7 text-[0.8125rem] font-semibold uppercase tracking-wide text-[var(--color-text)] transition-colors duration-200 hover:bg-[var(--color-border)] lg:h-10"
+              >
+                <option value="it">IT</option>
+                <option value="en">EN</option>
+                <option value="fr">FR</option>
+                <option value="de">DE</option>
+                <option value="es">ES</option>
+              </select>
+              <ChevronDown size={14} strokeWidth={2} className="pointer-events-none absolute right-2.5 text-[var(--color-text-muted)]" />
+            </div>
             <button
               onClick={toggleTheme}
               aria-label="Theme"
@@ -186,7 +197,7 @@ export default function Home() {
           </div>
 
           {/* Desktop nav */}
-          <nav className="hidden flex-col gap-1 lg:flex">
+          <nav className="pointer-events-auto hidden flex-col gap-1 lg:flex">
             {TABS.map(({ key, icon: Icon }) => {
               const active = activeTab === key;
               return (
@@ -209,7 +220,7 @@ export default function Home() {
           {/* Desktop persistent reception CTA */}
           <a
             href={HOTEL.phoneHref}
-            className="hidden h-12 items-center justify-center gap-2 rounded-full bg-[var(--color-accent)] text-[0.95rem] font-semibold text-[var(--color-on-accent)] transition-opacity duration-200 hover:opacity-90 active:scale-[0.98] lg:flex"
+            className="pointer-events-auto hidden h-12 items-center justify-center gap-2 rounded-full bg-[var(--color-accent)] text-[0.95rem] font-semibold text-[var(--color-on-accent)] transition-opacity duration-200 hover:opacity-90 active:scale-[0.98] lg:flex"
           >
             <Phone size={17} strokeWidth={1.875} />
             {t.common.receptionCta}

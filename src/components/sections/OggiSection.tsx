@@ -25,12 +25,12 @@ import type { TabKey } from "@/lib/nav";
 import type { ServiceHours } from "@/lib/hours";
 
 /* ── GHSM Group strip ── */
-const GROUP: { name: string; sub: string; img: string; tab: TabKey; sectionId?: string }[] = [
-  { name: "Centro Mességué", sub: "Benessere", img: "/images/wellness.webp", tab: "wellness" },
-  { name: "Ristorante La Terrazza", sub: "Ristorante", img: "/images/venue-laterrazza.webp", tab: "dining", sectionId: "venue-laTerrazza" },
-  { name: "Caffè Titano", sub: "Caffè", img: "/images/venue-caffetitano.webp", tab: "dining", sectionId: "venue-caffeTitano" },
-  { name: "La Cremeria del Titano", sub: "Gelateria", img: "/images/venue-cremeria.webp", tab: "dining", sectionId: "venue-cremeria" },
-  { name: "Titano Suites", sub: "Suites", img: "/images/suite.webp", tab: "explore" },
+const GROUP: { name: string; category: keyof HotelContent["home"]["groupCategories"]; img: string; tab: TabKey; sectionId?: string }[] = [
+  { name: "Centro Mességué", category: "wellness", img: "/images/wellness.webp", tab: "wellness" },
+  { name: "Ristorante La Terrazza", category: "dining", img: "/images/venue-laterrazza.webp", tab: "dining", sectionId: "venue-laTerrazza" },
+  { name: "Caffè Titano", category: "cafe", img: "/images/venue-caffetitano.webp", tab: "dining", sectionId: "venue-caffeTitano" },
+  { name: "La Cremeria del Titano", category: "gelato", img: "/images/venue-cremeria.webp", tab: "dining", sectionId: "venue-cremeria" },
+  { name: "Titano Suites", category: "suites", img: "/images/suite.webp", tab: "explore" },
 ];
 
 function LiveRow({
@@ -92,7 +92,7 @@ export function OggiSection({
       detail: (
         <>
           <p className="mb-3 text-[0.9rem] leading-relaxed text-[var(--color-text-secondary)]">{h.quick.reception.note}</p>
-          <CallButton href={HOTEL.phoneHref} label={t.common.receptionCta} />
+          <CallButton href={HOTEL.phoneHref} label={t.common.receptionCta} trackLabel="chiama-reception" />
         </>
       ),
     },
@@ -166,7 +166,7 @@ export function OggiSection({
                     />
                   </div>
                   <p className="mt-2 text-[0.9rem] font-semibold leading-snug text-[var(--color-text)]">{g.name}</p>
-                  <p className="text-[0.8rem] text-[var(--color-text-muted)]">{g.sub}</p>
+                  <p className="text-[0.8rem] text-[var(--color-text-muted)]">{h.groupCategories[g.category]}</p>
                 </button>
               </li>
             ))}
@@ -250,7 +250,7 @@ export function OggiSection({
       {/* ── Concierge ── */}
       <section>
         <button
-          onClick={onOpenChat}
+          onClick={() => { onOpenChat(); import("@/lib/analytics/tracker").then(m => m.trackClick("apri-concierge")); }}
           className="flex w-full items-center gap-4 rounded-2xl bg-[var(--color-accent)] px-5 py-4 text-left transition-[transform,opacity] duration-200 ease-out hover:opacity-95 active:scale-[0.99]"
         >
           <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 text-[var(--color-on-accent)]">
@@ -270,7 +270,7 @@ export function OggiSection({
         <SectionLabel>{h.nowLabel}</SectionLabel>
         <div className="rounded-2xl bg-[var(--color-surface)] px-4 lg:px-5">
           <div className="divide-y divide-[var(--color-border)]">
-            <LiveRow icon={Phone} label="Reception" hours={SERVICE_HOURS.reception} status={t.common.status} />
+            <LiveRow icon={Phone} label={t.common.receptionLabel} hours={SERVICE_HOURS.reception} status={t.common.status} />
             <LiveRow icon={UtensilsCrossed} label={t.dining.arengoLabel} hours={SERVICE_HOURS.arengo} status={t.common.status} />
             <LiveRow icon={BellRing} label={t.room.roomServiceLabel} hours={SERVICE_HOURS.roomService} status={t.common.status} />
             <LiveRow icon={Sparkles} label={t.wellness.messegueLabel} hours={SERVICE_HOURS.messegue} status={t.common.status} />
