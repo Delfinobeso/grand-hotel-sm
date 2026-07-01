@@ -26,11 +26,11 @@ import type { ServiceHours } from "@/lib/hours";
 
 /* ── GHSM Group strip ── */
 const GROUP: { name: string; category: keyof HotelContent["home"]["groupCategories"]; img: string; tab: TabKey; sectionId?: string }[] = [
-  { name: "Centro Mességué", category: "wellness", img: "/images/wellness.webp", tab: "wellness" },
-  { name: "Ristorante La Terrazza", category: "dining", img: "/images/venue-laterrazza.webp", tab: "dining", sectionId: "venue-laTerrazza" },
+  { name: "Centro Mességué", category: "wellness", img: "/images/group-wellness.webp", tab: "wellness" },
+  { name: "Ristorante La Terrazza", category: "dining", img: "/images/group-laterrazza.webp", tab: "dining", sectionId: "venue-laTerrazza" },
   { name: "Caffè Titano", category: "cafe", img: "/images/venue-caffetitano.webp", tab: "dining", sectionId: "venue-caffeTitano" },
-  { name: "La Cremeria del Titano", category: "gelato", img: "/images/venue-cremeria.webp", tab: "dining", sectionId: "venue-cremeria" },
-  { name: "La Loggia", category: "shop", img: "/images/venue-laloggia.webp", tab: "dining", sectionId: "venue-laLoggia" },
+  { name: "La Cremeria del Titano", category: "gelato", img: "/images/group-cremeria.webp", tab: "dining", sectionId: "venue-cremeria" },
+  { name: "La Loggia", category: "shop", img: "/images/group-laloggia.webp", tab: "dining", sectionId: "venue-laLoggia" },
   { name: "Titano Suites", category: "suites", img: "/images/suite.webp", tab: "explore" },
 ];
 
