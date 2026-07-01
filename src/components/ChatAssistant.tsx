@@ -28,6 +28,20 @@ function useVisualViewport() {
   return rect;
 }
 
+/** True at the lg breakpoint (1024px), where the concierge becomes a small
+ * floating widget instead of a full-screen sheet tracking the visual viewport. */
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setIsDesktop(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+  return isDesktop;
+}
+
 interface Message {
   role: "user" | "assistant";
   text: string;
@@ -184,6 +198,7 @@ export default function ChatAssistant({
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const vv = useVisualViewport();
+  const isDesktop = useIsDesktop();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -305,15 +320,20 @@ export default function ChatAssistant({
               onClick={() => setOpen(false)}
             />
 
-            {/* Wrapper: positioned to the visual viewport so the keyboard can't push it off-screen */}
+            {/* Wrapper: positioned to the visual viewport so the keyboard can't push it off-screen.
+                Desktop renders a small static floating widget instead, so it must not inherit this sizing. */}
             <div
               className="fixed z-50 lg:static lg:inset-auto"
-              style={{
-                top: vv?.top ?? 0,
-                left: 0,
-                right: 0,
-                height: vv?.height ?? "100dvh",
-              }}
+              style={
+                isDesktop
+                  ? undefined
+                  : {
+                      top: vv?.top ?? 0,
+                      left: 0,
+                      right: 0,
+                      height: vv?.height ?? "100dvh",
+                    }
+              }
             >
             <motion.div
               initial={{ y: "100%" }}
