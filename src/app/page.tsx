@@ -17,7 +17,6 @@ import {
 import { content, type Lang } from "@/lib/content";
 import { HOTEL } from "@/lib/hotel";
 import type { TabKey } from "@/lib/nav";
-import { setTab as analyticsSetTab } from "@/lib/analytics/tracker";
 import { OggiSection } from "@/components/sections/OggiSection";
 import { HotelSection } from "@/components/sections/HotelSection";
 import { DiningSection } from "@/components/sections/DiningSection";
@@ -96,7 +95,6 @@ export default function Home() {
     } else {
       el.scrollTop = 0;
     }
-    analyticsSetTab(activeTab);
   }, [activeTab, pendingSection]);
 
   const toggleTheme = () => {

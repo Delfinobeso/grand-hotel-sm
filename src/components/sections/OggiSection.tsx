@@ -250,7 +250,12 @@ export function OggiSection({
       {/* ── Concierge ── */}
       <section>
         <button
-          onClick={() => { onOpenChat(); import("@/lib/analytics/tracker").then(m => m.trackClick("apri-concierge")); }}
+          onClick={() => {
+            onOpenChat();
+            import("@/lib/analytics/tracker").then((m) => {
+              (m as unknown as { trackClick?: (label: string) => void }).trackClick?.("apri-concierge");
+            });
+          }}
           className="flex w-full items-center gap-4 rounded-2xl bg-[var(--color-accent)] px-5 py-4 text-left transition-[transform,opacity] duration-200 ease-out hover:opacity-95 active:scale-[0.99]"
         >
           <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 text-[var(--color-on-accent)]">
