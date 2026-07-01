@@ -65,7 +65,7 @@ export interface HotelContent {
     nowLabel: string;
     quickLabel: string;
     groupLabel: string;
-    groupCategories: { wellness: string; dining: string; cafe: string; gelato: string; suites: string };
+    groupCategories: { wellness: string; dining: string; cafe: string; gelato: string; suites: string; shop: string };
     quick: {
       wifi: { label: string; value: string; note: string; copyDone: string };
       breakfast: { label: string; note: string };
@@ -262,7 +262,7 @@ const it: HotelContent = {
     nowLabel: "In questo momento",
     quickLabel: "Azioni rapide",
     groupLabel: "Scopri il GHSM Group",
-    groupCategories: { wellness: "Benessere", dining: "Ristorante", cafe: "Caffè", gelato: "Gelateria", suites: "Suites" },
+    groupCategories: { wellness: "Benessere", dining: "Ristorante", cafe: "Caffè", gelato: "Gelateria", suites: "Suites", shop: "Bottega" },
     quick: {
       wifi: {
         label: "Wi-Fi",
@@ -653,7 +653,7 @@ const en: HotelContent = {
     nowLabel: "Right now",
     quickLabel: "Quick actions",
     groupLabel: "Discover the GHSM Group",
-    groupCategories: { wellness: "Wellness", dining: "Restaurant", cafe: "Café", gelato: "Ice cream", suites: "Suites" },
+    groupCategories: { wellness: "Wellness", dining: "Restaurant", cafe: "Café", gelato: "Ice cream", suites: "Suites", shop: "Boutique" },
     quick: {
       wifi: {
         label: "Wi-Fi",
@@ -1044,7 +1044,7 @@ const fr: HotelContent = {
     nowLabel: "En ce moment",
     quickLabel: "Actions rapides",
     groupLabel: "Découvrez le GHSM Group",
-    groupCategories: { wellness: "Bien-être", dining: "Restaurant", cafe: "Café", gelato: "Glacier", suites: "Suites" },
+    groupCategories: { wellness: "Bien-être", dining: "Restaurant", cafe: "Café", gelato: "Glacier", suites: "Suites", shop: "Boutique" },
     quick: {
       wifi: {
         label: "Wi-Fi",
@@ -1435,7 +1435,7 @@ const de: HotelContent = {
     nowLabel: "Gerade jetzt",
     quickLabel: "Schnellzugriff",
     groupLabel: "Entdecken Sie die GHSM Group",
-    groupCategories: { wellness: "Wellness", dining: "Restaurant", cafe: "Café", gelato: "Eisdiele", suites: "Suiten" },
+    groupCategories: { wellness: "Wellness", dining: "Restaurant", cafe: "Café", gelato: "Eisdiele", suites: "Suiten", shop: "Boutique" },
     quick: {
       wifi: {
         label: "Wi-Fi",
@@ -1826,7 +1826,7 @@ const es: HotelContent = {
     nowLabel: "En este momento",
     quickLabel: "Acciones rápidas",
     groupLabel: "Descubra el GHSM Group",
-    groupCategories: { wellness: "Bienestar", dining: "Restaurante", cafe: "Café", gelato: "Heladería", suites: "Suites" },
+    groupCategories: { wellness: "Bienestar", dining: "Restaurante", cafe: "Café", gelato: "Heladería", suites: "Suites", shop: "Tienda" },
     quick: {
       wifi: {
         label: "Wi-Fi",

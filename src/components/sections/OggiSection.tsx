@@ -30,6 +30,7 @@ const GROUP: { name: string; category: keyof HotelContent["home"]["groupCategori
   { name: "Ristorante La Terrazza", category: "dining", img: "/images/venue-laterrazza.webp", tab: "dining", sectionId: "venue-laTerrazza" },
   { name: "Caffè Titano", category: "cafe", img: "/images/venue-caffetitano.webp", tab: "dining", sectionId: "venue-caffeTitano" },
   { name: "La Cremeria del Titano", category: "gelato", img: "/images/venue-cremeria.webp", tab: "dining", sectionId: "venue-cremeria" },
+  { name: "La Loggia", category: "shop", img: "/images/venue-laloggia.webp", tab: "dining", sectionId: "venue-laLoggia" },
   { name: "Titano Suites", category: "suites", img: "/images/suite.webp", tab: "explore" },
 ];
 
