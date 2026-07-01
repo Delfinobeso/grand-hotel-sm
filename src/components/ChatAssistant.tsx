@@ -320,10 +320,11 @@ export default function ChatAssistant({
               onClick={() => setOpen(false)}
             />
 
-            {/* Wrapper: positioned to the visual viewport so the keyboard can't push it off-screen.
-                Desktop renders a small static floating widget instead, so it must not inherit this sizing. */}
+            {/* Wrapper: fixed on mobile to the visual viewport so the keyboard can't push it
+                off-screen; fixed on desktop too, but anchored as a small bottom-right widget so
+                it never joins the page's own flex layout (which would squeeze the app content). */}
             <div
-              className="fixed z-50 lg:static lg:inset-auto"
+              className="fixed z-50 lg:bottom-6 lg:right-4 lg:top-auto lg:left-auto lg:h-[34rem] lg:w-96"
               style={
                 isDesktop
                   ? undefined
@@ -340,7 +341,7 @@ export default function ChatAssistant({
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={SHEET_IN}
-              className="absolute inset-0 flex flex-col bg-[var(--color-bg)] lg:relative lg:inset-auto lg:ml-auto lg:h-[34rem] lg:w-96 lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl"
+              className="absolute inset-0 flex flex-col bg-[var(--color-bg)] lg:relative lg:h-full lg:w-full lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl"
             >
               {/* Header */}
           <div className="flex shrink-0 items-center gap-3 border-b border-[var(--color-border)] px-4 pt-[max(0.875rem,env(safe-area-inset-top))] pb-3.5 lg:rounded-t-3xl">
