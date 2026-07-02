@@ -19,7 +19,8 @@ function push(event: object) {
 
 export function initTracker(project: string) {
   _project = project;
-  push({ project, event: 'pageview', tab: document.title, timestamp: Date.now() });
+  // La prima pageview arriva da setTab(), chiamato dall'app con lo slug reale
+  // della sezione iniziale — evita il doppione con document.title.
   _timer = setInterval(flush, 15_000);
   window.addEventListener('pagehide', flush);
 }
