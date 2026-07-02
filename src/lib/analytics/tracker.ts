@@ -19,8 +19,10 @@ function push(event: object) {
 
 export function initTracker(project: string) {
   _project = project;
-  // La prima pageview arriva da setTab(), chiamato dall'app con lo slug reale
-  // della sezione iniziale — evita il doppione con document.title.
+  // Un solo evento 'session' per apertura reale dell'app — separato dai cambi
+  // di sezione (event: 'pageview'), altrimenti ogni tab visitata gonfia il
+  // conteggio "aperture app". L'ora locale alimenta la fascia oraria d'uso.
+  push({ project, event: 'session', hour: new Date().getHours(), timestamp: Date.now() });
   _timer = setInterval(flush, 15_000);
   window.addEventListener('pagehide', flush);
 }
