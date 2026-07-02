@@ -368,7 +368,8 @@ export function CallButton({
   trackLabel?: string;
 }) {
   return (
-    <a href={href} data-track={trackLabel} className={variant === "solid" ? ctaSolid : ctaOutline}>
+    <a href={href} className={variant === "solid" ? ctaSolid : ctaOutline}
+      onClick={() => { if (trackLabel) import("@/lib/analytics/tracker").then(m => m.trackClick(trackLabel)); }}>
       <Phone size={16} strokeWidth={1.875} />
       {label}
     </a>
@@ -400,8 +401,8 @@ export function NavigateButton({
       href={mapsUrl(lat, lon, name)}
       target="_blank"
       rel="noopener noreferrer"
-      data-track={trackLabel}
       className={variant === "solid" ? ctaSolid : ctaOutline}
+      onClick={() => { if (trackLabel) import("@/lib/analytics/tracker").then(m => m.trackClick(trackLabel)); }}
     >
       <MapPin size={16} strokeWidth={1.875} />
       {label}
@@ -421,13 +422,8 @@ export function BookButton({
   trackLabel?: string;
 }) {
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-track={trackLabel}
-      className={variant === "solid" ? ctaSolid : ctaOutline}
-    >
+    <a href={href} target="_blank" rel="noopener noreferrer" className={variant === "solid" ? ctaSolid : ctaOutline}
+      onClick={() => { if (trackLabel) import("@/lib/analytics/tracker").then(m => m.trackClick(trackLabel)); }}>
       <CalendarCheck size={16} strokeWidth={1.875} />
       {label}
     </a>

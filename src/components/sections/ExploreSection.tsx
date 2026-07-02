@@ -171,8 +171,8 @@ export function ExploreSection({ t }: { t: HotelContent }) {
                     </p>
                     <p className="mt-0.5 text-[0.95rem] text-[var(--color-text-secondary)]">{HOTEL.phone}</p>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} />
-                      <NavigateButton lat={HOTEL.lat} lon={HOTEL.lon} name={HOTEL.name} label={t.common.openInMapsLabel} />
+                      <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} trackLabel="chiama-reception" />
+                      <NavigateButton lat={HOTEL.lat} lon={HOTEL.lon} name={HOTEL.name} label={t.common.openInMapsLabel} trackLabel="mappe-hotel" />
                     </div>
                   </div>
                 </section>

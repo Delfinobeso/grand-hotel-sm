@@ -48,7 +48,7 @@ export function WellnessSection({ t }: { t: HotelContent }) {
           <p className="mb-3 text-[0.95rem] leading-relaxed text-[var(--color-text-secondary)]">
             {w.messegue.callNote}
           </p>
-          <CallButton href={HOTEL.phoneHref} label={t.common.bookLabel} />
+          <CallButton href={HOTEL.phoneHref} label={t.common.bookLabel} trackLabel="prenota-spa" />
         </div>
       </section>
 

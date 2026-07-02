@@ -130,7 +130,7 @@ export function HotelSection({ t }: { t: HotelContent }) {
             ))}
           </ul>
           <div className="mt-3">
-            <CallButton href={HOTEL.phoneHref} label={t.common.callValetLabel} variant="outline" />
+            <CallButton href={HOTEL.phoneHref} label={t.common.callValetLabel} variant="outline" trackLabel="chiama-valet" />
           </div>
           <p className="mt-4 font-medium text-[var(--color-text)]">{f.publicParking.title}</p>
           <p className="mt-1">{f.publicParking.body}</p>
@@ -138,7 +138,7 @@ export function HotelSection({ t }: { t: HotelContent }) {
 
         <AccordionItem icon={CarFront} title={f.taxiLabel}>
           <p className="mb-3">{f.taxi.body}</p>
-          <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" />
+          <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" trackLabel="chiama-taxi" />
         </AccordionItem>
 
         <AccordionItem icon={Clock} title={f.wakeUpLabel}>
@@ -151,7 +151,7 @@ export function HotelSection({ t }: { t: HotelContent }) {
 
         <AccordionItem icon={Presentation} title={f.meetingsLabel}>
           <p className="mb-3">{f.meetings.body}</p>
-          <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" />
+          <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" trackLabel="chiama-meeting" />
         </AccordionItem>
       </section>
     </div>
