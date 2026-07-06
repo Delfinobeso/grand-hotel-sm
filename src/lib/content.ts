@@ -82,6 +82,8 @@ export interface HotelContent {
     highlights: { title: string; body: string }[];
     hoursLabel: string;
     hours: HoursRow[];
+    hotelsLabel: string;
+    hotels: { name: string; description: string }[];
   };
   room: {
     label: string;
@@ -317,6 +319,12 @@ const it: HotelContent = {
       { label: "Room Service", value: "07:00 – 23:00 (+ €6,00)" },
       { label: "Lavanderia", value: "08:30 – 16:00" },
       { label: "Palestra", value: "08:00 – 20:00" },
+    ],
+    hotelsLabel: "Gli hotel del gruppo GHSM",
+    hotels: [
+      { name: "Grand Hotel San Marino", description: "60 camere e suite con vista sulla valle del Montefeltro." },
+      { name: "Hotel Titano", description: "Il fascino di fine Ottocento nel cuore di San Marino." },
+      { name: "Titano Suites", description: "Suite di design nel centro storico della Repubblica." },
     ],
   },
   room: {
@@ -709,6 +717,12 @@ const en: HotelContent = {
       { label: "Laundry", value: "8:30 AM – 4:00 PM" },
       { label: "Gym", value: "8:00 AM – 8:00 PM" },
     ],
+    hotelsLabel: "The GHSM Group hotels",
+    hotels: [
+      { name: "Grand Hotel San Marino", description: "60 rooms and suites overlooking the Montefeltro valley." },
+      { name: "Hotel Titano", description: "Late-19th-century charm in the heart of San Marino." },
+      { name: "Titano Suites", description: "Design suites in the historic centre of the Republic." },
+    ],
   },
   room: {
     label: "In-Room Services",
@@ -1099,6 +1113,12 @@ const fr: HotelContent = {
       { label: "Room Service", value: "07h00 – 23h00 (+ 6,00 €)" },
       { label: "Blanchisserie", value: "08h30 – 16h00" },
       { label: "Salle de sport", value: "08h00 – 20h00" },
+    ],
+    hotelsLabel: "Les hôtels du groupe GHSM",
+    hotels: [
+      { name: "Grand Hotel San Marino", description: "60 chambres et suites avec vue sur la vallée du Montefeltro." },
+      { name: "Hotel Titano", description: "Le charme de la fin du XIXe siècle au cœur de Saint-Marin." },
+      { name: "Titano Suites", description: "Suites design dans le centre historique de la République." },
     ],
   },
   room: {
@@ -1491,6 +1511,12 @@ const de: HotelContent = {
       { label: "Wäscheservice", value: "08:30 – 16:00 Uhr" },
       { label: "Fitnessraum", value: "08:00 – 20:00 Uhr" },
     ],
+    hotelsLabel: "Die Hotels der GHSM Group",
+    hotels: [
+      { name: "Grand Hotel San Marino", description: "60 Zimmer und Suiten mit Blick auf das Montefeltro-Tal." },
+      { name: "Hotel Titano", description: "Der Charme des ausgehenden 19. Jahrhunderts im Herzen von San Marino." },
+      { name: "Titano Suites", description: "Design-Suiten in der Altstadt der Republik." },
+    ],
   },
   room: {
     label: "Zimmerservice",
@@ -1881,6 +1907,12 @@ const es: HotelContent = {
       { label: "Servicio de habitaciones", value: "07:00 – 23:00 (+ 6,00 €)" },
       { label: "Lavandería", value: "08:30 – 16:00" },
       { label: "Gimnasio", value: "08:00 – 20:00" },
+    ],
+    hotelsLabel: "Los hoteles del grupo GHSM",
+    hotels: [
+      { name: "Grand Hotel San Marino", description: "60 habitaciones y suites con vistas al valle de Montefeltro." },
+      { name: "Hotel Titano", description: "El encanto de finales del siglo XIX en el corazón de San Marino." },
+      { name: "Titano Suites", description: "Suites de diseño en el centro histórico de la República." },
     ],
   },
   room: {

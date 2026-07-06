@@ -24,15 +24,21 @@ import { SectionLabel, CopyField, CallButton, HoursTable, StatusBadge, EASE_EXPO
 import type { TabKey } from "@/lib/nav";
 import type { ServiceHours } from "@/lib/hours";
 
-/* ── GHSM Group strip ── */
+/* ── GHSM Group strip (non-hotel venues) ── */
 const GROUP: { name: string; category: keyof HotelContent["home"]["groupCategories"]; img: string; tab: TabKey; sectionId?: string }[] = [
   { name: "Centro Mességué", category: "wellness", img: "/images/group-wellness.webp", tab: "wellness" },
   { name: "Ristorante La Terrazza", category: "dining", img: "/images/group-laterrazza.webp", tab: "dining", sectionId: "venue-laTerrazza" },
   { name: "Caffè Titano", category: "cafe", img: "/images/venue-caffetitano.webp", tab: "dining", sectionId: "venue-caffeTitano" },
-  { name: "La Cremeria del Titano", category: "gelato", img: "/images/group-cremeria.webp", tab: "dining", sectionId: "venue-cremeria" },
   { name: "La Loggia", category: "shop", img: "/images/group-laloggia.webp", tab: "dining", sectionId: "venue-laLoggia" },
-  { name: "Titano Suites", category: "suites", img: "/images/suite.webp", tab: "explore" },
+  { name: "La Cremeria del Titano", category: "gelato", img: "/images/group-cremeria.webp", tab: "dining", sectionId: "venue-cremeria" },
 ];
+
+/* ── GHSM Hotel Collection ── */
+const HOTEL_IMG: Record<string, string> = {
+  "Grand Hotel San Marino": "/images/hero.webp",
+  "Hotel Titano": "/images/group-hotel-titano.webp",
+  "Titano Suites": "/images/suite.webp",
+};
 
 function LiveRow({
   icon: Icon,
@@ -294,6 +300,29 @@ export function OggiSection({
           </h3>
         </div>
         <HoursTable rows={h.hours} />
+      </section>
+
+      {/* ── GHSM Hotel Collection ── */}
+      <section>
+        <SectionLabel>{h.hotelsLabel}</SectionLabel>
+        <div className="-mx-5 overflow-x-auto scroll-pl-5 md:-mx-6 md:scroll-pl-6 lg:mx-0 lg:scroll-pl-0">
+          <ul className="flex w-max gap-3 px-5 md:px-6 lg:px-0">
+            {h.hotels.map((hotel) => (
+              <li key={hotel.name} className="w-40 shrink-0">
+                <div className="overflow-hidden rounded-2xl bg-[var(--color-surface-muted)]">
+                  <img
+                    src={HOTEL_IMG[hotel.name]}
+                    alt={hotel.name}
+                    loading="lazy"
+                    className="aspect-[4/5] w-full object-cover"
+                  />
+                </div>
+                <p className="mt-2 text-[0.9rem] font-semibold leading-snug text-[var(--color-text)]">{hotel.name}</p>
+                <p className="line-clamp-2 text-[0.8rem] text-[var(--color-text-muted)]">{hotel.description}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
     </div>
   );
