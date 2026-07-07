@@ -309,16 +309,18 @@ export function OggiSection({
           <ul className="flex w-max gap-3 px-5 md:px-6 lg:px-0">
             {h.hotels.map((hotel) => (
               <li key={hotel.name} className="w-40 shrink-0">
-                <div className="overflow-hidden rounded-2xl bg-[var(--color-surface-muted)]">
-                  <img
-                    src={HOTEL_IMG[hotel.name]}
-                    alt={hotel.name}
-                    loading="lazy"
-                    className="aspect-[4/5] w-full object-cover"
-                  />
-                </div>
-                <p className="mt-2 text-[0.9rem] font-semibold leading-snug text-[var(--color-text)]">{hotel.name}</p>
-                <p className="line-clamp-2 text-[0.8rem] text-[var(--color-text-muted)]">{hotel.description}</p>
+                <a href={hotel.url} target="_blank" rel="noopener noreferrer" className="block">
+                  <div className="overflow-hidden rounded-2xl bg-[var(--color-surface-muted)]">
+                    <img
+                      src={HOTEL_IMG[hotel.name]}
+                      alt={hotel.name}
+                      loading="lazy"
+                      className="aspect-[4/5] w-full object-cover"
+                    />
+                  </div>
+                  <p className="mt-2 text-[0.9rem] font-semibold leading-snug text-[var(--color-text)]">{hotel.name}</p>
+                  <p className="line-clamp-2 text-[0.8rem] text-[var(--color-text-muted)]">{hotel.description}</p>
+                </a>
               </li>
             ))}
           </ul>

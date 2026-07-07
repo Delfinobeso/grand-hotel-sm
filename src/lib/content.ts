@@ -83,7 +83,7 @@ export interface HotelContent {
     hoursLabel: string;
     hours: HoursRow[];
     hotelsLabel: string;
-    hotels: { name: string; description: string }[];
+    hotels: { name: string; description: string; url: string }[];
   };
   room: {
     label: string;
@@ -322,9 +322,9 @@ const it: HotelContent = {
     ],
     hotelsLabel: "Gli hotel del gruppo GHSM",
     hotels: [
-      { name: "Grand Hotel San Marino", description: "60 camere e suite con vista sulla valle del Montefeltro." },
-      { name: "Hotel Titano", description: "Il fascino di fine Ottocento nel cuore di San Marino." },
-      { name: "Titano Suites", description: "Suite di design nel centro storico della Repubblica." },
+      { name: "Grand Hotel San Marino", description: "60 camere e suite con vista sulla valle del Montefeltro.", url: "https://www.grandhotel.sm" },
+      { name: "Hotel Titano", description: "Il fascino di fine Ottocento nel cuore di San Marino.", url: "https://www.hoteltitano.com" },
+      { name: "Titano Suites", description: "Suite di design nel centro storico della Repubblica.", url: "https://www.titanosuiteshotel.com" },
     ],
   },
   room: {
@@ -719,9 +719,9 @@ const en: HotelContent = {
     ],
     hotelsLabel: "The GHSM Group hotels",
     hotels: [
-      { name: "Grand Hotel San Marino", description: "60 rooms and suites overlooking the Montefeltro valley." },
-      { name: "Hotel Titano", description: "Late-19th-century charm in the heart of San Marino." },
-      { name: "Titano Suites", description: "Design suites in the historic centre of the Republic." },
+      { name: "Grand Hotel San Marino", description: "60 rooms and suites overlooking the Montefeltro valley.", url: "https://www.grandhotel.sm" },
+      { name: "Hotel Titano", description: "Late-19th-century charm in the heart of San Marino.", url: "https://www.hoteltitano.com" },
+      { name: "Titano Suites", description: "Design suites in the historic centre of the Republic.", url: "https://www.titanosuiteshotel.com" },
     ],
   },
   room: {
@@ -1116,9 +1116,9 @@ const fr: HotelContent = {
     ],
     hotelsLabel: "Les hôtels du groupe GHSM",
     hotels: [
-      { name: "Grand Hotel San Marino", description: "60 chambres et suites avec vue sur la vallée du Montefeltro." },
-      { name: "Hotel Titano", description: "Le charme de la fin du XIXe siècle au cœur de Saint-Marin." },
-      { name: "Titano Suites", description: "Suites design dans le centre historique de la République." },
+      { name: "Grand Hotel San Marino", description: "60 chambres et suites avec vue sur la vallée du Montefeltro.", url: "https://www.grandhotel.sm" },
+      { name: "Hotel Titano", description: "Le charme de la fin du XIXe siècle au cœur de Saint-Marin.", url: "https://www.hoteltitano.com" },
+      { name: "Titano Suites", description: "Suites design dans le centre historique de la République.", url: "https://www.titanosuiteshotel.com" },
     ],
   },
   room: {
@@ -1513,9 +1513,9 @@ const de: HotelContent = {
     ],
     hotelsLabel: "Die Hotels der GHSM Group",
     hotels: [
-      { name: "Grand Hotel San Marino", description: "60 Zimmer und Suiten mit Blick auf das Montefeltro-Tal." },
-      { name: "Hotel Titano", description: "Der Charme des ausgehenden 19. Jahrhunderts im Herzen von San Marino." },
-      { name: "Titano Suites", description: "Design-Suiten in der Altstadt der Republik." },
+      { name: "Grand Hotel San Marino", description: "60 Zimmer und Suiten mit Blick auf das Montefeltro-Tal.", url: "https://www.grandhotel.sm" },
+      { name: "Hotel Titano", description: "Der Charme des ausgehenden 19. Jahrhunderts im Herzen von San Marino.", url: "https://www.hoteltitano.com" },
+      { name: "Titano Suites", description: "Design-Suiten in der Altstadt der Republik.", url: "https://www.titanosuiteshotel.com" },
     ],
   },
   room: {
@@ -1910,9 +1910,9 @@ const es: HotelContent = {
     ],
     hotelsLabel: "Los hoteles del grupo GHSM",
     hotels: [
-      { name: "Grand Hotel San Marino", description: "60 habitaciones y suites con vistas al valle de Montefeltro." },
-      { name: "Hotel Titano", description: "El encanto de finales del siglo XIX en el corazón de San Marino." },
-      { name: "Titano Suites", description: "Suites de diseño en el centro histórico de la República." },
+      { name: "Grand Hotel San Marino", description: "60 habitaciones y suites con vistas al valle de Montefeltro.", url: "https://www.grandhotel.sm" },
+      { name: "Hotel Titano", description: "El encanto de finales del siglo XIX en el corazón de San Marino.", url: "https://www.hoteltitano.com" },
+      { name: "Titano Suites", description: "Suites de diseño en el centro histórico de la República.", url: "https://www.titanosuiteshotel.com" },
     ],
   },
   room: {
