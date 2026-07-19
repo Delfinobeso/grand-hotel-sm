@@ -61,6 +61,10 @@ export default function Home() {
   const [chatOpen, setChatOpen] = useState(false);
   const keyboardOpen = useKeyboardOpen();
   const mainRef = useRef<HTMLElement>(null);
+  // Quando pendingSection viene consumato l'effetto ri-gira con valore null:
+  // senza questo flag il ramo "else" farebbe scrollTop=0 annullando lo scroll
+  // all'anchor appena eseguito.
+  const sectionJustConsumedRef = useRef(false);
   const scrollHidden = useScrollDirection();
   // Only the "oggi" tab has no header bar of its own — its lang/theme controls float
   // over the content and would cover it on scroll (e.g. the check-out time). Other
@@ -95,18 +99,27 @@ export default function Home() {
       // Ritenta finché l'anchor non appare, con una deadline di sicurezza.
       const id = pendingSection;
       const deadline = performance.now() + 1200;
+      let cancelled = false;
       const attempt = () => {
+        if (cancelled) return;
         const target = el.querySelector<HTMLElement>(`#${id}`);
         if (target) {
           el.scrollTo({ top: target.offsetTop - 16, behavior: "smooth" });
+          sectionJustConsumedRef.current = true;
           setPendingSection(null);
         } else if (performance.now() < deadline) {
           requestAnimationFrame(attempt);
         } else {
+          sectionJustConsumedRef.current = true;
           setPendingSection(null);
         }
       };
       requestAnimationFrame(attempt);
+      return () => {
+        cancelled = true;
+      };
+    } else if (sectionJustConsumedRef.current) {
+      sectionJustConsumedRef.current = false;
     } else {
       el.scrollTop = 0;
     }
