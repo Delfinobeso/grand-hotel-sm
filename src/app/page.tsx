@@ -313,7 +313,7 @@ export default function Home() {
         })}
       </nav>
 
-      <ChatAssistant lang={lang} open={chatOpen} onOpenChange={setChatOpen} />
+      <ChatAssistant lang={lang} open={chatOpen} onOpenChange={setChatOpen} hideFab={activeTab === "explore"} />
     </div>
   );
 }

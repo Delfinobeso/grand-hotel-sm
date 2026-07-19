@@ -197,10 +197,14 @@ export default function ChatAssistant({
   lang,
   open,
   onOpenChange,
+  hideFab = false,
 }: {
   lang: Lang;
   open: boolean;
   onOpenChange: (v: boolean) => void;
+  /** Il tab mappa non scrolla in verticale: lì l'auto-hide non scatta mai e il
+   * FAB coprirebbe stabilmente la CTA "Naviga" del carosello — va nascosto. */
+  hideFab?: boolean;
 }) {
   const c = COPY[lang];
   const setOpen = onOpenChange;
@@ -304,7 +308,7 @@ export default function ChatAssistant({
     <>
       {/* FAB */}
       <AnimatePresence>
-        {!open && (
+        {!open && !hideFab && (
           <motion.button
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: scrollHidden ? 0 : 1, y: scrollHidden ? 24 : 0 }}
