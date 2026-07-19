@@ -404,6 +404,16 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
       {/* Bottom overlay stack: category chips, carousel counter, then the place
           carousel. Anchored at the same bottom offset the carousel used alone. */}
       <div className="absolute inset-x-0 bottom-[var(--dock-inset)] z-[1000] flex flex-col gap-1.5 lg:bottom-4">
+        {/* Carousel position counter — above the chips so the chips stay attached
+            to the carousel without a gap underneath. */}
+        {!chipsHidden && (
+          <div className="flex justify-end px-4">
+            <span className="rounded-full bg-[var(--color-surface)]/80 px-2.5 py-1 text-[0.7rem] font-medium tabular-nums text-[var(--color-text-muted)] backdrop-blur-md">
+              {Math.min(active + 1, filteredPlaces.length)} {t.common.counterOf} {filteredPlaces.length}
+            </span>
+          </div>
+        )}
+
         {/* Category chips — hidden while either bottom sheet is open (no visual doubling). */}
         {!chipsHidden && (
           <div className="flex gap-2 overflow-x-auto px-4 pb-0.5" style={{ scrollbarWidth: "none" }}>
@@ -433,13 +443,6 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
             })}
           </div>
         )}
-
-        {/* Carousel position counter — updates with the active card and the filter. */}
-        <div className="flex justify-end px-4">
-          <span className="rounded-full bg-[var(--color-surface)]/80 px-2.5 py-1 text-[0.7rem] font-medium tabular-nums text-[var(--color-text-muted)] backdrop-blur-md">
-            {Math.min(active + 1, filteredPlaces.length)} {t.common.counterOf} {filteredPlaces.length}
-          </span>
-        </div>
 
         {/* Bottom banners. overflow-x-auto forces overflow-y to clip, which would crop
             the cards' drop shadows at the scroller's edges (a hard line above the dock).
