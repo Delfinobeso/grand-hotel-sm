@@ -200,9 +200,10 @@ Indicazioni mappa (per "come arrivo / dov'è" — link universali, funzionano su
 - Museo di Stato: [Apri in Mappe](https://www.google.com/maps/search/?api=1&query=Museo%20di%20Stato%20San%20Marino%2043.935991,12.446556)
 
 Chiamate (formato [Testo](tel:NUMERO)):
-- Reception Grand Hotel: [Chiama la Reception](tel:+390****2400)
-- La Terrazza / Titano Suites: [Chiama](tel:+390****1007)
-- Caffè Titano / Cremeria: [Chiama](tel:+390****2473)
+- Reception Grand Hotel: [Chiama la Reception](tel:+390549992400)
+- La Terrazza / Titano Suites: [Chiama](tel:+390549991007)
+- Caffè Titano / Cremeria: [Chiama](tel:+390549992473)
+- La Loggia: [Chiama](tel:+390549946284)
 ---
 
 REGOLE FONDAMENTALI:

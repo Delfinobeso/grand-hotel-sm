@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 // Apply persisted theme before paint to avoid a flash; only sets <html data-theme>.
-const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}var l=localStorage.getItem('lang');if(l==='en'){document.documentElement.lang='en';}}catch(e){}})();`;
+const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}var l=localStorage.getItem('lang');if(l&&['en','fr','de','es'].indexOf(l)!==-1){document.documentElement.lang=l;}}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
