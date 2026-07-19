@@ -82,16 +82,28 @@ export interface PointOfInterest {
   lat: number;
   lon: number;
   walkMinutes: number;
+  /** True for the 6 landmarks on the classic sightseeing route drawn on the map.
+   *  New POIs added later are pin + card only, and are kept off that route line. */
+  onRoute?: boolean;
 }
 
 /** San Marino landmarks worth visiting — coordinates verified via OpenStreetMap Nominatim. */
 export const POINTS_OF_INTEREST: PointOfInterest[] = [
-  { id: "palazzoPubblico", name: "Palazzo Pubblico", lat: 43.936783, lon: 12.446273, walkMinutes: 5 },
-  { id: "basilica", name: "Basilica del Santo", lat: 43.937147, lon: 12.446694, walkMinutes: 5 },
-  { id: "museoStato", name: "Museo di Stato", lat: 43.935991, lon: 12.446556, walkMinutes: 5 },
-  { id: "guaita", name: "Prima Torre · Rocca Guaita", lat: 43.935215, lon: 12.449239, walkMinutes: 8 },
-  { id: "cesta", name: "Seconda Torre · Rocca Cesta", lat: 43.932623, lon: 12.451356, walkMinutes: 12 },
-  { id: "funivia", name: "Funivia di San Marino", lat: 43.939070, lon: 12.445616, walkMinutes: 10 },
+  { id: "palazzoPubblico", name: "Palazzo Pubblico", lat: 43.936783, lon: 12.446273, walkMinutes: 5, onRoute: true },
+  { id: "basilica", name: "Basilica del Santo", lat: 43.937147, lon: 12.446694, walkMinutes: 5, onRoute: true },
+  { id: "museoStato", name: "Museo di Stato", lat: 43.935991, lon: 12.446556, walkMinutes: 5, onRoute: true },
+  { id: "guaita", name: "Prima Torre · Rocca Guaita", lat: 43.935215, lon: 12.449239, walkMinutes: 8, onRoute: true },
+  { id: "cesta", name: "Seconda Torre · Rocca Cesta", lat: 43.932623, lon: 12.451356, walkMinutes: 12, onRoute: true },
+  { id: "funivia", name: "Funivia di San Marino", lat: 43.939070, lon: 12.445616, walkMinutes: 10, onRoute: true },
+  // Added 2026-07-19 — coordinates via Nominatim, walkMinutes via the app's own
+  // OSRM foot router (routing.openstreetmap.de/routed-foot). Not part of the
+  // classic route polyline: pin + card + list entry only (onRoute omitted).
+  { id: "cavaBalestrieri", name: "Cava dei Balestrieri", lat: 43.9373895, lon: 12.4457579, walkMinutes: 7 },
+  { id: "passoStreghe", name: "Passo delle Streghe", lat: 43.9347715, lon: 12.4497637, walkMinutes: 7 },
+  { id: "montale", name: "Terza Torre · Torre Montale", lat: 43.9299904, lon: 12.4524743, walkMinutes: 10 },
+  { id: "chiesaSanFrancesco", name: "Chiesa di San Francesco", lat: 43.9352302, lon: 12.4471200, walkMinutes: 4 },
+  { id: "museoCuriosita", name: "Museo delle Curiosità", lat: 43.9351757, lon: 12.4484983, walkMinutes: 5 },
+  { id: "portaSanFrancesco", name: "Porta San Francesco", lat: 43.9352215, lon: 12.4467932, walkMinutes: 4 },
 ];
 
 export interface Airport {

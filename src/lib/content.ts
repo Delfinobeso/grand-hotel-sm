@@ -562,6 +562,36 @@ const it: HotelContent = {
         name: "Funivia di San Marino",
         body: "Collega in pochi minuti il centro storico a Borgo Maggiore, con una vista panoramica sulla Valle del Montefeltro.",
       },
+      {
+        id: "cavaBalestrieri",
+        name: "Cava dei Balestrieri",
+        body: "Un'ampia terrazza verde alle spalle di Piazza della Libertà, storica sede delle esibizioni della Federazione Balestrieri di San Marino. Da qui lo sguardo spazia sulle colline del Montefeltro.",
+      },
+      {
+        id: "passoStreghe",
+        name: "Passo delle Streghe",
+        body: "Un suggestivo camminamento scavato nella roccia che collega Rocca Guaita a Rocca Cesta, con scorci sospesi sulla vallata. Il nome richiama le leggende popolari legate al monte Titano.",
+      },
+      {
+        id: "montale",
+        name: "Terza Torre · Torre Montale",
+        body: "La più piccola e meno accessibile delle Tre Torri, edificata come postazione di avvistamento e oggi non visitabile all'interno. Segna il punto più meridionale della cresta del monte Titano.",
+      },
+      {
+        id: "chiesaSanFrancesco",
+        name: "Chiesa di San Francesco",
+        body: "Uno dei luoghi di culto più antichi di San Marino, annesso all'ex convento francescano oggi sede del Museo di Stato. Conserva opere pittoriche di scuola riminese e marchigiana.",
+      },
+      {
+        id: "museoCuriosita",
+        name: "Museo delle Curiosità",
+        body: "Una raccolta insolita di record, invenzioni e oggetti curiosi da tutto il mondo, allestita nel cuore del centro storico. Un percorso adatto a visitatori di ogni età, tra stranezze e aneddoti.",
+      },
+      {
+        id: "portaSanFrancesco",
+        name: "Porta San Francesco",
+        body: "Uno degli antichi ingressi fortificati al borgo, all'imbocco di Piazzale Lo Stradone verso il centro storico. Il passaggio sotto la torre conserva ancora l'atmosfera medievale delle mura cittadine.",
+      },
     ],
     airportsLabel: "Aeroporti",
     airports: {
@@ -962,6 +992,36 @@ const en: HotelContent = {
         id: "funivia",
         name: "San Marino Cable Car",
         body: "Connects the historic centre to Borgo Maggiore in just a few minutes, with panoramic views over the Montefeltro Valley.",
+      },
+      {
+        id: "cavaBalestrieri",
+        name: "Cava dei Balestrieri",
+        body: "A broad green terrace behind Piazza della Libertà, the historic home of San Marino's Crossbowmen Federation displays. From here the view opens over the hills of Montefeltro.",
+      },
+      {
+        id: "passoStreghe",
+        name: "Passo delle Streghe",
+        body: "An evocative rock-cut walkway linking Rocca Guaita to Rocca Cesta, with views suspended over the valley. Its name recalls the folk legends tied to Mount Titano.",
+      },
+      {
+        id: "montale",
+        name: "Third Tower · Montale Tower",
+        body: "The smallest and least accessible of the Three Towers, built as a watch post and not open to visitors inside today. It marks the southernmost point of Mount Titano's ridge.",
+      },
+      {
+        id: "chiesaSanFrancesco",
+        name: "Chiesa di San Francesco",
+        body: "One of San Marino's oldest places of worship, adjoining the former Franciscan convent that now houses the State Museum. It holds paintings from the Rimini and Marche schools.",
+      },
+      {
+        id: "museoCuriosita",
+        name: "Museum of Curiosities",
+        body: "An unusual collection of records, inventions and curious objects from around the world, set in the heart of the historic centre. A visit suited to all ages, full of oddities and anecdotes.",
+      },
+      {
+        id: "portaSanFrancesco",
+        name: "Porta San Francesco",
+        body: "One of the town's ancient fortified gateways, at the entrance to Piazzale Lo Stradone leading into the historic centre. Passing beneath the tower still carries the medieval atmosphere of the city walls.",
       },
     ],
     airportsLabel: "Airports",
@@ -1364,6 +1424,36 @@ const fr: HotelContent = {
         name: "Téléphérique de Saint-Marin",
         body: "Il relie en quelques minutes le centre historique à Borgo Maggiore, avec une vue panoramique sur la vallée du Montefeltro.",
       },
+      {
+        id: "cavaBalestrieri",
+        name: "Cava dei Balestrieri",
+        body: "Une vaste terrasse verdoyante derrière la Piazza della Libertà, siège historique des démonstrations de la Fédération des Arbalétriers de Saint-Marin. La vue s'y étend sur les collines du Montefeltro.",
+      },
+      {
+        id: "passoStreghe",
+        name: "Passo delle Streghe",
+        body: "Un chemin évocateur taillé dans la roche, reliant la forteresse Guaita à la forteresse Cesta, avec des vues suspendues sur la vallée. Son nom rappelle les légendes populaires liées au mont Titano.",
+      },
+      {
+        id: "montale",
+        name: "Troisième Tour · Tour Montale",
+        body: "La plus petite et la moins accessible des Trois Tours, construite comme poste de guet et aujourd'hui fermée à la visite intérieure. Elle marque le point le plus méridional de la crête du mont Titano.",
+      },
+      {
+        id: "chiesaSanFrancesco",
+        name: "Chiesa di San Francesco",
+        body: "L'un des plus anciens lieux de culte de Saint-Marin, attenant à l'ancien couvent franciscain qui abrite aujourd'hui le Musée d'État. Elle conserve des œuvres picturales des écoles de Rimini et des Marches.",
+      },
+      {
+        id: "museoCuriosita",
+        name: "Musée des Curiosités",
+        body: "Une collection insolite de records, d'inventions et d'objets curieux venus du monde entier, installée au cœur du centre historique. Un parcours adapté à tous les âges, entre bizarreries et anecdotes.",
+      },
+      {
+        id: "portaSanFrancesco",
+        name: "Porta San Francesco",
+        body: "L'une des anciennes portes fortifiées du bourg, à l'entrée de la Piazzale Lo Stradone menant au centre historique. Le passage sous la tour conserve encore l'atmosphère médiévale des remparts de la ville.",
+      },
     ],
     airportsLabel: "Aéroports",
     airports: {
@@ -1765,6 +1855,36 @@ const de: HotelContent = {
         name: "Seilbahn von San Marino",
         body: "Sie verbindet die Altstadt in wenigen Minuten mit Borgo Maggiore und bietet einen Panoramablick auf das Montefeltro-Tal.",
       },
+      {
+        id: "cavaBalestrieri",
+        name: "Cava dei Balestrieri",
+        body: "Eine weite grüne Terrasse hinter der Piazza della Libertà, historischer Schauplatz der Vorführungen der Armbrustschützen-Vereinigung San Marinos. Von hier reicht der Blick über die Hügel des Montefeltro.",
+      },
+      {
+        id: "passoStreghe",
+        name: "Passo delle Streghe",
+        body: "Ein stimmungsvoller, in den Fels gehauener Weg, der die Festung Guaita mit der Festung Cesta verbindet, mit schwebenden Ausblicken auf das Tal. Sein Name erinnert an die Volkslegenden rund um den Monte Titano.",
+      },
+      {
+        id: "montale",
+        name: "Dritter Turm · Turm Montale",
+        body: "Der kleinste und am wenigsten zugängliche der Drei Türme, einst als Wachposten errichtet und heute im Inneren nicht zugänglich. Er markiert den südlichsten Punkt des Kamms des Monte Titano.",
+      },
+      {
+        id: "chiesaSanFrancesco",
+        name: "Chiesa di San Francesco",
+        body: "Eines der ältesten Gotteshäuser San Marinos, angrenzend an das ehemalige Franziskanerkloster, in dem heute das Staatsmuseum untergebracht ist. Sie bewahrt Gemälde der Schulen von Rimini und der Marken.",
+      },
+      {
+        id: "museoCuriosita",
+        name: "Kuriositätenmuseum",
+        body: "Eine ungewöhnliche Sammlung von Rekorden, Erfindungen und kuriosen Objekten aus aller Welt, mitten in der Altstadt untergebracht. Ein Rundgang für jedes Alter, voller Kuriositäten und Anekdoten.",
+      },
+      {
+        id: "portaSanFrancesco",
+        name: "Porta San Francesco",
+        body: "Eines der alten befestigten Stadttore, am Eingang zur Piazzale Lo Stradone, die in die Altstadt führt. Der Durchgang unter dem Turm bewahrt noch die mittelalterliche Atmosphäre der Stadtmauern.",
+      },
     ],
     airportsLabel: "Flughäfen",
     airports: {
@@ -2165,6 +2285,36 @@ const es: HotelContent = {
         id: "funivia",
         name: "Teleférico de San Marino",
         body: "Conecta en pocos minutos el centro histórico con Borgo Maggiore, con una vista panorámica sobre el valle de Montefeltro.",
+      },
+      {
+        id: "cavaBalestrieri",
+        name: "Cava dei Balestrieri",
+        body: "Una amplia terraza verde detrás de la Piazza della Libertà, sede histórica de las exhibiciones de la Federación de Ballesteros de San Marino. Desde aquí la vista se abre sobre las colinas del Montefeltro.",
+      },
+      {
+        id: "passoStreghe",
+        name: "Passo delle Streghe",
+        body: "Un evocador camino excavado en la roca que une la Rocca Guaita con la Rocca Cesta, con vistas suspendidas sobre el valle. Su nombre recuerda las leyendas populares ligadas al monte Titano.",
+      },
+      {
+        id: "montale",
+        name: "Tercera Torre · Torre Montale",
+        body: "La más pequeña y menos accesible de las Tres Torres, construida como puesto de vigilancia y hoy no visitable por dentro. Marca el punto más meridional de la cresta del monte Titano.",
+      },
+      {
+        id: "chiesaSanFrancesco",
+        name: "Chiesa di San Francesco",
+        body: "Uno de los lugares de culto más antiguos de San Marino, contiguo al antiguo convento franciscano que hoy alberga el Museo de Estado. Conserva obras pictóricas de la escuela de Rímini y de las Marcas.",
+      },
+      {
+        id: "museoCuriosita",
+        name: "Museo de las Curiosidades",
+        body: "Una insólita colección de récords, inventos y objetos curiosos de todo el mundo, instalada en el corazón del centro histórico. Un recorrido apto para todas las edades, entre rarezas y anécdotas.",
+      },
+      {
+        id: "portaSanFrancesco",
+        name: "Porta San Francesco",
+        body: "Una de las antiguas puertas fortificadas del burgo, en la entrada de la Piazzale Lo Stradone hacia el centro histórico. El paso bajo la torre conserva todavía la atmósfera medieval de las murallas de la ciudad.",
       },
     ],
     airportsLabel: "Aeropuertos",
