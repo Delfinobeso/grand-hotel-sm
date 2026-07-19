@@ -20,8 +20,18 @@ const STATIC_CACHE = CACHE_VERSION + '-static';
  * Evento install: attiva subito il nuovo Service Worker senza aspettare
  * la chiusura delle vecchie tab.
  */
-self.addEventListener('install', () => {
-  self.skipWaiting();
+self.addEventListener('install', (event) => {
+  // Precache della shell: l'offline funziona già dalla prima visita
+  // (la prima navigazione avviene prima che il SW controlli la pagina).
+  event.waitUntil((async () => {
+    try {
+      const cache = await caches.open(RUNTIME_CACHE);
+      await cache.add('/');
+    } catch (err) {
+      // rete assente durante l'install: pazienza, si cacherà alla prossima navigazione
+    }
+    await self.skipWaiting();
+  })());
 });
 
 /**
