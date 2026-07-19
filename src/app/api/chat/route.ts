@@ -12,6 +12,25 @@ interface ChatMsg {
   content: string;
 }
 
+// Mappa host -> projectId per l'analytics first-party (fleet-wide, dato non sensibile).
+const PROJECT_ID_BY_HOST: Record<string, string> = {
+  "grandhotelsanmarino.blasat.com": "grand-hotel-sm",
+  "hoteltitano.blasat.com": "hotel-titano",
+  "titanosuites.blasat.com": "titano-suites",
+};
+
+/** Logga in modo anonimo la sola domanda dell'ospite (nessuna risposta, nessun IP).
+ *  Fire-and-forget: non deve mai rallentare o far fallire la risposta della chat. */
+function logQuestionAnonymously(req: NextRequest, question: string) {
+  const host = req.headers.get("host") || "unknown";
+  const projectId = PROJECT_ID_BY_HOST[host] || host;
+  fetch("https://analytics.blasat.com/api/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ project: projectId, event: "chatq", q: question.slice(0, 200) }),
+  }).catch(() => {});
+}
+
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
@@ -56,6 +75,11 @@ export async function POST(req: NextRequest) {
     }
 
     const systemPrompt = buildSystemPrompt();
+
+    const lastUserMsg = [...history].reverse().find((m) => m.role === "user");
+    if (lastUserMsg) {
+      logQuestionAnonymously(req, lastUserMsg.content);
+    }
 
     const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
@@ -138,9 +162,25 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Chat API error:", error);
-    return NextResponse.json(
-      { reply: FALLBACK_FATAL_ERROR },
-      { status: 200 },
-    );
+    // Il client legge SOLO lo stream SSE (mai il body JSON diretto): rispondere qui con
+    // NextResponse.json lascerebbe l'utente senza alcun messaggio. Emettiamo quindi lo
+    // stesso formato SSE del ramo di streaming (già gestito dal client, vedi c.error).
+    const encoder = new TextEncoder();
+    const fatalStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify({ error: FALLBACK_FATAL_ERROR })}\n\n`),
+        );
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      },
+    });
+    return new Response(fatalStream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
   }
 }

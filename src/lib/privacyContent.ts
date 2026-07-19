@@ -37,7 +37,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     dataItems: [
       {
         label: "Assistente AI (concierge)",
-        text: "I messaggi che scrivi in chat vengono inviati a un fornitore di intelligenza artificiale terzo (DeepSeek, con server anche al di fuori dell'UE) al solo scopo di generare la risposta. Non inserire dati personali sensibili (salute, documenti, pagamenti). La cronologia della conversazione resta nel tuo dispositivo.",
+        text: "I messaggi che scrivi in chat vengono inviati a un fornitore di intelligenza artificiale terzo (DeepSeek, con server anche al di fuori dell'UE) al solo scopo di generare la risposta. Non inserire dati personali sensibili (salute, documenti, pagamenti). La cronologia della conversazione resta nel tuo dispositivo. Le domande poste all'assistente possono essere conservate in forma anonima, senza dati identificativi, per migliorare il servizio.",
       },
       {
         label: "Statistiche d'uso",
@@ -68,7 +68,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     dataItems: [
       {
         label: "AI assistant (concierge)",
-        text: "The messages you write in chat are sent to a third-party artificial intelligence provider (DeepSeek, with servers also located outside the EU) solely to generate the reply. Please do not enter sensitive personal data (health, documents, payments). Your conversation history remains on your device.",
+        text: "The messages you write in chat are sent to a third-party artificial intelligence provider (DeepSeek, with servers also located outside the EU) solely to generate the reply. Please do not enter sensitive personal data (health, documents, payments). Your conversation history remains on your device. Questions asked to the assistant may be stored anonymously, without identifying data, to improve the service.",
       },
       {
         label: "Usage statistics",
@@ -99,7 +99,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     dataItems: [
       {
         label: "Assistant IA (concierge)",
-        text: "Les messages que vous écrivez dans le chat sont envoyés à un fournisseur tiers d'intelligence artificielle (DeepSeek, avec des serveurs également situés hors UE) dans le seul but de générer la réponse. Ne saisissez pas de données personnelles sensibles (santé, documents, paiements). L'historique de la conversation reste sur votre appareil.",
+        text: "Les messages que vous écrivez dans le chat sont envoyés à un fournisseur tiers d'intelligence artificielle (DeepSeek, avec des serveurs également situés hors UE) dans le seul but de générer la réponse. Ne saisissez pas de données personnelles sensibles (santé, documents, paiements). L'historique de la conversation reste sur votre appareil. Les questions posées à l'assistant peuvent être conservées de façon anonyme, sans donnée identifiante, afin d'améliorer le service.",
       },
       {
         label: "Statistiques d'utilisation",
@@ -130,7 +130,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     dataItems: [
       {
         label: "KI-Assistent (Concierge)",
-        text: "Die Nachrichten, die Sie im Chat schreiben, werden ausschließlich zur Erzeugung der Antwort an einen externen Anbieter künstlicher Intelligenz (DeepSeek, mit Servern auch außerhalb der EU) gesendet. Geben Sie keine sensiblen personenbezogenen Daten ein (Gesundheit, Dokumente, Zahlungen). Der Gesprächsverlauf verbleibt auf Ihrem Gerät.",
+        text: "Die Nachrichten, die Sie im Chat schreiben, werden ausschließlich zur Erzeugung der Antwort an einen externen Anbieter künstlicher Intelligenz (DeepSeek, mit Servern auch außerhalb der EU) gesendet. Geben Sie keine sensiblen personenbezogenen Daten ein (Gesundheit, Dokumente, Zahlungen). Der Gesprächsverlauf verbleibt auf Ihrem Gerät. Die an den Assistenten gestellten Fragen können anonymisiert, ohne identifizierende Daten, zur Verbesserung des Dienstes gespeichert werden.",
       },
       {
         label: "Nutzungsstatistiken",
@@ -161,7 +161,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     dataItems: [
       {
         label: "Asistente IA (concierge)",
-        text: "Los mensajes que escribe en el chat se envían a un proveedor externo de inteligencia artificial (DeepSeek, con servidores también fuera de la UE) únicamente para generar la respuesta. No introduzca datos personales sensibles (salud, documentos, pagos). El historial de la conversación permanece en su dispositivo.",
+        text: "Los mensajes que escribe en el chat se envían a un proveedor externo de inteligencia artificial (DeepSeek, con servidores también fuera de la UE) únicamente para generar la respuesta. No introduzca datos personales sensibles (salud, documentos, pagos). El historial de la conversación permanece en su dispositivo. Las preguntas realizadas al asistente pueden conservarse de forma anónima, sin datos identificativos, para mejorar el servicio.",
       },
       {
         label: "Estadísticas de uso",
