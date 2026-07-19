@@ -7,7 +7,6 @@ import {
   Coffee,
   Phone,
   Tv,
-  Clock,
   LogIn,
   DoorOpen,
   Sparkles,
@@ -15,14 +14,15 @@ import {
   UtensilsCrossed,
   BellRing,
   Dumbbell,
+  Shirt,
   ChevronRight,
   type LucideIcon,
 } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL, SERVICE_HOURS } from "@/lib/hotel";
-import { SectionLabel, CopyField, CallButton, HoursTable, StatusBadge, EASE_EXPO } from "@/components/ui";
+import { SectionLabel, CopyField, CallButton, StatusBadge, EASE_EXPO } from "@/components/ui";
 import type { TabKey } from "@/lib/nav";
-import type { ServiceHours } from "@/lib/hours";
+import { formatHoursCaption, type ServiceHours } from "@/lib/hours";
 
 /* ── GHSM Group strip (non-hotel venues) ── */
 const GROUP: { name: string; category: keyof HotelContent["home"]["groupCategories"]; img: string; tab: TabKey; sectionId?: string }[] = [
@@ -51,12 +51,18 @@ function LiveRow({
   hours: ServiceHours;
   status: HotelContent["common"]["status"];
 }) {
+  const caption = formatHoursCaption(hours);
   return (
     <div className="flex items-center gap-3 py-3">
       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
         <Icon size={15} strokeWidth={1.875} />
       </span>
-      <span className="flex-1 text-[0.95rem] font-medium text-[var(--color-text)]">{label}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[0.95rem] font-medium text-[var(--color-text)]">{label}</span>
+        {caption && (
+          <span className="mt-0.5 block text-[0.8125rem] text-[var(--color-text-muted)]">{caption}</span>
+        )}
+      </span>
       <StatusBadge hours={hours} labels={status} />
     </div>
   );
@@ -286,20 +292,10 @@ export function OggiSection({
             <LiveRow icon={UtensilsCrossed} label={t.dining.arengoLabel} hours={SERVICE_HOURS.arengo} status={t.common.status} />
             <LiveRow icon={BellRing} label={t.room.roomServiceLabel} hours={SERVICE_HOURS.roomService} status={t.common.status} />
             <LiveRow icon={Sparkles} label={t.wellness.messegueLabel} hours={SERVICE_HOURS.messegue} status={t.common.status} />
+            <LiveRow icon={Shirt} label={t.room.laundryLabel} hours={SERVICE_HOURS.laundry} status={t.common.status} />
             <LiveRow icon={Dumbbell} label={t.facility.gymLabel} hours={SERVICE_HOURS.gym} status={t.common.status} />
           </div>
         </div>
-      </section>
-
-      {/* ── Orari ── */}
-      <section>
-        <div className="mb-3 flex items-center gap-2 px-1">
-          <Clock size={15} strokeWidth={2} className="text-[var(--color-text-muted)]" />
-          <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-text-muted)]">
-            {h.hoursLabel}
-          </h3>
-        </div>
-        <HoursTable rows={h.hours} />
       </section>
 
       {/* ── GHSM Hotel Collection ── */}

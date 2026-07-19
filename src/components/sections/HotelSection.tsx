@@ -16,6 +16,7 @@ import {
   Clock,
   Scissors,
   Presentation,
+  MapPin,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -27,6 +28,7 @@ import {
   AccordionItem,
   CopyField,
   CallButton,
+  NavigateButton,
   FloorBadge,
 } from "@/components/ui";
 
@@ -152,6 +154,25 @@ export function HotelSection({ t }: { t: HotelContent }) {
         <AccordionItem icon={Presentation} title={f.meetingsLabel}>
           <p className="mb-3">{f.meetings.body}</p>
           <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" trackLabel="chiama-meeting" />
+        </AccordionItem>
+
+        <AccordionItem icon={MapPin} title={f.contactsLabel}>
+          <p className="font-medium text-[var(--color-text)]">{HOTEL.name}</p>
+          <p>
+            {HOTEL.addressLine1}, {HOTEL.addressLine2}
+          </p>
+          <p>{HOTEL.phone}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" trackLabel="chiama-hotel" />
+            <NavigateButton
+              lat={HOTEL.lat}
+              lon={HOTEL.lon}
+              name={HOTEL.name}
+              label={t.common.openInMapsLabel}
+              variant="outline"
+              trackLabel="mappe-hotel"
+            />
+          </div>
         </AccordionItem>
       </section>
     </div>

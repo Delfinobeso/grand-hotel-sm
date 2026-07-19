@@ -60,6 +60,14 @@ export function nextOccurrenceYear(month: number, day: number, now: { year: numb
   return now.year;
 }
 
+/** Compact "HH:MM–HH:MM" caption for ranges-type hours (multi-range joined with " · "),
+ *  e.g. for a muted line under a service name. Returns null for "always"/"onrequest"
+ *  types — those have no time range and are already fully conveyed by the status badge. */
+export function formatHoursCaption(hours: ServiceHours): string | null {
+  if (hours.type !== "ranges") return null;
+  return hours.ranges.map((r) => `${r.open}–${r.close}`).join(" · ");
+}
+
 export function getServiceStatus(hours: ServiceHours, date: Date = new Date()): StatusResult {
   if (hours.type === "always") return { status: "open" };
   if (hours.type === "onrequest") return { status: "inactive" };

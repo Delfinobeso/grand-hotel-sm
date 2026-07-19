@@ -377,7 +377,7 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
         )}
       </AnimatePresence>
 
-      {/* "Elenco" — mirrors the "Eventi e info" trigger in ExploreSection on the
+      {/* "Elenco" — mirrors the "Info e contatti" trigger in ExploreSection on the
           opposite corner (left on mobile, since the header's lang/theme pills own
           the top-right on mobile; left on desktop too, mirroring Info's top-right).
           Same isolate/z-[750] reasoning as "My location" above. */}
@@ -521,9 +521,9 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
       {/* "Elenco" bottom sheet — portaled to <body> so it escapes this component's
           own `isolate` stacking context (everything inside it is trapped as a single
           atomic layer below later page-level siblings like the header and the
-          "Eventi e info" sheet, regardless of z-index used here — see the "My
+          "Info e contatti" sheet, regardless of z-index used here — see the "My
           location" comment above). Portaling puts it back at the top level, at the
-          same z-40 the "Eventi e info" sheet already uses successfully. */}
+          same z-40 the "Info e contatti" sheet already uses successfully. */}
       {typeof document !== "undefined" &&
         createPortal(
           <AnimatePresence>

@@ -89,8 +89,6 @@ export interface HotelContent {
     highlightsSeeAll: string;
     chatPlaceholder: string;
     highlights: { title: string; body: string }[];
-    hoursLabel: string;
-    hours: HoursRow[];
     hotelsLabel: string;
     hotels: { name: string; description: string; url: string }[];
   };
@@ -133,6 +131,7 @@ export interface HotelContent {
     gym: { body: string };
     bikeLabel: string;
     bike: { body: string };
+    contactsLabel: string;
   };
   dining: {
     label: string;
@@ -329,16 +328,6 @@ const it: HotelContent = {
         body: "Servita al Ristorante L'Arengo dalle 07:00 alle 10:00. Room service disponibile con supplemento di €6,00.",
       },
     ],
-    hoursLabel: "Orari dei servizi",
-    hours: [
-      { label: "Reception", value: "24 ore su 24" },
-      { label: "Colazione · Ristorante L'Arengo", value: "07:00 – 10:00" },
-      { label: "Pranzo · Ristorante L'Arengo", value: "12:00 – 14:30" },
-      { label: "Cena · Ristorante L'Arengo", value: "19:00 – 21:30" },
-      { label: "Room Service", value: "07:00 – 23:00 (+ €6,00)" },
-      { label: "Lavanderia", value: "08:30 – 16:00" },
-      { label: "Palestra", value: "08:00 – 20:00" },
-    ],
     hotelsLabel: "Gli hotel del gruppo GHSM",
     hotels: [
       { name: "Grand Hotel San Marino", description: "60 camere e suite con vista sulla valle del Montefeltro.", url: "https://www.grandhotel.sm" },
@@ -447,6 +436,7 @@ const it: HotelContent = {
     bike: {
       body: "San Marino offre percorsi stradali e off-road tra i 9 castelli della Repubblica, ideali per escursioni in bicicletta. Per il noleggio bici, chiedere informazioni al Ricevimento.",
     },
+    contactsLabel: "Contatti e posizione",
   },
   dining: {
     label: "Ristorante",
@@ -540,7 +530,7 @@ const it: HotelContent = {
   info: {
     label: "Dove",
     intro: "La mappa della zona, gli indirizzi del gruppo GHSM, i luoghi da non perdere a San Marino e come muoversi in città.",
-    sheetLabel: "Eventi e info",
+    sheetLabel: "Info e contatti",
     ghsmLabel: "Indirizzi GHSM nei dintorni",
     poiLabel: "Da non perdere a San Marino",
     pois: [
@@ -766,16 +756,6 @@ const en: HotelContent = {
         body: "Served at Ristorante L'Arengo from 7:00 to 10:00 AM. Room service available with a €6.00 supplement.",
       },
     ],
-    hoursLabel: "Service hours",
-    hours: [
-      { label: "Reception", value: "24 hours" },
-      { label: "Breakfast · L'Arengo Restaurant", value: "7:00 – 10:00 AM" },
-      { label: "Lunch · L'Arengo Restaurant", value: "12:00 – 2:30 PM" },
-      { label: "Dinner · L'Arengo Restaurant", value: "7:00 – 9:30 PM" },
-      { label: "Room Service", value: "7:00 AM – 11:00 PM (+ €6.00)" },
-      { label: "Laundry", value: "8:30 AM – 4:00 PM" },
-      { label: "Gym", value: "8:00 AM – 8:00 PM" },
-    ],
     hotelsLabel: "The GHSM Group hotels",
     hotels: [
       { name: "Grand Hotel San Marino", description: "60 rooms and suites overlooking the Montefeltro valley.", url: "https://www.grandhotel.sm" },
@@ -884,6 +864,7 @@ const en: HotelContent = {
     bike: {
       body: "San Marino offers road and off-road routes among the Republic's 9 castles, ideal for cycling excursions. For bike rental, please ask at Reception.",
     },
+    contactsLabel: "Contact & location",
   },
   dining: {
     label: "Dining",
@@ -977,7 +958,7 @@ const en: HotelContent = {
   info: {
     label: "Explore",
     intro: "The area map, GHSM Group addresses, must-see places in San Marino and how to get around.",
-    sheetLabel: "Events & info",
+    sheetLabel: "Info & contacts",
     ghsmLabel: "GHSM Group nearby",
     poiLabel: "Must-see in San Marino",
     pois: [
@@ -1203,16 +1184,6 @@ const fr: HotelContent = {
         body: "Servi au Restaurant L'Arengo de 07h00 à 10h00. Room service disponible avec un supplément de 6,00 €.",
       },
     ],
-    hoursLabel: "Horaires des services",
-    hours: [
-      { label: "Réception", value: "24h/24" },
-      { label: "Petit-déjeuner · Restaurant L'Arengo", value: "07h00 – 10h00" },
-      { label: "Déjeuner · Restaurant L'Arengo", value: "12h00 – 14h30" },
-      { label: "Dîner · Restaurant L'Arengo", value: "19h00 – 21h30" },
-      { label: "Room Service", value: "07h00 – 23h00 (+ 6,00 €)" },
-      { label: "Blanchisserie", value: "08h30 – 16h00" },
-      { label: "Salle de sport", value: "08h00 – 20h00" },
-    ],
     hotelsLabel: "Les hôtels du groupe GHSM",
     hotels: [
       { name: "Grand Hotel San Marino", description: "60 chambres et suites avec vue sur la vallée du Montefeltro.", url: "https://www.grandhotel.sm" },
@@ -1321,6 +1292,7 @@ const fr: HotelContent = {
     bike: {
       body: "Saint-Marin propose des itinéraires routiers et hors route parmi les 9 châteaux de la République, idéaux pour des excursions à vélo. Pour la location de vélos, renseignez-vous à la Réception.",
     },
+    contactsLabel: "Contact et localisation",
   },
   dining: {
     label: "Restaurant",
@@ -1414,7 +1386,7 @@ const fr: HotelContent = {
   info: {
     label: "Explorer",
     intro: "La carte de la zone, les adresses du groupe GHSM, les lieux à ne pas manquer à Saint-Marin et comment se déplacer en ville.",
-    sheetLabel: "Événements et infos",
+    sheetLabel: "Infos & contacts",
     ghsmLabel: "Adresses GHSM à proximité",
     poiLabel: "À ne pas manquer à Saint-Marin",
     pois: [
@@ -1640,16 +1612,6 @@ const de: HotelContent = {
         body: "Serviert im Restaurant L'Arengo von 07:00 bis 10:00 Uhr. Zimmerservice gegen Aufpreis von 6,00 € verfügbar.",
       },
     ],
-    hoursLabel: "Öffnungszeiten der Services",
-    hours: [
-      { label: "Rezeption", value: "Rund um die Uhr" },
-      { label: "Frühstück · Restaurant L'Arengo", value: "07:00 – 10:00 Uhr" },
-      { label: "Mittagessen · Restaurant L'Arengo", value: "12:00 – 14:30 Uhr" },
-      { label: "Abendessen · Restaurant L'Arengo", value: "19:00 – 21:30 Uhr" },
-      { label: "Zimmerservice", value: "07:00 – 23:00 Uhr (+ 6,00 €)" },
-      { label: "Wäscheservice", value: "08:30 – 16:00 Uhr" },
-      { label: "Fitnessraum", value: "08:00 – 20:00 Uhr" },
-    ],
     hotelsLabel: "Die Hotels der GHSM Group",
     hotels: [
       { name: "Grand Hotel San Marino", description: "60 Zimmer und Suiten mit Blick auf das Montefeltro-Tal.", url: "https://www.grandhotel.sm" },
@@ -1758,6 +1720,7 @@ const de: HotelContent = {
     bike: {
       body: "San Marino bietet Straßen- und Offroad-Strecken zwischen den 9 Burgen der Republik, ideal für Radausflüge. Informationen zum Fahrradverleih erhalten Sie an der Rezeption.",
     },
+    contactsLabel: "Kontakt und Standort",
   },
   dining: {
     label: "Restaurant",
@@ -1851,7 +1814,7 @@ const de: HotelContent = {
   info: {
     label: "Entdecken",
     intro: "Die Karte der Umgebung, die Adressen der GHSM Group, die Sehenswürdigkeiten in San Marino und wie man sich in der Stadt fortbewegt.",
-    sheetLabel: "Veranstaltungen & Infos",
+    sheetLabel: "Infos & Kontakt",
     ghsmLabel: "GHSM-Adressen in der Nähe",
     poiLabel: "Sehenswürdigkeiten in San Marino",
     pois: [
@@ -2077,16 +2040,6 @@ const es: HotelContent = {
         body: "Servido en el Restaurante L'Arengo de 07:00 a 10:00. Servicio de habitaciones disponible con un suplemento de 6,00 €.",
       },
     ],
-    hoursLabel: "Horarios de los servicios",
-    hours: [
-      { label: "Recepción", value: "24 horas" },
-      { label: "Desayuno · Restaurante L'Arengo", value: "07:00 – 10:00" },
-      { label: "Almuerzo · Restaurante L'Arengo", value: "12:00 – 14:30" },
-      { label: "Cena · Restaurante L'Arengo", value: "19:00 – 21:30" },
-      { label: "Servicio de habitaciones", value: "07:00 – 23:00 (+ 6,00 €)" },
-      { label: "Lavandería", value: "08:30 – 16:00" },
-      { label: "Gimnasio", value: "08:00 – 20:00" },
-    ],
     hotelsLabel: "Los hoteles del grupo GHSM",
     hotels: [
       { name: "Grand Hotel San Marino", description: "60 habitaciones y suites con vistas al valle de Montefeltro.", url: "https://www.grandhotel.sm" },
@@ -2195,6 +2148,7 @@ const es: HotelContent = {
     bike: {
       body: "San Marino ofrece rutas de carretera y off-road entre los 9 castillos de la República, ideales para excursiones en bicicleta. Para el alquiler de bicicletas, consulte en Recepción.",
     },
+    contactsLabel: "Contacto y ubicación",
   },
   dining: {
     label: "Restaurante",
@@ -2288,7 +2242,7 @@ const es: HotelContent = {
   info: {
     label: "Explorar",
     intro: "El mapa de la zona, las direcciones del grupo GHSM, los lugares imprescindibles de San Marino y cómo moverse por la ciudad.",
-    sheetLabel: "Eventos e información",
+    sheetLabel: "Información y contacto",
     ghsmLabel: "Direcciones GHSM cercanas",
     poiLabel: "Imprescindibles en San Marino",
     pois: [
