@@ -11,16 +11,18 @@
   --color-border: oklch(0.24 0.066 258 / 0.1);
   --color-text: oklch(0.23 0.02 258);
   --color-text-secondary: oklch(0.46 0.018 258);
-  --color-text-muted: oklch(0.6 0.012 80);
+  --color-text-muted: oklch(0.5 0.014 80);
   --color-accent: oklch(0.27 0.068 257);
   --color-accent-soft: oklch(0.27 0.068 257 / 0.08);
   --color-on-accent: oklch(0.98 0.005 83);
   --color-success: oklch(0.58 0.12 150);
-  --color-success-soft: oklch(0.58 0.12 150 / 0.12);
+  --color-success-soft: oklch(0.58 0.12 150 / 0.16);
+  --color-success-text: oklch(0.47 0.12 150);
   --color-warning: oklch(0.72 0.12 75);
   --color-warning-soft: oklch(0.72 0.12 75 / 0.14);
   --color-danger: oklch(0.57 0.16 27);
-  --color-danger-soft: oklch(0.57 0.16 27 / 0.1);
+  --color-danger-soft: oklch(0.57 0.16 27 / 0.15);
+  --color-danger-text: oklch(0.47 0.16 27);
   /* navy hero overlay for legible white text over photos */
   --hero-tint: oklch(0.24 0.066 258 / 0.62);
 }
@@ -40,10 +42,12 @@
   --color-on-accent: oklch(0.18 0.01 258);
   --color-success: oklch(0.75 0.13 150);
   --color-success-soft: oklch(0.75 0.13 150 / 0.16);
+  --color-success-text: oklch(0.75 0.13 150);
   --color-warning: oklch(0.8 0.12 80);
   --color-warning-soft: oklch(0.8 0.12 80 / 0.16);
   --color-danger: oklch(0.7 0.17 27);
   --color-danger-soft: oklch(0.7 0.17 27 / 0.16);
+  --color-danger-text: oklch(0.7 0.17 27);
   --hero-tint: oklch(0.12 0.01 258 / 0.55);
   --channel-logo-filter: invert(0.85);
 }
@@ -275,6 +279,30 @@ body {
     transform: scale(2.1);
     opacity: 0;
   }
+}
+
+/* "My location" pin — accent colour (not navy) so it reads as distinct from the
+   hotel's own pin; same pulse animation, smaller footprint. */
+.ghsm-user-pin {
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+.ghsm-user-dot {
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 3px solid var(--color-on-accent);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.ghsm-user-pulse {
+  position: absolute;
+  inset: 1px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  opacity: 0.35;
+  animation: ghsm-pulse 2s var(--ease-out) infinite;
 }
 
 /* Active place pin (pops in on selection) */

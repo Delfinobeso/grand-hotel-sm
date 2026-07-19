@@ -339,8 +339,8 @@ export function StatusBadge({ hours, labels }: { hours: ServiceHours; labels: St
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
         isOpen
-          ? "bg-[var(--color-success-soft)] text-[var(--color-success)]"
-          : "bg-[var(--color-danger-soft)] text-[var(--color-danger)]"
+          ? "bg-[var(--color-success-soft)] text-[var(--color-success-text)]"
+          : "bg-[var(--color-danger-soft)] text-[var(--color-danger-text)]"
       }`}
     >
       <span className={`h-1.5 w-1.5 rounded-full bg-current ${isOpen ? "animate-pulse" : ""}`} />

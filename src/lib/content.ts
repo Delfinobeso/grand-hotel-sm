@@ -36,6 +36,7 @@ export interface HotelContent {
     receptionCta: string;
     receptionLabel: string;
     languageLabel: string;
+    themeLabel: string;
     status: StatusLabels;
     callLabel: string;
     bookLabel: string;
@@ -51,6 +52,8 @@ export interface HotelContent {
     floorThird: string;
     floorThirdMessegue: string;
     floorBasement: string;
+    myLocationLabel: string;
+    locationUnavailableLabel: string;
   };
   home: {
     eyebrow: string;
@@ -229,6 +232,7 @@ const it: HotelContent = {
     receptionCta: "Chiama la Reception",
     receptionLabel: "Reception",
     languageLabel: "Lingua",
+    themeLabel: "Tema",
     status: {
       open: "Aperto",
       closed: "Chiuso",
@@ -242,7 +246,7 @@ const it: HotelContent = {
     openInMapsLabel: "Apri in Mappe",
     addToCalendarLabel: "Aggiungi al calendario",
     callValetLabel: "Chiama il Valet",
-    youAreHere: "Ti trovi qui",
+    youAreHere: "Il vostro hotel",
     minWalk: "min a piedi",
     byCar: "in auto",
     airport: "Aeroporto",
@@ -250,6 +254,8 @@ const it: HotelContent = {
     floorThird: "3° piano",
     floorThirdMessegue: "3° piano · Centro Mességué",
     floorBasement: "-1 · Garage",
+    myLocationLabel: "La mia posizione",
+    locationUnavailableLabel: "Posizione non disponibile",
   },
   home: {
     eyebrow: "Benvenuti al",
@@ -432,7 +438,7 @@ const it: HotelContent = {
   },
   dining: {
     label: "Ristorante",
-    intro: "La cucina del Grand Hotel San Marino e gli altri locali del gruppo GHSM. Per il Room Service direttamente in camera, consulta la sezione Camera.",
+    intro: "La cucina del Grand Hotel San Marino e gli altri locali del gruppo GHSM. Per il Room Service direttamente in camera, consulta la sezione Hotel.",
     arengoLabel: "Ristorante L'Arengo",
     arengo: {
       hours: [
@@ -627,6 +633,7 @@ const en: HotelContent = {
     receptionCta: "Call Reception",
     receptionLabel: "Reception",
     languageLabel: "Language",
+    themeLabel: "Theme",
     status: {
       open: "Open",
       closed: "Closed",
@@ -640,7 +647,7 @@ const en: HotelContent = {
     openInMapsLabel: "Open in Maps",
     addToCalendarLabel: "Add to calendar",
     callValetLabel: "Call Valet",
-    youAreHere: "You are here",
+    youAreHere: "Your hotel",
     minWalk: "min walk",
     byCar: "by car",
     airport: "Airport",
@@ -648,6 +655,8 @@ const en: HotelContent = {
     floorThird: "3rd floor",
     floorThirdMessegue: "3rd floor · Mességué Centre",
     floorBasement: "-1 · Garage",
+    myLocationLabel: "My location",
+    locationUnavailableLabel: "Location unavailable",
   },
   home: {
     eyebrow: "Welcome to",
@@ -830,7 +839,7 @@ const en: HotelContent = {
   },
   dining: {
     label: "Dining",
-    intro: "The cuisine of the Grand Hotel San Marino and the other venues of the GHSM Group. For Room Service in your room, see the Room section.",
+    intro: "The cuisine of the Grand Hotel San Marino and the other venues of the GHSM Group. For Room Service in your room, see the Hotel section.",
     arengoLabel: "L'Arengo Restaurant",
     arengo: {
       hours: [
@@ -1025,6 +1034,7 @@ const fr: HotelContent = {
     receptionCta: "Appeler la réception",
     receptionLabel: "Réception",
     languageLabel: "Langue",
+    themeLabel: "Thème",
     status: {
       open: "Ouvert",
       closed: "Fermé",
@@ -1038,7 +1048,7 @@ const fr: HotelContent = {
     openInMapsLabel: "Ouvrir dans Plans",
     addToCalendarLabel: "Ajouter au calendrier",
     callValetLabel: "Appeler le voiturier",
-    youAreHere: "Vous êtes ici",
+    youAreHere: "Votre hôtel",
     minWalk: "min à pied",
     byCar: "en voiture",
     airport: "Aéroport",
@@ -1046,6 +1056,8 @@ const fr: HotelContent = {
     floorThird: "3e étage",
     floorThirdMessegue: "3e étage · Centre Mességué",
     floorBasement: "-1 · Garage",
+    myLocationLabel: "Ma position",
+    locationUnavailableLabel: "Position indisponible",
   },
   home: {
     eyebrow: "Bienvenue au",
@@ -1228,7 +1240,7 @@ const fr: HotelContent = {
   },
   dining: {
     label: "Restaurant",
-    intro: "La cuisine du Grand Hotel San Marino et les autres adresses du groupe GHSM. Pour le Room Service directement en chambre, consultez la section Chambre.",
+    intro: "La cuisine du Grand Hotel San Marino et les autres adresses du groupe GHSM. Pour le Room Service directement en chambre, consultez la section Hôtel.",
     arengoLabel: "Restaurant L'Arengo",
     arengo: {
       hours: [
@@ -1423,6 +1435,7 @@ const de: HotelContent = {
     receptionCta: "Rezeption anrufen",
     receptionLabel: "Rezeption",
     languageLabel: "Sprache",
+    themeLabel: "Thema",
     status: {
       open: "Geöffnet",
       closed: "Geschlossen",
@@ -1436,7 +1449,7 @@ const de: HotelContent = {
     openInMapsLabel: "In Karten öffnen",
     addToCalendarLabel: "Zum Kalender hinzufügen",
     callValetLabel: "Voiturier anrufen",
-    youAreHere: "Sie sind hier",
+    youAreHere: "Ihr Hotel",
     minWalk: "Min. zu Fuß",
     byCar: "mit dem Auto",
     airport: "Flughafen",
@@ -1444,6 +1457,8 @@ const de: HotelContent = {
     floorThird: "3. Stock",
     floorThirdMessegue: "3. Stock · Mességué-Zentrum",
     floorBasement: "-1 · Garage",
+    myLocationLabel: "Mein Standort",
+    locationUnavailableLabel: "Standort nicht verfügbar",
   },
   home: {
     eyebrow: "Willkommen im",
@@ -1626,7 +1641,7 @@ const de: HotelContent = {
   },
   dining: {
     label: "Restaurant",
-    intro: "Die Küche des Grand Hotel San Marino und die weiteren Adressen der GHSM Group. Für den Zimmerservice direkt aufs Zimmer siehe den Bereich Zimmer.",
+    intro: "Die Küche des Grand Hotel San Marino und die weiteren Adressen der GHSM Group. Für den Zimmerservice direkt aufs Zimmer siehe den Bereich Hotel.",
     arengoLabel: "Restaurant L'Arengo",
     arengo: {
       hours: [
@@ -1821,6 +1836,7 @@ const es: HotelContent = {
     receptionCta: "Llamar a recepción",
     receptionLabel: "Recepción",
     languageLabel: "Idioma",
+    themeLabel: "Tema",
     status: {
       open: "Abierto",
       closed: "Cerrado",
@@ -1834,7 +1850,7 @@ const es: HotelContent = {
     openInMapsLabel: "Abrir en Mapas",
     addToCalendarLabel: "Añadir al calendario",
     callValetLabel: "Llamar al valet",
-    youAreHere: "Está aquí",
+    youAreHere: "Su hotel",
     minWalk: "min a pie",
     byCar: "en coche",
     airport: "Aeropuerto",
@@ -1842,6 +1858,8 @@ const es: HotelContent = {
     floorThird: "3ª planta",
     floorThirdMessegue: "3ª planta · Centro Mességué",
     floorBasement: "-1 · Garaje",
+    myLocationLabel: "Mi ubicación",
+    locationUnavailableLabel: "Ubicación no disponible",
   },
   home: {
     eyebrow: "Bienvenidos al",
@@ -2024,7 +2042,7 @@ const es: HotelContent = {
   },
   dining: {
     label: "Restaurante",
-    intro: "La cocina del Grand Hotel San Marino y los demás locales del grupo GHSM. Para el Room Service directamente en la habitación, consulte la sección Habitación.",
+    intro: "La cocina del Grand Hotel San Marino y los demás locales del grupo GHSM. Para el Room Service directamente en la habitación, consulte la sección Hotel.",
     arengoLabel: "Restaurante L'Arengo",
     arengo: {
       hours: [

@@ -23,6 +23,7 @@ import { DiningSection } from "@/components/sections/DiningSection";
 import { WellnessSection } from "@/components/sections/WellnessSection";
 import { ExploreSection } from "@/components/sections/ExploreSection";
 import ChatAssistant from "@/components/ChatAssistant";
+import { useScrollDirection } from "@/lib/useScrollDirection";
 
 const TABS: { key: TabKey; icon: LucideIcon }[] = [
   { key: "oggi", icon: HomeIcon },
@@ -60,6 +61,11 @@ export default function Home() {
   const [chatOpen, setChatOpen] = useState(false);
   const keyboardOpen = useKeyboardOpen();
   const mainRef = useRef<HTMLElement>(null);
+  const scrollHidden = useScrollDirection();
+  // Only the "oggi" tab has no header bar of its own — its lang/theme controls float
+  // over the content and would cover it on scroll (e.g. the check-out time). Other
+  // tabs sit on a solid header bar, so they're left untouched.
+  const hideOggiControls = activeTab === "oggi" && scrollHidden;
 
   // One-time sync from localStorage after mount. The inline THEME_SCRIPT in layout.tsx
   // already set data-theme/lang on <html> pre-paint; this only updates React-rendered
@@ -174,13 +180,17 @@ export default function Home() {
           </div>
 
           {/* Toggles */}
-          <div className="pointer-events-auto ml-auto flex shrink-0 items-center gap-1.5 lg:order-last lg:ml-0 lg:mt-auto lg:w-full">
-            <div className="relative flex h-9 items-center lg:h-10 lg:flex-1">
+          <div
+            className={`ml-auto flex shrink-0 items-center gap-1.5 transition-[opacity,transform] duration-[250ms] ease-out lg:order-last lg:ml-0 lg:mt-auto lg:w-full ${
+              hideOggiControls ? "pointer-events-none -translate-y-2 opacity-0" : "pointer-events-auto translate-y-0 opacity-100"
+            }`}
+          >
+            <div className="relative flex h-11 items-center lg:h-10 lg:flex-1">
               <select
                 value={lang}
                 onChange={(e) => changeLang(e.target.value as Lang)}
                 aria-label={t.common.languageLabel}
-                className="h-9 w-full appearance-none rounded-full bg-[var(--color-surface-muted)] pl-3 pr-7 text-[0.8125rem] font-semibold uppercase tracking-wide text-[var(--color-text)] transition-colors duration-200 hover:bg-[var(--color-border)] lg:h-10"
+                className="h-11 w-full appearance-none rounded-full bg-[var(--color-surface-muted)] pl-3 pr-7 text-[0.8125rem] font-semibold uppercase tracking-wide text-[var(--color-text)] transition-colors duration-200 hover:bg-[var(--color-border)] lg:h-10"
               >
                 <option value="it">IT</option>
                 <option value="en">EN</option>
@@ -192,8 +202,8 @@ export default function Home() {
             </div>
             <button
               onClick={toggleTheme}
-              aria-label="Theme"
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-surface-muted)] text-[var(--color-text)] transition-colors duration-200 hover:bg-[var(--color-border)] lg:h-10 lg:w-auto lg:flex-1"
+              aria-label={t.common.themeLabel}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-surface-muted)] text-[var(--color-text)] transition-colors duration-200 hover:bg-[var(--color-border)] lg:h-10 lg:w-auto lg:flex-1"
             >
               {theme === "light" ? <Moon size={16} strokeWidth={1.875} /> : <Sun size={16} strokeWidth={1.875} />}
             </button>
@@ -234,7 +244,7 @@ export default function Home() {
         {activeTab === "explore" ? (
           <main className="min-h-0 flex-1 overflow-hidden">{sections.explore}</main>
         ) : (
-          <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:pt-2 lg:pb-0">
+          <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto px-5 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:pt-2 lg:pb-0">
             <motion.div
               key={activeTab}
               initial={{ opacity: 0, y: 10 }}

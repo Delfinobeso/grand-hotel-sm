@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Tooltip, Polyline, useMap } from "react-leaflet";
-import { Navigation, Footprints, Car, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Navigation, LocateFixed, Footprints, Car, ChevronRight } from "lucide-react";
 import { HOTEL, GHSM_VENUES, POINTS_OF_INTEREST, AIRPORTS } from "@/lib/hotel";
 import type { HotelContent } from "@/lib/content";
 import { mapsUrl } from "@/components/ui";
@@ -54,6 +55,13 @@ const hotelIcon = L.divIcon({
   iconAnchor: [13, 13],
 });
 
+const userIcon = L.divIcon({
+  className: "",
+  html: `<div class="ghsm-user-pin"><span class="ghsm-user-pulse"></span><span class="ghsm-user-dot"></span></div>`,
+  iconSize: [22, 22],
+  iconAnchor: [11, 11],
+});
+
 function placeIcon(active: boolean, kind: Kind): L.DivIcon {
   const color = KIND_COLOR[kind];
   const size = active ? 22 : 14;
@@ -93,7 +101,7 @@ function MapDriver({ active, onRoute }: { active: Place; onRoute: (r: LatLng[]) 
       onRoute(coords);
       map.flyToBounds(L.latLngBounds(coords), {
         paddingTopLeft: [28, 100],
-        paddingBottomRight: [28, 290],
+        paddingBottomRight: [28, 370],
         maxZoom: 17,
         duration: 0.9,
         easeLinearity: 0.24,
@@ -122,8 +130,37 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const programmatic = useRef(false);
   const rafId = useRef<number>(0);
+  const mapRef = useRef<L.Map | null>(null);
+  const [userPos, setUserPos] = useState<LatLng | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [locError, setLocError] = useState(false);
 
   const onRoute = useCallback((r: LatLng[]) => setRoute(r), []);
+
+  // One-shot geolocation lookup — no watch, nothing sent anywhere but the map itself.
+  const locateMe = useCallback(() => {
+    if (locating) return;
+    if (!navigator.geolocation) {
+      setLocError(true);
+      window.setTimeout(() => setLocError(false), 2500);
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const ll: LatLng = [pos.coords.latitude, pos.coords.longitude];
+        setUserPos(ll);
+        setLocating(false);
+        mapRef.current?.flyTo(ll, 17, { duration: 0.9 });
+      },
+      () => {
+        setLocating(false);
+        setLocError(true);
+        window.setTimeout(() => setLocError(false), 2500);
+      },
+      { enableHighAccuracy: true, timeout: 10_000 },
+    );
+  }, [locating]);
 
   const scrollToCard = useCallback((i: number) => {
     const el = scrollRef.current;
@@ -172,6 +209,7 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
   return (
     <div className="relative h-full w-full overflow-hidden isolate">
       <MapContainer
+        ref={mapRef}
         center={[HOTEL.lat, HOTEL.lon]}
         zoom={16}
         scrollWheelZoom={false}
@@ -209,6 +247,9 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
           </Tooltip>
         </Marker>
 
+        {/* Visitor's own position — client-side only, never sent anywhere */}
+        {userPos && <Marker position={userPos} icon={userIcon} zIndexOffset={1100} />}
+
         {/* Places */}
         {places.map((p, i) => {
           const isActive = i === active;
@@ -229,6 +270,34 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
           );
         })}
       </MapContainer>
+
+      {/* "My location" — sits below the theme/lang controls in the page header (which
+          paint above this whole isolate subtree regardless of z-index, since header is
+          a positioned sibling with z-20) and above the carousel/scrim below. z-[750]
+          keeps it above Leaflet's own panes (which top out around z-index 700) but
+          below the scrim (z-800) and carousel (z-1000). */}
+      <button
+        onClick={locateMe}
+        aria-label={t.common.myLocationLabel}
+        className="absolute right-4 top-[calc(env(safe-area-inset-top)+4.5rem)] z-[750] flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-surface)]/90 text-[var(--color-text)] shadow-[0_6px_20px_oklch(0.2_0.04_258/0.22)] ring-1 ring-[var(--color-border)] backdrop-blur-xl transition-transform duration-200 active:scale-95 disabled:opacity-60 lg:right-3 lg:top-16"
+        disabled={locating}
+      >
+        <LocateFixed size={18} strokeWidth={2} className={locating ? "animate-pulse" : ""} />
+      </button>
+
+      <AnimatePresence>
+        {locError && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute right-4 top-[calc(env(safe-area-inset-top)+7.25rem)] z-[750] rounded-full bg-[var(--color-surface)]/95 px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] shadow-[0_6px_20px_oklch(0.2_0.04_258/0.22)] ring-1 ring-[var(--color-border)] backdrop-blur-xl lg:right-3 lg:top-28"
+          >
+            {t.common.locationUnavailableLabel}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Bottom scrim — explicit color stops (no color-interpolation hint, which iOS
           Safari can reject and drop the whole background → transparent). The lower
