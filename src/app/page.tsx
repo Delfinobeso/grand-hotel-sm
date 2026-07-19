@@ -256,6 +256,13 @@ export default function Home() {
               >
                 Blasat
               </a>
+              {" · "}
+              <a
+                href="/privacy"
+                className="font-medium text-[var(--color-text-secondary)] underline-offset-2 hover:underline"
+              >
+                {t.privacyLabel}
+              </a>
             </p>
           </main>
         )}

@@ -174,6 +174,7 @@ export interface HotelContent {
   };
   footer: string;
   poweredBy: string;
+  privacyLabel: string;
 }
 
 const TV_CHANNELS = [
@@ -611,6 +612,7 @@ const it: HotelContent = {
   },
   footer: "Grand Hotel San Marino",
   poweredBy: "Realizzata da",
+  privacyLabel: "Privacy",
 };
 
 const en: HotelContent = {
@@ -1008,6 +1010,7 @@ const en: HotelContent = {
   },
   footer: "Grand Hotel San Marino",
   poweredBy: "Built by",
+  privacyLabel: "Privacy",
 };
 
 const fr: HotelContent = {
@@ -1405,6 +1408,7 @@ const fr: HotelContent = {
   },
   footer: "Grand Hotel San Marino",
   poweredBy: "Créée par",
+  privacyLabel: "Confidentialité",
 };
 
 const de: HotelContent = {
@@ -1802,6 +1806,7 @@ const de: HotelContent = {
   },
   footer: "Grand Hotel San Marino",
   poweredBy: "Erstellt von",
+  privacyLabel: "Datenschutz",
 };
 
 const es: HotelContent = {
@@ -2199,6 +2204,7 @@ const es: HotelContent = {
   },
   footer: "Grand Hotel San Marino",
   poweredBy: "Creada por",
+  privacyLabel: "Privacidad",
 };
 
 export const content: Record<Lang, HotelContent> = { it, en, fr, de, es };
