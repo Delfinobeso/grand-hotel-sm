@@ -416,7 +416,7 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
 
         {/* Category chips — hidden while either bottom sheet is open (no visual doubling). */}
         {!chipsHidden && (
-          <div className="flex gap-2 overflow-x-auto px-4 pb-0.5" style={{ scrollbarWidth: "none" }}>
+          <div className="relative z-10 flex gap-2 overflow-x-auto px-4 pb-0.5" style={{ scrollbarWidth: "none" }}>
             {FILTERS.map((f) => {
               const isActive = filter === f.key;
               return (
@@ -448,11 +448,13 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
             the cards' drop shadows at the scroller's edges (a hard line above the dock).
             Generous vertical padding (pt-8 / pb-[5rem]) so each card's shadow fits fully
             inside the clip box — nothing is cropped, and the cards still sit above the
-            dock. */}
+            dock. The -mt-7 pulls the scroller up so the visual gap between chips and
+            cards stays small and constant (the pt-8 is only shadow room); the chips
+            row is z-10 so it keeps painting and receiving taps above the overlap. */}
         <div
           ref={scrollRef}
           onScroll={onScroll}
-          className="ghsm-carousel flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pt-8 pb-[5.75rem] lg:pb-8"
+          className="ghsm-carousel -mt-7 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pt-8 pb-[5.75rem] lg:pb-8"
         >
         {filteredPlaces.map((p, i) => {
           const isActive = i === active;
