@@ -97,6 +97,11 @@ export default function Home() {
     }
   }, [activeTab, pendingSection]);
 
+  // Traccia il cambio di sezione per l'analytics Blasat.
+  useEffect(() => {
+    import("@/lib/analytics/tracker").then((m) => m.setTab(activeTab));
+  }, [activeTab]);
+
   const toggleTheme = () => {
     const next = theme === "light" ? "dark" : "light";
     setTheme(next);
