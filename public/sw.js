@@ -8,6 +8,97 @@
  * e viene registrato dal client con navigator.serviceWorker.register('/sw.js')
  */
 
+/**
+ * Versione della cache: cambiarla invalida tutte le cache precedenti
+ * (vedi evento 'activate' più sotto).
+ */
+const CACHE_VERSION = 'blasat-v1';
+const RUNTIME_CACHE = CACHE_VERSION + '-runtime';
+const STATIC_CACHE = CACHE_VERSION + '-static';
+
+/**
+ * Evento install: attiva subito il nuovo Service Worker senza aspettare
+ * la chiusura delle vecchie tab.
+ */
+self.addEventListener('install', () => {
+  self.skipWaiting();
+});
+
+/**
+ * Evento activate: ripulisce le cache di versioni precedenti e prende
+ * il controllo delle pagine già aperte.
+ */
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(keys.filter((k) => !k.startsWith(CACHE_VERSION)).map((k) => caches.delete(k)));
+      await self.clients.claim();
+    })()
+  );
+});
+
+/**
+ * Evento fetch: strategie di caching differenziate per tipo di risorsa.
+ * Offline fallback per la shell di navigazione, cache-first per gli asset
+ * hashati di Next, stale-while-revalidate per immagini/font/manifest.
+ */
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return; // niente tile mappa/terze parti
+  if (url.pathname.startsWith('/api/')) return; // mai cachare le API
+
+  // Shell di navigazione: network-first, fallback cache (offline → ultima shell vista)
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      (async () => {
+        try {
+          const fresh = await fetch(req);
+          const cache = await caches.open(RUNTIME_CACHE);
+          cache.put(req, fresh.clone());
+          return fresh;
+        } catch {
+          return (await caches.match(req)) || (await caches.match('/')) || Response.error();
+        }
+      })()
+    );
+    return;
+  }
+
+  // Asset hashati Next (immutabili): cache-first
+  if (url.pathname.startsWith('/_next/static/')) {
+    event.respondWith(
+      (async () => {
+        const cached = await caches.match(req);
+        if (cached) return cached;
+        const fresh = await fetch(req);
+        if (fresh.ok) (await caches.open(STATIC_CACHE)).put(req, fresh.clone());
+        return fresh;
+      })()
+    );
+    return;
+  }
+
+  // Immagini, font, manifest: stale-while-revalidate
+  if (req.destination === 'image' || req.destination === 'font' || url.pathname === '/manifest.json') {
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(RUNTIME_CACHE);
+        const cached = await cache.match(req);
+        const network = fetch(req)
+          .then((res) => {
+            if (res.ok) cache.put(req, res.clone());
+            return res;
+          })
+          .catch(() => undefined);
+        return cached || (await network) || Response.error();
+      })()
+    );
+  }
+});
+
 // Assegna un ID univoco a ogni notifica per evitare duplicati
 let notificationId = 0;
 

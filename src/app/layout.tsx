@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
+import SwRegister from "@/components/SwRegister";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <AnalyticsProvider project="grand-hotel-sm" />
+        <SwRegister />
         {children}
       </body>
     </html>
