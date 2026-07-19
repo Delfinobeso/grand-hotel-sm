@@ -90,14 +90,23 @@ export default function Home() {
     const el = mainRef.current;
     if (!el) return;
     if (pendingSection) {
-      // Wait one frame for the new tab's DOM to paint, then scroll to target.
-      requestAnimationFrame(() => {
-        const target = el.querySelector<HTMLElement>(`#${pendingSection}`);
+      // Il contenuto del tab è dentro un wrapper animato (key={activeTab}):
+      // al primo frame la sezione nuova può non essere ancora montata.
+      // Ritenta finché l'anchor non appare, con una deadline di sicurezza.
+      const id = pendingSection;
+      const deadline = performance.now() + 1200;
+      const attempt = () => {
+        const target = el.querySelector<HTMLElement>(`#${id}`);
         if (target) {
           el.scrollTo({ top: target.offsetTop - 16, behavior: "smooth" });
+          setPendingSection(null);
+        } else if (performance.now() < deadline) {
+          requestAnimationFrame(attempt);
+        } else {
+          setPendingSection(null);
         }
-        setPendingSection(null);
-      });
+      };
+      requestAnimationFrame(attempt);
     } else {
       el.scrollTop = 0;
     }
