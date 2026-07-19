@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MENUS } from "@/lib/menus";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 const SYSTEM_PROMPT_BASE = `Sei il Concierge digitale del Grand Hotel San Marino: cortese, caldo e concreto, come un concierge di un hotel 4 stelle. Aiuti gli ospiti sia con i servizi dell'hotel sia con la visita di San Marino.
 
@@ -228,6 +229,13 @@ interface ChatMsg {
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const origin = req.headers.get("origin");
+    if (origin && !origin.endsWith(".blasat.com") && !origin.endsWith(".vercel.app")) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+    }
+
     const body = await req.json();
 
     // Accept either a multi-turn `messages` history or a single `message` (back-compat).
@@ -246,6 +254,15 @@ export async function POST(req: NextRequest) {
 
     if (history.length === 0) {
       return NextResponse.json({ error: "Messaggio non valido" }, { status: 400 });
+    }
+
+    if (history[history.length - 1].content.length > 1000) {
+      return NextResponse.json({ error: "Messaggio troppo lungo" }, { status: 400 });
+    }
+    history = history.map((m) => ({ ...m, content: m.content.slice(0, 1000) }));
+
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json({ error: "rate_limited" }, { status: 429 });
     }
 
     const apiKey = process.env.DEEPSEEK_API_KEY;
