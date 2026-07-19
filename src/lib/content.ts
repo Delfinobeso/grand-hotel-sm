@@ -54,6 +54,12 @@ export interface HotelContent {
     floorBasement: string;
     myLocationLabel: string;
     locationUnavailableLabel: string;
+    listLabel: string;
+    filterAll: string;
+    filterPois: string;
+    filterVenues: string;
+    filterAirports: string;
+    counterOf: string;
   };
   home: {
     eyebrow: string;
@@ -256,6 +262,12 @@ const it: HotelContent = {
     floorBasement: "-1 · Garage",
     myLocationLabel: "La mia posizione",
     locationUnavailableLabel: "Posizione non disponibile",
+    listLabel: "Elenco",
+    filterAll: "Tutto",
+    filterPois: "Da non perdere",
+    filterVenues: "I nostri locali",
+    filterAirports: "Come arrivare",
+    counterOf: "di",
   },
   home: {
     eyebrow: "Benvenuti al",
@@ -687,6 +699,12 @@ const en: HotelContent = {
     floorBasement: "-1 · Garage",
     myLocationLabel: "My location",
     locationUnavailableLabel: "Location unavailable",
+    listLabel: "List",
+    filterAll: "All",
+    filterPois: "Must-see",
+    filterVenues: "Our venues",
+    filterAirports: "Getting there",
+    counterOf: "of",
   },
   home: {
     eyebrow: "Welcome to",
@@ -1118,6 +1136,12 @@ const fr: HotelContent = {
     floorBasement: "-1 · Garage",
     myLocationLabel: "Ma position",
     locationUnavailableLabel: "Position indisponible",
+    listLabel: "Liste",
+    filterAll: "Tout",
+    filterPois: "À ne pas manquer",
+    filterVenues: "Nos adresses",
+    filterAirports: "Comment venir",
+    counterOf: "sur",
   },
   home: {
     eyebrow: "Bienvenue au",
@@ -1549,6 +1573,12 @@ const de: HotelContent = {
     floorBasement: "-1 · Garage",
     myLocationLabel: "Mein Standort",
     locationUnavailableLabel: "Standort nicht verfügbar",
+    listLabel: "Liste",
+    filterAll: "Alle",
+    filterPois: "Sehenswürdigkeiten",
+    filterVenues: "Unsere Adressen",
+    filterAirports: "Anreise",
+    counterOf: "von",
   },
   home: {
     eyebrow: "Willkommen im",
@@ -1980,6 +2010,12 @@ const es: HotelContent = {
     floorBasement: "-1 · Garaje",
     myLocationLabel: "Mi ubicación",
     locationUnavailableLabel: "Ubicación no disponible",
+    listLabel: "Lista",
+    filterAll: "Todo",
+    filterPois: "Imprescindibles",
+    filterVenues: "Nuestros locales",
+    filterAirports: "Cómo llegar",
+    counterOf: "de",
   },
   home: {
     eyebrow: "Bienvenidos al",

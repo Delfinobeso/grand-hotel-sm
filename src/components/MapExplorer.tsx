@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { createPortal } from "react-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Tooltip, Polyline, useMap } from "react-leaflet";
 import { motion, AnimatePresence } from "framer-motion";
-import { Navigation, LocateFixed, Footprints, Car, ChevronRight } from "lucide-react";
+import { Navigation, LocateFixed, Footprints, Car, ChevronRight, List, X } from "lucide-react";
 import { HOTEL, GHSM_VENUES, POINTS_OF_INTEREST, AIRPORTS } from "@/lib/hotel";
 import type { HotelContent } from "@/lib/content";
-import { mapsUrl } from "@/components/ui";
+import { mapsUrl, EASE_EXPO } from "@/components/ui";
 
 type LatLng = [number, number];
 type Kind = "poi" | "venue" | "airport";
+type Filter = "all" | Kind;
 
 interface Place {
   id: string;
@@ -23,6 +25,8 @@ interface Place {
   mode: "walk" | "drive";
   walk?: number;
   km?: number;
+  /** Whether this place participates in the classic sightseeing route line. */
+  routable: boolean;
 }
 
 function buildPlaces(t: HotelContent): Place[] {
@@ -34,13 +38,16 @@ function buildPlaces(t: HotelContent): Place[] {
 
   const pois: Place[] = POINTS_OF_INTEREST.map((p) => ({
     id: p.id, name: p.name, lat: p.lat, lon: p.lon, desc: poiDesc[p.id] ?? "", kind: "poi", mode: "walk", walk: p.walkMinutes,
+    routable: p.onRoute === true,
   }));
   const venues: Place[] = GHSM_VENUES.map((v) => ({
     id: v.id, name: v.name, lat: v.lat, lon: v.lon, desc: venueDesc[v.id] ?? "", kind: "venue", mode: "walk", walk: v.walkMinutes ?? 5,
+    routable: true,
   }));
   const airports: Place[] = AIRPORTS.map((a) => ({
     id: a.id, name: `${a.name} ${a.code}`, lat: a.lat, lon: a.lon,
     desc: t.info.airports.note, kind: "airport", mode: "drive", km: a.distanceKm,
+    routable: true,
   }));
   // Sightseeing first, then group venues, then airports (reachable by car).
   return [...pois, ...venues, ...airports];
@@ -86,20 +93,20 @@ function InvalidateSize() {
   return null;
 }
 
-/** Drives camera + route whenever the active place changes (walking or driving). */
+/** Drives camera + route whenever the active place changes (walking or driving).
+ *  Places outside the classic route (new POIs added later, `routable: false`)
+ *  still get the camera framing, just without a route line drawn to them. */
 function MapDriver({ active, onRoute }: { active: Place; onRoute: (r: LatLng[]) => void }) {
   const map = useMap();
 
   useEffect(() => {
-    const ctrl = new AbortController();
     const straight: LatLng[] = [
       [HOTEL.lat, HOTEL.lon],
       [active.lat, active.lon],
     ];
     // Frame the whole route; large bottom padding keeps it visible above the banners.
     const frame = (coords: LatLng[]) => {
-      onRoute(coords);
-      map.flyToBounds(L.latLngBounds(coords), {
+      map.flyToBounds(L.latLngBounds(coords.length ? coords : straight), {
         paddingTopLeft: [28, 100],
         paddingBottomRight: [28, 370],
         maxZoom: 17,
@@ -107,15 +114,28 @@ function MapDriver({ active, onRoute }: { active: Place; onRoute: (r: LatLng[]) 
         easeLinearity: 0.24,
       });
     };
+
+    if (!active.routable) {
+      onRoute([]);
+      frame(straight);
+      return;
+    }
+
+    const ctrl = new AbortController();
     const profile = active.mode === "drive" ? "routed-car/route/v1/driving" : "routed-foot/route/v1/foot";
     const url = `https://routing.openstreetmap.de/${profile}/${HOTEL.lon},${HOTEL.lat};${active.lon},${active.lat}?overview=full&geometries=geojson`;
     fetch(url, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => {
         const coords = d?.routes?.[0]?.geometry?.coordinates as [number, number][] | undefined;
-        frame(coords?.length ? coords.map(([lon, lat]) => [lat, lon] as LatLng) : straight);
+        const routeCoords = coords?.length ? coords.map(([lon, lat]) => [lat, lon] as LatLng) : straight;
+        onRoute(routeCoords);
+        frame(routeCoords);
       })
-      .catch(() => frame(straight));
+      .catch(() => {
+        onRoute(straight);
+        frame(straight);
+      });
 
     return () => ctrl.abort();
   }, [active, map, onRoute]);
@@ -123,10 +143,16 @@ function MapDriver({ active, onRoute }: { active: Place; onRoute: (r: LatLng[]) 
   return null;
 }
 
-export default function MapExplorer({ t }: { t: HotelContent }) {
+export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelContent; infoSheetOpen?: boolean }) {
   const places = useMemo(() => buildPlaces(t), [t]);
+  const [filter, setFilter] = useState<Filter>("all");
+  const filteredPlaces = useMemo(
+    () => (filter === "all" ? places : places.filter((p) => p.kind === filter)),
+    [places, filter],
+  );
   const [active, setActive] = useState(0);
   const [route, setRoute] = useState<LatLng[]>([]);
+  const [listOpen, setListOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const programmatic = useRef(false);
   const rafId = useRef<number>(0);
@@ -134,6 +160,9 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
   const [userPos, setUserPos] = useState<LatLng | null>(null);
   const [locating, setLocating] = useState(false);
   const [locError, setLocError] = useState(false);
+  // Set by selectPlace() (list sheet) when it needs a filter change to land the
+  // target place first — consumed once the resulting re-render is committed.
+  const pendingScroll = useRef<number | null>(null);
 
   const onRoute = useCallback((r: LatLng[]) => setRoute(r), []);
 
@@ -202,9 +231,58 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
     [scrollToCard],
   );
 
-  const activePlace = places[active];
+  // Chip tap: swap the visible set, restart the carousel at the first card.
+  const chooseFilter = useCallback(
+    (f: Filter) => {
+      setFilter(f);
+      setActive(0);
+      requestAnimationFrame(() => scrollToCard(0));
+    },
+    [scrollToCard],
+  );
+
+  // List sheet row tap: always resolve against the unfiltered set so any place
+  // is reachable regardless of the active chip, then land the carousel on it.
+  const selectPlace = useCallback(
+    (id: string) => {
+      const idx = places.findIndex((p) => p.id === id);
+      if (idx === -1) return;
+      setListOpen(false);
+      pendingScroll.current = idx;
+      setFilter("all");
+      setActive(idx);
+    },
+    [places],
+  );
+
+  // Consumes a pending list-sheet selection once the "all" filter has committed
+  // and the carousel's DOM reflects the full place list again.
+  useEffect(() => {
+    if (pendingScroll.current === null) return;
+    const idx = pendingScroll.current;
+    pendingScroll.current = null;
+    scrollToCard(idx);
+  }, [filter, places, active, scrollToCard]);
+
+  const activePlace = filteredPlaces[active] ?? filteredPlaces[0] ?? places[0];
 
   const badgeFor = (k: Kind) => (k === "venue" ? "GHSM Group" : k === "airport" ? t.common.airport : t.info.poiLabel);
+
+  const chipsHidden = infoSheetOpen || listOpen;
+
+  const FILTERS: { key: Filter; label: string; dot?: string }[] = [
+    { key: "all", label: t.common.filterAll },
+    { key: "poi", label: t.common.filterPois, dot: KIND_COLOR.poi },
+    { key: "venue", label: t.common.filterVenues, dot: KIND_COLOR.venue },
+    { key: "airport", label: t.common.filterAirports, dot: KIND_COLOR.airport },
+  ];
+
+  // Places grouped by kind for the "Elenco" list sheet, in the same order as the map/carousel.
+  const groups: { kind: Kind; label: string; items: Place[] }[] = [
+    { kind: "poi", label: t.common.filterPois, items: places.filter((p) => p.kind === "poi") },
+    { kind: "venue", label: t.common.filterVenues, items: places.filter((p) => p.kind === "venue") },
+    { kind: "airport", label: t.common.filterAirports, items: places.filter((p) => p.kind === "airport") },
+  ];
 
   return (
     <div className="relative h-full w-full overflow-hidden isolate">
@@ -250,8 +328,8 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
         {/* Visitor's own position — client-side only, never sent anywhere */}
         {userPos && <Marker position={userPos} icon={userIcon} zIndexOffset={1100} />}
 
-        {/* Places */}
-        {places.map((p, i) => {
+        {/* Places — only those matching the active chip filter */}
+        {filteredPlaces.map((p, i) => {
           const isActive = i === active;
           return (
             <Marker
@@ -299,6 +377,19 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
         )}
       </AnimatePresence>
 
+      {/* "Elenco" — mirrors the "Eventi e info" trigger in ExploreSection on the
+          opposite corner (left on mobile, since the header's lang/theme pills own
+          the top-right on mobile; left on desktop too, mirroring Info's top-right).
+          Same isolate/z-[750] reasoning as "My location" above. */}
+      <button
+        onClick={() => setListOpen(true)}
+        aria-label={t.common.listLabel}
+        className="absolute left-3 top-[calc(env(safe-area-inset-top)+4.5rem)] z-[750] inline-flex h-11 items-center gap-1.5 rounded-full bg-[var(--color-surface)]/90 px-4 text-[0.85rem] font-semibold text-[var(--color-text)] shadow-[0_6px_20px_oklch(0.2_0.04_258/0.22)] ring-1 ring-[var(--color-border)] backdrop-blur-xl transition-transform duration-200 active:scale-95 lg:left-3 lg:top-3"
+      >
+        <List size={16} strokeWidth={2} />
+        {t.common.listLabel}
+      </button>
+
       {/* Bottom scrim — explicit color stops (no color-interpolation hint, which iOS
           Safari can reject and drop the whole background → transparent). The lower
           ~45% stays near-opaque so the strip between the cards and the dock is fully
@@ -310,18 +401,57 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
         style={{ height: "26rem" }}
       />
 
-      {/* Bottom banners. overflow-x-auto forces overflow-y to clip, which would crop
-          the cards' drop shadows at the scroller's edges (a hard line above the dock).
-          We anchor the scroller's bottom edge behind the dock (--dock-inset) and add
-          generous vertical padding (pt-8 / pb-[5rem]) so each card's shadow fits fully
-          inside the clip box — nothing is cropped, and the cards still sit above the
-          dock. */}
-      <div
-        ref={scrollRef}
-        onScroll={onScroll}
-        className="ghsm-carousel absolute inset-x-0 bottom-[var(--dock-inset)] z-[1000] flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pt-8 pb-[5.75rem] lg:bottom-4 lg:pb-8"
-      >
-        {places.map((p, i) => {
+      {/* Bottom overlay stack: category chips, carousel counter, then the place
+          carousel. Anchored at the same bottom offset the carousel used alone. */}
+      <div className="absolute inset-x-0 bottom-[var(--dock-inset)] z-[1000] flex flex-col gap-1.5 lg:bottom-4">
+        {/* Category chips — hidden while either bottom sheet is open (no visual doubling). */}
+        {!chipsHidden && (
+          <div className="flex gap-2 overflow-x-auto px-4 pb-0.5" style={{ scrollbarWidth: "none" }}>
+            {FILTERS.map((f) => {
+              const isActive = filter === f.key;
+              return (
+                // Outer button = full 44px tap target (invisible padding); the inner
+                // span carries the compact ~34px pill look the chips are meant to have.
+                <button key={f.key} onClick={() => chooseFilter(f.key)} className="flex h-11 shrink-0 items-center">
+                  <span
+                    className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-[0.8rem] font-semibold backdrop-blur-xl transition-colors duration-200 ${
+                      isActive
+                        ? "bg-[var(--color-accent)] text-[var(--color-on-accent)]"
+                        : "bg-[var(--color-surface)]/85 text-[var(--color-text)] ring-1 ring-[var(--color-border)]"
+                    }`}
+                  >
+                    {f.dot && (
+                      <span
+                        className="h-1.5 w-1.5 shrink-0 rounded-full"
+                        style={{ background: isActive ? "currentColor" : f.dot }}
+                      />
+                    )}
+                    {f.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Carousel position counter — updates with the active card and the filter. */}
+        <div className="flex justify-end px-4">
+          <span className="rounded-full bg-[var(--color-surface)]/80 px-2.5 py-1 text-[0.7rem] font-medium tabular-nums text-[var(--color-text-muted)] backdrop-blur-md">
+            {Math.min(active + 1, filteredPlaces.length)} {t.common.counterOf} {filteredPlaces.length}
+          </span>
+        </div>
+
+        {/* Bottom banners. overflow-x-auto forces overflow-y to clip, which would crop
+            the cards' drop shadows at the scroller's edges (a hard line above the dock).
+            Generous vertical padding (pt-8 / pb-[5rem]) so each card's shadow fits fully
+            inside the clip box — nothing is cropped, and the cards still sit above the
+            dock. */}
+        <div
+          ref={scrollRef}
+          onScroll={onScroll}
+          className="ghsm-carousel flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pt-8 pb-[5.75rem] lg:pb-8"
+        >
+        {filteredPlaces.map((p, i) => {
           const isActive = i === active;
           return (
             <article
@@ -382,7 +512,87 @@ export default function MapExplorer({ t }: { t: HotelContent }) {
             </article>
           );
         })}
+        </div>
       </div>
+
+      {/* "Elenco" bottom sheet — portaled to <body> so it escapes this component's
+          own `isolate` stacking context (everything inside it is trapped as a single
+          atomic layer below later page-level siblings like the header and the
+          "Eventi e info" sheet, regardless of z-index used here — see the "My
+          location" comment above). Portaling puts it back at the top level, at the
+          same z-40 the "Eventi e info" sheet already uses successfully. */}
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {listOpen && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  onClick={() => setListOpen(false)}
+                  className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+                />
+                <motion.div
+                  initial={{ y: "100%" }}
+                  animate={{ y: 0 }}
+                  exit={{ y: "100%" }}
+                  transition={{ duration: 0.4, ease: EASE_EXPO }}
+                  className="fixed inset-x-0 bottom-0 z-40 max-h-[85svh] overflow-y-auto rounded-t-3xl bg-[var(--color-bg)] pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+                >
+                  <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg)]/90 px-5 py-3.5 backdrop-blur-md">
+                    <h2 className="font-display text-lg font-semibold text-[var(--color-text)]">{t.common.listLabel}</h2>
+                    <button
+                      onClick={() => setListOpen(false)}
+                      aria-label="Close"
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-surface-muted)] text-[var(--color-text-secondary)]"
+                    >
+                      <X size={18} strokeWidth={2} />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col gap-6 px-5 py-6">
+                    {groups.map((g) => (
+                      <section key={g.kind} className="space-y-2">
+                        <h3 className="mb-1 px-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-text-muted)]">
+                          {g.label}
+                        </h3>
+                        <div className="rounded-2xl bg-[var(--color-surface)] px-4 lg:px-5">
+                          {g.items.map((p, i) => (
+                            <button
+                              key={p.id}
+                              onClick={() => selectPlace(p.id)}
+                              className={`flex w-full items-center justify-between gap-3 py-3.5 text-left ${
+                                i !== 0 ? "border-t border-[var(--color-border)]" : ""
+                              }`}
+                            >
+                              <span className="min-w-0 truncate font-medium text-[var(--color-text)]">{p.name}</span>
+                              <span className="ml-auto inline-flex shrink-0 items-center gap-1 text-[0.8rem] font-medium text-[var(--color-text-muted)]">
+                                {p.mode === "drive" ? (
+                                  <>
+                                    <Car size={14} strokeWidth={2} />
+                                    {p.km} km {t.common.byCar}
+                                  </>
+                                ) : (
+                                  <>
+                                    <Footprints size={14} strokeWidth={2} />
+                                    {p.walk} {t.common.minWalk}
+                                  </>
+                                )}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </section>
+                    ))}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
     </div>
   );
 }

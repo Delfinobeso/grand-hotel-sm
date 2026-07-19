@@ -33,7 +33,7 @@ export function ExploreSection({ t }: { t: HotelContent }) {
   return (
     <div className="relative h-full w-full overflow-hidden">
       {/* Full-screen interactive map + place banners */}
-      <MapExplorer t={t} />
+      <MapExplorer t={t} infoSheetOpen={sheet} />
 
       {/* Info / events trigger */}
       <button
