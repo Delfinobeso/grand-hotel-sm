@@ -49,7 +49,7 @@ INFORMAZIONI UFFICIALI DEL GRAND HOTEL SAN MARINO (fonte: grandhotel.sm e sito G
 - Cassaforte: tasto R + codice personale 4-10 cifre + #
 - Aria condizionata: regolabile dal pannello in camera, si disattiva aprendo la finestra
 - Non disturbare: cartoncino sulla maniglia esterna
-- Lavanderia: 08:30-16:00, costi e tempi dipendono dal tipo di tessuto. Modulo nell'armadio della camera
+- Lavanderia: 08:30-16:00, costi e tempi dipendono dal tipo di tessuto (vedi listino prezzi sotto). Modulo nell'armadio della camera
 - Canali TV: 37 canali disponibili in camera
 - Animali domestici: piccola taglia ammessi, supplemento €4,00 al giorno
 - Colazione: servita al Ristorante L'Arengo 07:00-10:00, room service disponibile
@@ -76,6 +76,45 @@ INFORMAZIONI UFFICIALI DEL GRAND HOTEL SAN MARINO (fonte: grandhotel.sm e sito G
 ## PALESTRA E BICI
 - Palestra: piccola palestra con vista sulla Valle del Montefeltro, 3° piano (Centro Mességué), 08:00-20:00, accesso libero senza prenotazione
 - Biciclette: servizi dedicati ai ciclisti con deposito sicuro e assistenza personalizzata. San Marino offre percorsi tra i 9 castelli ricchi di storia e atmosfera medievale. Noleggio: informazioni in Reception
+
+## LAVANDERIA — LISTINO PREZZI
+Servizio disponibile 08:30-16:00, modulo nell'armadio della camera. Prezzi per capo, in ordine: lavaggio / stiratura / lavaggio+stiratura / lavaggio a secco ("–" = servizio non disponibile per quel capo).
+
+UOMO:
+- Camicia: €4,00 / €4,50 / €6,50 / €8,00
+- Camicia di seta: €6,50 / €6,00 / €8,00 / €12,00
+- Canottiera: €2,50 / €2,50 / €4,00 / €5,00
+- Maglietta: €3,00 / €3,50 / €5,00 / €6,00
+- Mutande-Slip: €2,00 / – / €3,00 / –
+- Pigiama: – / – / €6,00 / –
+- Calze: €1,00 / – / €3,00 / –
+- Fazzoletto: €1,00 / – / €3,00 / –
+- Pantalone: €4,00 / €4,50 / €6,00 / €8,00
+- Giacca: – / €5,50 / – / €12,00
+- Vestito completo: – / €15,00 / – / €20,00
+- Soprabito: – / €15,00 / – / €20,00
+- Pullover: €7,00 / €7,50 / €8,00 / €10,00
+- Polo: €4,00 / €4,50 / €6,50 / €8,00
+- Cravatta: – / €3,00 / – / €4,00
+- Gilet: – / €5,50 / – / €8,00
+- Tuta da ginnastica: €6,00 / – / – / –
+- Giubbotto: – / €8,00 / – / €20,00
+
+DONNA:
+- Camicia: €4,00 / €4,50 / €6,50 / €8,00
+- Camicia di seta: €6,50 / €6,00 / €8,00 / €12,00
+- Calze: €1,00 / – / €3,00 / –
+- Pigiama: – / – / €6,00 / –
+- Mutandine: €1,50 / – / €3,00 / –
+- Maglietta: €3,00 / €3,50 / €5,00 / €6,00
+- Pantalone: €4,00 / €4,50 / €6,00 / €8,00
+- Tailleur: – / €15,00 / – / €20,00
+- Gonna: €4,00 / €4,50 / €6,50 / €8,00
+- Reggiseno: €3,00 / – / – / –
+- Pullover: €7,00 / €7,50 / €8,00 / €10,00
+- Giacca: – / €5,50 / – / €12,00
+- Vestito: – / €10,00 / – / €20,00
+- Foulard: €3,00 / €3,00 / €5,00 / €6,00
 
 ## RISTORAZIONE
 
