@@ -74,7 +74,7 @@ export interface HotelContent {
     nowLabel: string;
     quickLabel: string;
     groupLabel: string;
-    groupCategories: { wellness: string; dining: string; cafe: string; gelato: string; suites: string; shop: string };
+    groupCategories: { wellness: string; dining: string; cafe: string; gelato: string; suites: string; shop: string; bar: string };
     quick: {
       wifi: { label: string; value: string; note: string; copyDone: string };
       breakfast: { label: string; note: string };
@@ -126,11 +126,8 @@ export interface HotelContent {
     hairdresser: { body: string };
     meetingsLabel: string;
     meetings: { body: string };
-    gymBikeLabel: string;
     gymLabel: string;
     gym: { body: string };
-    bikeLabel: string;
-    bike: { body: string };
     contactsLabel: string;
   };
   dining: {
@@ -282,7 +279,7 @@ const it: HotelContent = {
     nowLabel: "In questo momento",
     quickLabel: "Azioni rapide",
     groupLabel: "Scopri il GHSM Group",
-    groupCategories: { wellness: "Benessere", dining: "Ristorante", cafe: "Caffè", gelato: "Gelateria", suites: "Suites", shop: "Bottega" },
+    groupCategories: { wellness: "Benessere", dining: "Ristorante", cafe: "Caffè", gelato: "Gelateria", suites: "Suites", shop: "Bottega", bar: "Lounge bar" },
     quick: {
       wifi: {
         label: "Wi-Fi",
@@ -404,7 +401,7 @@ const it: HotelContent = {
     },
     publicParking: {
       title: "Parcheggio pubblico",
-      body: "Biglietti a €4,00 al giorno disponibili in Reception, validi fino alle ore 12:00 del giorno successivo nelle strisce blu.",
+      body: "Biglietti a €6,00 al giorno disponibili in Reception, validi fino alle ore 24:00 del giorno successivo nelle strisce blu.",
     },
     conciergeLabel: "Concierge",
     taxiLabel: "Taxi",
@@ -427,14 +424,9 @@ const it: HotelContent = {
     meetings: {
       body: "Il Grand Hotel San Marino dispone di 5 sale meeting modulabili, per eventi da 2 a 200 persone, con supporti tecnologici e uno staff qualificato a disposizione per organizzare meeting su misura, colazioni e cene di lavoro, eventi privati, celebrazioni e banchetti.",
     },
-    gymBikeLabel: "Palestra e bici",
     gymLabel: "Palestra",
     gym: {
       body: "Una piccola palestra affacciata sulla Valle del Montefeltro, con attrezzi fitness di base, situata all'interno del Centro Mességué al 3° piano. Accesso libero, senza prenotazione, dalle 08:00 alle 20:00.",
-    },
-    bikeLabel: "In bicicletta",
-    bike: {
-      body: "San Marino offre percorsi stradali e off-road tra i 9 castelli della Repubblica, ideali per escursioni in bicicletta. Per il noleggio bici, chiedere informazioni al Ricevimento.",
     },
     contactsLabel: "Contatti e posizione",
   },
@@ -477,7 +469,7 @@ const it: HotelContent = {
       {
         id: "laLoggia",
         name: "La Loggia",
-        body: "Una bottega nel cuore del centro storico, in Piazzetta Garibaldi: formaggi, salumi e taglieri, vini e vermouth artigianali, dolci tipici sammarinesi e birre locali, selezionati per raccontare i sapori più autentici della nostra terra.",
+        body: "Lounge bar e bottega nel cuore del centro storico, in Piazzetta Garibaldi: formaggi, salumi e taglieri, vini e vermouth artigianali, dolci tipici sammarinesi e birre locali, selezionati per raccontare i sapori più autentici della nostra terra.",
       },
     ],
   },
@@ -710,7 +702,7 @@ const en: HotelContent = {
     nowLabel: "Right now",
     quickLabel: "Quick actions",
     groupLabel: "Discover the GHSM Group",
-    groupCategories: { wellness: "Wellness", dining: "Restaurant", cafe: "Café", gelato: "Ice cream", suites: "Suites", shop: "Boutique" },
+    groupCategories: { wellness: "Wellness", dining: "Restaurant", cafe: "Café", gelato: "Ice cream", suites: "Suites", shop: "Boutique", bar: "Lounge bar" },
     quick: {
       wifi: {
         label: "Wi-Fi",
@@ -832,7 +824,7 @@ const en: HotelContent = {
     },
     publicParking: {
       title: "Public parking",
-      body: "Tickets at €4.00 per day are available at Reception, valid until 12:00 PM the following day in blue-line parking spaces.",
+      body: "Tickets at €6.00 per day are available at Reception, valid until midnight the following day in blue-line parking spaces.",
     },
     conciergeLabel: "Concierge",
     taxiLabel: "Taxi",
@@ -855,14 +847,9 @@ const en: HotelContent = {
     meetings: {
       body: "The Grand Hotel San Marino has 5 modular meeting rooms for events from 2 to 200 people, with technological support and a qualified staff available to organise tailor-made meetings, working breakfasts and dinners, private events, celebrations and banquets.",
     },
-    gymBikeLabel: "Gym & bike",
     gymLabel: "Gym",
     gym: {
       body: "A small gym overlooking the Montefeltro Valley, with basic fitness equipment, located inside the Mességué Centre on the 3rd floor. Free access, no booking required, from 8:00 AM to 8:00 PM.",
-    },
-    bikeLabel: "By bike",
-    bike: {
-      body: "San Marino offers road and off-road routes among the Republic's 9 castles, ideal for cycling excursions. For bike rental, please ask at Reception.",
     },
     contactsLabel: "Contact & location",
   },
@@ -905,7 +892,7 @@ const en: HotelContent = {
       {
         id: "laLoggia",
         name: "La Loggia",
-        body: "A boutique in the heart of the historic centre, on Piazzetta Garibaldi: local cheeses, cured meats and charcuterie boards, artisan wines and vermouth, traditional Sammarinese sweets and local craft beers, selected to capture the most authentic flavours of our land.",
+        body: "A lounge bar and boutique in the heart of the historic centre, on Piazzetta Garibaldi: local cheeses, cured meats and charcuterie boards, artisan wines and vermouth, traditional Sammarinese sweets and local craft beers, selected to capture the most authentic flavours of our land.",
       },
     ],
   },
@@ -1138,7 +1125,7 @@ const fr: HotelContent = {
     nowLabel: "En ce moment",
     quickLabel: "Actions rapides",
     groupLabel: "Découvrez le GHSM Group",
-    groupCategories: { wellness: "Bien-être", dining: "Restaurant", cafe: "Café", gelato: "Glacier", suites: "Suites", shop: "Boutique" },
+    groupCategories: { wellness: "Bien-être", dining: "Restaurant", cafe: "Café", gelato: "Glacier", suites: "Suites", shop: "Boutique", bar: "Bar lounge" },
     quick: {
       wifi: {
         label: "Wi-Fi",
@@ -1260,7 +1247,7 @@ const fr: HotelContent = {
     },
     publicParking: {
       title: "Parking public",
-      body: "Des tickets à 4,00 € par jour sont disponibles à la Réception, valables jusqu'à 12h00 le lendemain dans les zones bleues.",
+      body: "Des tickets à 6,00 € par jour sont disponibles à la Réception, valables jusqu'à minuit le lendemain dans les zones bleues.",
     },
     conciergeLabel: "Concierge",
     taxiLabel: "Taxi",
@@ -1283,14 +1270,9 @@ const fr: HotelContent = {
     meetings: {
       body: "Le Grand Hotel San Marino dispose de 5 salles de réunion modulables, pour des événements de 2 à 200 personnes, avec équipements technologiques et un personnel qualifié à disposition pour organiser réunions sur mesure, petits-déjeuners et dîners de travail, événements privés, célébrations et banquets.",
     },
-    gymBikeLabel: "Salle de sport et vélos",
     gymLabel: "Salle de sport",
     gym: {
       body: "Une petite salle de sport donnant sur la vallée du Montefeltro, avec des équipements fitness de base, située au sein du Centre Mességué au 3e étage. Accès libre, sans réservation, de 08h00 à 20h00.",
-    },
-    bikeLabel: "À vélo",
-    bike: {
-      body: "Saint-Marin propose des itinéraires routiers et hors route parmi les 9 châteaux de la République, idéaux pour des excursions à vélo. Pour la location de vélos, renseignez-vous à la Réception.",
     },
     contactsLabel: "Contact et localisation",
   },
@@ -1333,7 +1315,7 @@ const fr: HotelContent = {
       {
         id: "laLoggia",
         name: "La Loggia",
-        body: "Une boutique au cœur du centre historique, sur la Piazzetta Garibaldi : fromages, charcuteries et planches, vins et vermouths artisanaux, douceurs typiques saint-marinaises et bières locales, sélectionnés pour raconter les saveurs les plus authentiques de notre terre.",
+        body: "Un bar lounge et une boutique au cœur du centre historique, sur la Piazzetta Garibaldi : fromages, charcuteries et planches, vins et vermouths artisanaux, douceurs typiques saint-marinaises et bières locales, sélectionnés pour raconter les saveurs les plus authentiques de notre terre.",
       },
     ],
   },
@@ -1566,7 +1548,7 @@ const de: HotelContent = {
     nowLabel: "Gerade jetzt",
     quickLabel: "Schnellzugriff",
     groupLabel: "Entdecken Sie die GHSM Group",
-    groupCategories: { wellness: "Wellness", dining: "Restaurant", cafe: "Café", gelato: "Eisdiele", suites: "Suiten", shop: "Boutique" },
+    groupCategories: { wellness: "Wellness", dining: "Restaurant", cafe: "Café", gelato: "Eisdiele", suites: "Suiten", shop: "Boutique", bar: "Lounge-Bar" },
     quick: {
       wifi: {
         label: "Wi-Fi",
@@ -1688,7 +1670,7 @@ const de: HotelContent = {
     },
     publicParking: {
       title: "Öffentlicher Parkplatz",
-      body: "Tickets zu 4,00 € pro Tag sind an der Rezeption erhältlich, gültig bis 12:00 Uhr des Folgetags in den blauen Parkzonen.",
+      body: "Tickets zu 6,00 € pro Tag sind an der Rezeption erhältlich, gültig bis Mitternacht des Folgetags in den blauen Parkzonen.",
     },
     conciergeLabel: "Concierge",
     taxiLabel: "Taxi",
@@ -1711,14 +1693,9 @@ const de: HotelContent = {
     meetings: {
       body: "Das Grand Hotel San Marino verfügt über 5 modulare Tagungsräume für Veranstaltungen von 2 bis 200 Personen, mit technischer Ausstattung und qualifiziertem Personal, das maßgeschneiderte Meetings, Arbeitsfrühstücke und -abendessen, private Veranstaltungen, Feiern und Bankette organisiert.",
     },
-    gymBikeLabel: "Fitness & Fahrrad",
     gymLabel: "Fitnessraum",
     gym: {
       body: "Ein kleiner Fitnessraum mit Blick auf das Montefeltro-Tal und grundlegenden Fitnessgeräten, im Mességué-Zentrum im 3. Stock. Freier Zugang ohne Reservierung, von 08:00 bis 20:00 Uhr.",
-    },
-    bikeLabel: "Mit dem Fahrrad",
-    bike: {
-      body: "San Marino bietet Straßen- und Offroad-Strecken zwischen den 9 Burgen der Republik, ideal für Radausflüge. Informationen zum Fahrradverleih erhalten Sie an der Rezeption.",
     },
     contactsLabel: "Kontakt und Standort",
   },
@@ -1761,7 +1738,7 @@ const de: HotelContent = {
       {
         id: "laLoggia",
         name: "La Loggia",
-        body: "Eine Boutique im Herzen der Altstadt, an der Piazzetta Garibaldi: Käse, Wurstwaren und Vesperplatten, handwerklich hergestellte Weine und Wermut, typische sammarinesische Süßigkeiten und lokale Craft-Biere, ausgewählt, um die authentischsten Aromen unserer Heimat zu erzählen.",
+        body: "Eine Lounge-Bar und Boutique im Herzen der Altstadt, an der Piazzetta Garibaldi: Käse, Wurstwaren und Vesperplatten, handwerklich hergestellte Weine und Wermut, typische sammarinesische Süßigkeiten und lokale Craft-Biere, ausgewählt, um die authentischsten Aromen unserer Heimat zu erzählen.",
       },
     ],
   },
@@ -1994,7 +1971,7 @@ const es: HotelContent = {
     nowLabel: "En este momento",
     quickLabel: "Acciones rápidas",
     groupLabel: "Descubra el GHSM Group",
-    groupCategories: { wellness: "Bienestar", dining: "Restaurante", cafe: "Café", gelato: "Heladería", suites: "Suites", shop: "Tienda" },
+    groupCategories: { wellness: "Bienestar", dining: "Restaurante", cafe: "Café", gelato: "Heladería", suites: "Suites", shop: "Tienda", bar: "Lounge bar" },
     quick: {
       wifi: {
         label: "Wi-Fi",
@@ -2116,7 +2093,7 @@ const es: HotelContent = {
     },
     publicParking: {
       title: "Aparcamiento público",
-      body: "Hay tickets de 4,00 € al día disponibles en Recepción, válidos hasta las 12:00 del día siguiente en las zonas azules.",
+      body: "Hay tickets de 6,00 € al día disponibles en Recepción, válidos hasta la medianoche del día siguiente en las zonas azules.",
     },
     conciergeLabel: "Concierge",
     taxiLabel: "Taxi",
@@ -2139,14 +2116,9 @@ const es: HotelContent = {
     meetings: {
       body: "El Grand Hotel San Marino cuenta con 5 salas de reuniones modulables, para eventos de 2 a 200 personas, con soporte tecnológico y personal cualificado disponible para organizar reuniones a medida, desayunos y cenas de trabajo, eventos privados, celebraciones y banquetes.",
     },
-    gymBikeLabel: "Gimnasio y bicicletas",
     gymLabel: "Gimnasio",
     gym: {
       body: "Un pequeño gimnasio con vistas al valle de Montefeltro, con equipamiento fitness básico, situado dentro del Centro Mességué en la 3ª planta. Acceso libre, sin reserva, de 08:00 a 20:00.",
-    },
-    bikeLabel: "En bicicleta",
-    bike: {
-      body: "San Marino ofrece rutas de carretera y off-road entre los 9 castillos de la República, ideales para excursiones en bicicleta. Para el alquiler de bicicletas, consulte en Recepción.",
     },
     contactsLabel: "Contacto y ubicación",
   },
@@ -2189,7 +2161,7 @@ const es: HotelContent = {
       {
         id: "laLoggia",
         name: "La Loggia",
-        body: "Una tienda en el corazón del centro histórico, en la Piazzetta Garibaldi: quesos, embutidos y tablas, vinos y vermús artesanales, dulces típicos sanmarinenses y cervezas artesanales locales, seleccionados para contar los sabores más auténticos de nuestra tierra.",
+        body: "Un lounge bar y una tienda en el corazón del centro histórico, en la Piazzetta Garibaldi: quesos, embutidos y tablas, vinos y vermús artesanales, dulces típicos sanmarinenses y cervezas artesanales locales, seleccionados para contar los sabores más auténticos de nuestra tierra.",
       },
     ],
   },

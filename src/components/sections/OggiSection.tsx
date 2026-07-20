@@ -29,7 +29,7 @@ const GROUP: { name: string; category: keyof HotelContent["home"]["groupCategori
   { name: "Centro Mességué", category: "wellness", img: "/images/group-wellness.webp", tab: "wellness" },
   { name: "Ristorante La Terrazza", category: "dining", img: "/images/group-laterrazza.webp", tab: "dining", sectionId: "venue-laTerrazza" },
   { name: "Caffè Titano", category: "cafe", img: "/images/venue-caffetitano.webp", tab: "dining", sectionId: "venue-caffeTitano" },
-  { name: "La Loggia", category: "shop", img: "/images/group-laloggia.webp", tab: "dining", sectionId: "venue-laLoggia" },
+  { name: "La Loggia", category: "bar", img: "/images/group-laloggia.webp", tab: "dining", sectionId: "venue-laLoggia" },
   { name: "La Cremeria del Titano", category: "gelato", img: "/images/group-cremeria.webp", tab: "dining", sectionId: "venue-cremeria" },
 ];
 

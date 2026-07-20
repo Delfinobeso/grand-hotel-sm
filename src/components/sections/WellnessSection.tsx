@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles, Dumbbell, Bike } from "lucide-react";
+import { Sparkles, Dumbbell } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL, SERVICE_HOURS } from "@/lib/hotel";
 import {
@@ -59,10 +59,8 @@ export function WellnessSection({ t }: { t: HotelContent }) {
         <p className="px-1 text-[0.8125rem] leading-relaxed text-[var(--color-text-muted)]">{w.priceListNote}</p>
       </section>
 
-      {/* ── Palestra & bici ── */}
+      {/* ── Palestra ── */}
       <section className="space-y-3">
-        <SectionLabel>{f.gymBikeLabel}</SectionLabel>
-
         <div className="rounded-2xl bg-[var(--color-surface)] px-4 py-4 lg:px-5 lg:py-5">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
@@ -73,16 +71,6 @@ export function WellnessSection({ t }: { t: HotelContent }) {
           </div>
           <FloorBadge>{t.common.floorThirdMessegue}</FloorBadge>
           <p className="mt-2 text-[0.95rem] leading-relaxed text-[var(--color-text-secondary)]">{f.gym.body}</p>
-        </div>
-
-        <div className="rounded-2xl bg-[var(--color-surface)] px-4 py-4 lg:px-5 lg:py-5">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
-              <Bike size={16} strokeWidth={1.875} />
-            </span>
-            <h4 className="font-semibold text-[var(--color-text)]">{f.bikeLabel}</h4>
-          </div>
-          <p className="text-[0.95rem] leading-relaxed text-[var(--color-text-secondary)]">{f.bike.body}</p>
         </div>
       </section>
     </div>
