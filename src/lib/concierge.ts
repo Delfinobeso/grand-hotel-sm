@@ -36,11 +36,10 @@ INFORMAZIONI UFFICIALI DEL GRAND HOTEL SAN MARINO (fonte: grandhotel.sm e sito G
 - Lingue del sito: Italiano, Inglese, Francese, Tedesco
 
 ## TIPOLOGIE CAMERE
-Tutte con vista panoramica:
-- Classic — incantevole vista panoramica sugli Appennini
-- Superior
-- Deluxe
-- Executive Suite
+- Classic — senza vista panoramica
+- Superior — vista panoramica sugli Appennini
+- Deluxe — vista panoramica sugli Appennini
+- Executive Suite — vista panoramica sugli Appennini
 
 ## SERVIZI IN CAMERA
 - Reception: tasto 9 dal telefono in camera, 24 ore su 24
@@ -57,7 +56,7 @@ Tutte con vista panoramica:
 
 ## SERVIZI DELLA STRUTTURA
 - Garage coperto privato: piano -1 dell'hotel, chiuso da sbarra. Servizio valet 07:00-23:00 (consegnare le chiavi in Reception, richiedere l'auto con 30 minuti di anticipo). €19,00 a notte. Prenotabile già al momento della prenotazione. Colonna di ricarica per veicoli elettrici con supplemento
-- Parcheggio pubblico: a pagamento proprio di fronte all'hotel, con posto dedicato per disabili. Biglietti €4,00 al giorno disponibili in Reception, validi fino alle 12:00 del giorno successivo nelle strisce blu
+- Parcheggio pubblico: a pagamento proprio di fronte all'hotel, con posto dedicato per disabili. Biglietti €6,00 al giorno disponibili in Reception, validi fino alle 24:00 del giorno successivo nelle strisce blu
 - Concierge: disponibile in Reception
 - Servizio sveglia: contattare il Ricevimento al tasto 9
 - TuttoSanMarino Card: sconti in musei, negozi e ristoranti convenzionati, richiedibile in Reception
@@ -65,7 +64,7 @@ Tutte con vista panoramica:
 - Parrucchiere: Ricevimento a disposizione per informazioni sui saloni vicini
 - American Bar
 - Salone Camino: lounge con camino, utilizzabile anche come spazio meeting
-- La Loggia: piccola bottega al piano terra con salumi, formaggi, vini e vermouth locali e genuini di San Marino e Romagna
+- La Loggia: lounge bar, piccola bottega al piano terra con salumi, formaggi, vini e vermouth locali e genuini di San Marino e Romagna
 
 ## SALE MEETING
 - 5 sale riunioni: Sala Camino, Saletta Guaita, Sala Cesta, Saletta Executive
