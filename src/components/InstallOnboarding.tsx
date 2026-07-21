@@ -338,11 +338,23 @@ function IosStepMockup({
   step,
   appName,
   system,
+  stepImages,
 }: {
   step: number;
   appName: string;
   system: IosSystemCopy;
+  stepImages?: (string | undefined)[];
 }) {
+  const realImage = stepImages?.[step];
+  if (realImage) {
+    // Screenshot reale (con evidenziazione) al posto della ricostruzione CSS —
+    // usato quando disponibile per quell'hotel specifico (vedi prop stepImages).
+    return (
+      <div className="blasat-onboard-mock blasat-onboard-mock--photo">
+        <img src={realImage} alt="" aria-hidden="true" className="blasat-onboard-mock-photo" />
+      </div>
+    );
+  }
   switch (step) {
     case 0:
       // Step 1: barra Safari in basso con l'icona Condividi evidenziata.
@@ -464,7 +476,14 @@ function IosStepMockup({
   }
 }
 
-export default function InstallOnboarding({ appName }: { appName: string }) {
+export default function InstallOnboarding({
+  appName,
+  stepImages,
+}: {
+  appName: string;
+  /** Screenshot reali (index 0-4) da usare al posto dei mockup CSS generici, per hotel. */
+  stepImages?: (string | undefined)[];
+}) {
   const [visible, setVisible] = useState(false);
   const [platform, setPlatform] = useState<Platform | null>(null);
   const [lang, setLang] = useState<Lang>("it");
@@ -607,7 +626,7 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
         {platform === "ios" ? (
           <>
             <div className="blasat-onboard-stepbody">
-              <IosStepMockup step={step} appName={appName} system={copy.ios.system} />
+              <IosStepMockup step={step} appName={appName} system={copy.ios.system} stepImages={stepImages} />
               <h3 className="blasat-onboard-steptitle">{copy.ios.steps[step].title}</h3>
               <p className="blasat-onboard-steptext">{copy.ios.steps[step].body}</p>
             </div>
@@ -854,6 +873,16 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
           display: flex;
           justify-content: center;
           font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .blasat-onboard-mock--photo {
+          padding: 4px 0;
+        }
+        .blasat-onboard-mock-photo {
+          width: 100%;
+          max-width: 320px;
+          height: auto;
+          display: block;
         }
 
         .blasat-onboard-safaribar {
