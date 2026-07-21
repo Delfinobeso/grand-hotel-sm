@@ -25,6 +25,14 @@ import { ExploreSection } from "@/components/sections/ExploreSection";
 import ChatAssistant from "@/components/ChatAssistant";
 import { useScrollDirection } from "@/lib/useScrollDirection";
 
+const INSTALL_LINK_LABEL: Record<Lang, string> = {
+  it: "Come installare l'app",
+  en: "How to install the app",
+  fr: "Comment installer l'application",
+  de: "So installierst du die App",
+  es: "Cómo instalar la app",
+};
+
 const TABS: { key: TabKey; icon: LucideIcon }[] = [
   { key: "oggi", icon: HomeIcon },
   { key: "hotel", icon: BedDouble },
@@ -56,6 +64,7 @@ function useKeyboardOpen() {
 export default function Home() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [lang, setLang] = useState<Lang>("it");
+  const [installLinkVisible, setInstallLinkVisible] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>("oggi");
   const [pendingSection, setPendingSection] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
@@ -70,6 +79,14 @@ export default function Home() {
   // over the content and would cover it on scroll (e.g. the check-out time). Other
   // tabs sit on a solid header bar, so they're left untouched.
   const hideOggiControls = activeTab === "oggi" && scrollHidden;
+
+  // Nasconde il link "Come installare l'app" se la PWA è già in standalone.
+  useEffect(() => {
+    const nav = window.navigator as Navigator & { standalone?: boolean };
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || nav.standalone === true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setInstallLinkVisible(!standalone);
+  }, []);
 
   // One-time sync from localStorage after mount. The inline THEME_SCRIPT in layout.tsx
   // already set data-theme/lang on <html> pre-paint; this only updates React-rendered
@@ -295,6 +312,18 @@ export default function Home() {
               >
                 {t.privacyLabel}
               </a>
+              {installLinkVisible && (
+                <>
+                  {" · "}
+                  <button
+                    type="button"
+                    onClick={() => window.dispatchEvent(new Event("blasat:show-onboarding"))}
+                    className="bg-transparent p-0 font-medium text-[var(--color-text-secondary)] underline-offset-2 hover:underline"
+                  >
+                    {INSTALL_LINK_LABEL[lang]}
+                  </button>
+                </>
+              )}
             </p>
           </main>
         )}

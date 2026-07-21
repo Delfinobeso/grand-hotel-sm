@@ -3,6 +3,7 @@ import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import SwRegister from "@/components/SwRegister";
+import InstallOnboarding from "@/components/InstallOnboarding";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <AnalyticsProvider project="grand-hotel-sm" />
         <SwRegister />
+        <InstallOnboarding appName="Grand Hotel SM" />
         {children}
       </body>
     </html>
