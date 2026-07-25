@@ -88,10 +88,10 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "deepseek-chat",
+        model: "deepseek-v4-flash",
         messages: [{ role: "system", content: systemPrompt }, ...history],
         temperature: 0.4,
-        max_tokens: 500,
+        max_tokens: 1500,
         stream: true,
       }),
     });
