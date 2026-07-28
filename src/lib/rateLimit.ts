@@ -12,6 +12,28 @@ const MAX_MAP_SIZE = 500;
 
 const requestLog = new Map<string, number[]>();
 
+/**
+ * Estrae un identificativo IP il più possibile affidabile dalla richiesta.
+ *
+ * `x-forwarded-for` è impostato dal client e quindi FALSIFICABILE (basta
+ * cambiare header per ottenere una nuova "quota" di rate-limit). Su Vercel gli
+ * header `x-vercel-forwarded-for` / `x-real-ip` sono scritti dall'edge della
+ * piattaforma DOPO aver scartato quanto inviato dal client, quindi non sono
+ * spoofabili: li preferiamo. Si ricade su `x-forwarded-for` (primo hop) solo
+ * come ultima risorsa per ambienti non-Vercel.
+ */
+export function getClientIp(req: {
+  headers: { get(name: string): string | null };
+}): string {
+  const vercel = req.headers.get("x-vercel-forwarded-for");
+  if (vercel) return vercel.split(",")[0]!.trim();
+  const real = req.headers.get("x-real-ip");
+  if (real) return real.trim();
+  const fwd = req.headers.get("x-forwarded-for");
+  if (fwd) return fwd.split(",")[0]!.trim();
+  return "unknown";
+}
+
 /** Ritorna true se la richiesta è consentita, false se l'IP ha superato il limite. */
 export function checkRateLimit(ip: string): boolean {
   const now = Date.now();

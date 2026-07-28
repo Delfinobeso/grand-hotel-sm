@@ -1,8 +1,31 @@
 /**
  * POST /api/push/send — Invia notifiche push ai subscriber
+ *
+ * Endpoint amministrativo: richiede l'header `x-push-secret` uguale a
+ * process.env.PUSH_ADMIN_SECRET. Senza (o con secret errato) → 401.
+ * Confronto timing-safe. Fail-closed: se PUSH_ADMIN_SECRET non è configurato
+ * l'invio è disabilitato per tutti (nessuno può spammare notifiche col brand
+ * dell'hotel finché non viene impostato il secret sul deploy).
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import webpush from 'web-push';
+
+/** Confronto stringhe a tempo costante (evita timing attack sul secret). */
+function secretsMatch(provided: string, expected: string): boolean {
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
+
+/** true solo se l'header x-push-secret combacia con PUSH_ADMIN_SECRET. */
+function isAuthorized(request: NextRequest): boolean {
+  const expected = process.env.PUSH_ADMIN_SECRET;
+  if (!expected) return false; // fail-closed: nessun secret configurato ⇒ nessun invio
+  const provided = request.headers.get('x-push-secret') || '';
+  return secretsMatch(provided, expected);
+}
 
 function getVapidKeys() {
   const publicKey = process.env.VAPID_PUBLIC_KEY;
@@ -27,6 +50,9 @@ const subscriptionStore: Map<string, any[]> =
 
 export async function POST(request: NextRequest) {
   try {
+    if (!isAuthorized(request)) {
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+    }
     ensureVapid();
     const body = await request.json();
     const { project, title, body: msgBody, url, icon } = body;

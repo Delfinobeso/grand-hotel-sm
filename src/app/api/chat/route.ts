@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MENUS } from "@/lib/menus";
-import { checkRateLimit } from "@/lib/rateLimit";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { SYSTEM_PROMPT_BASE, TRAILING, FALLBACK_STREAM_ERROR, FALLBACK_FATAL_ERROR } from "@/lib/concierge";
 
 function buildSystemPrompt(): string {
@@ -31,12 +31,46 @@ function logQuestionAnonymously(req: NextRequest, question: string) {
   }).catch(() => {});
 }
 
+/** Verifica che la richiesta provenga da un contesto browser autorizzato.
+ *  Questo endpoint è chiamato SOLO via fetch dal client della PWA, che invia
+ *  sempre l'header Origin sulle POST. Un valore host è consentito se termina
+ *  con un dominio della flotta (.blasat.com) o un preview Vercel (.vercel.app).
+ *  - Origin presente → deve combaciare, altrimenti 403.
+ *  - Origin assente → si ripiega sul Referer (alcuni browser lo inviano al
+ *    posto dell'Origin): consentito solo se l'host del Referer combacia.
+ *  - Nessuno dei due (tipico di curl/bot server-to-server) → 403.
+ *  In questo modo i browser legittimi passano sempre, mentre le richieste
+ *  automatizzate "nude" vengono trattate come sospette. */
+function isAllowedCaller(req: NextRequest): boolean {
+  const ok = (host: string) =>
+    host.endsWith(".blasat.com") ||
+    host === "blasat.com" ||
+    host.endsWith(".vercel.app");
+
+  const origin = req.headers.get("origin");
+  if (origin) {
+    try {
+      return ok(new URL(origin).hostname);
+    } catch {
+      return false;
+    }
+  }
+  const referer = req.headers.get("referer");
+  if (referer) {
+    try {
+      return ok(new URL(referer).hostname);
+    } catch {
+      return false;
+    }
+  }
+  return false; // né Origin né Referer: richiesta non-browser → sospetta
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const ip = getClientIp(req);
 
-    const origin = req.headers.get("origin");
-    if (origin && !origin.endsWith(".blasat.com") && !origin.endsWith(".vercel.app")) {
+    if (!isAllowedCaller(req)) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
 
