@@ -393,10 +393,19 @@ export default function ChatAssistant({
             aria-label={c.fab}
             className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-[0_8px_24px_oklch(0.2_0.04_258/0.35)] active:scale-95 lg:bottom-6"
           >
+            {/* Anello che si espande e svanisce (sonar) dietro l'icona — molto più
+                notato di una semplice variazione di scala, resta comunque discreto
+                perché sparisce quasi subito. */}
             <motion.span
-              animate={{ scale: [1, 1.06, 1] }}
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-full bg-[var(--color-on-accent)]"
+              animate={{ scale: [1, 1.7], opacity: [0.35, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+            />
+            <motion.span
+              animate={{ scale: [1, 1.12, 1] }}
               transition={{ duration: 1.8, ease: "easeInOut", repeat: Infinity }}
-              className="flex h-full w-full items-center justify-center"
+              className="relative flex h-full w-full items-center justify-center"
             >
               <ConciergeBell size={22} strokeWidth={1.75} />
             </motion.span>
