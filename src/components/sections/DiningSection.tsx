@@ -2,7 +2,7 @@
 
 import { UtensilsCrossed } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
-import { GHSM_VENUES, SERVICE_HOURS, HOTEL } from "@/lib/hotel";
+import { GHSM_VENUES, SERVICE_HOURS, HOTEL, REVIEW_LINKS } from "@/lib/hotel";
 import {
   SectionHeader,
   SectionLabel,
@@ -12,6 +12,7 @@ import {
   CallButton,
   NavigateButton,
   BookButton,
+  ReviewButtons,
 } from "@/components/ui";
 
 const VENUE_IMG: Record<string, string> = {
@@ -58,6 +59,7 @@ export function DiningSection({ t }: { t: HotelContent }) {
 
         {d.venues.map((v) => {
           const pin = GHSM_VENUES.find((p) => p.id === v.id);
+          const reviewLinks = REVIEW_LINKS[v.id];
           return (
             <div key={v.id} id={`venue-${v.id}`} className="rounded-2xl bg-[var(--color-surface)] px-4 py-4 lg:px-5 lg:py-5">
               {VENUE_IMG[v.id] && <CardImage src={VENUE_IMG[v.id]} alt={v.name} />}
@@ -82,6 +84,18 @@ export function DiningSection({ t }: { t: HotelContent }) {
                   {pin.phoneHref && (
                     <CallButton href={pin.phoneHref} label={t.common.callLabel} variant="outline" trackLabel={`chiama-${v.id}`} />
                   )}
+                </div>
+              )}
+              {reviewLinks && (
+                <div className="mt-4 border-t border-[var(--color-border)] pt-4">
+                  <p className="mb-3 text-[0.8125rem] font-medium text-[var(--color-text)]">{t.common.reviewLabel}</p>
+                  <ReviewButtons
+                    googleUrl={reviewLinks.googleUrl}
+                    tripadvisorUrl={reviewLinks.tripadvisorUrl}
+                    googleLabel={t.common.reviewGoogleLabel}
+                    tripadvisorLabel={t.common.reviewTripadvisorLabel}
+                    trackPrefix={`recensione-${v.id}`}
+                  />
                 </div>
               )}
             </div>

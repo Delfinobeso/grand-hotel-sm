@@ -11,6 +11,7 @@ import {
   Copy,
   Quote,
   CalendarCheck,
+  Star,
   type LucideIcon,
 } from "lucide-react";
 import type { HoursRow, MassageItem } from "@/lib/content";
@@ -427,6 +428,47 @@ export function BookButton({
       <CalendarCheck size={16} strokeWidth={1.875} />
       {label}
     </a>
+  );
+}
+
+/** Bottoni "Lasciaci una recensione" — Google + Tripadvisor, riuso dello stile CTA
+ *  outline esistente (CallButton/NavigateButton). Nomi delle piattaforme non tradotti. */
+export function ReviewButtons({
+  googleUrl,
+  tripadvisorUrl,
+  googleLabel,
+  tripadvisorLabel,
+  trackPrefix,
+}: {
+  googleUrl: string;
+  tripadvisorUrl: string;
+  googleLabel: string;
+  tripadvisorLabel: string;
+  trackPrefix: string;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <a
+        href={googleUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={ctaOutline}
+        onClick={() => { import("@/lib/analytics/tracker").then(m => m.trackClick(`${trackPrefix}-google`)); }}
+      >
+        <Star size={16} strokeWidth={1.875} />
+        {googleLabel}
+      </a>
+      <a
+        href={tripadvisorUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={ctaOutline}
+        onClick={() => { import("@/lib/analytics/tracker").then(m => m.trackClick(`${trackPrefix}-tripadvisor`)); }}
+      >
+        <Star size={16} strokeWidth={1.875} />
+        {tripadvisorLabel}
+      </a>
+    </div>
   );
 }
 

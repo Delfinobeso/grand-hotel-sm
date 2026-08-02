@@ -10,6 +10,33 @@ export const HOTEL = {
   lon: 12.449153,
 };
 
+/** Link review reali (Google/Tripadvisor) per i 4 outlet GHSM, richiesti da feedback
+ *  portale 2026-08-02 — chiave = MapPin.id dove esiste, "hotel" per il Grand Hotel stesso.
+ *  Google usa il formato ufficiale Maps URLs (search query), non un Place ID. */
+export const REVIEW_LINKS: Record<string, { googleUrl: string; tripadvisorUrl: string }> = {
+  hotel: {
+    googleUrl: "https://www.google.com/maps/search/?api=1&query=Grand+Hotel+San+Marino+Viale+Onofri+31+San+Marino",
+    tripadvisorUrl:
+      "https://www.tripadvisor.com/Hotel_Review-g187809-d249113-Reviews-Grand_Hotel_San_Marino-City_of_San_Marino.html",
+  },
+  laTerrazza: {
+    googleUrl:
+      "https://www.google.com/maps/search/?api=1&query=Ristorante+La+Terrazza+Contrada+del+Collegio+31+San+Marino",
+    tripadvisorUrl:
+      "https://www.tripadvisor.com/Restaurant_Review-g187809-d3645023-Reviews-La_Terrazza_Ristorante-City_of_San_Marino.html",
+  },
+  laLoggia: {
+    googleUrl: "https://www.google.com/maps/search/?api=1&query=La+Loggia+Piazzetta+Garibaldi+San+Marino",
+    tripadvisorUrl:
+      "https://www.tripadvisor.com/Restaurant_Review-g187809-d23476861-Reviews-La_Loggia-City_of_San_Marino.html",
+  },
+  messegue: {
+    googleUrl: "https://www.google.com/maps/search/?api=1&query=Centro+Messegue+Viale+Onofri+31+San+Marino",
+    tripadvisorUrl:
+      "https://www.tripadvisor.com/Attraction_Review-g187809-d34112368-Reviews-Centro_Messegue_San_Marino-City_of_San_Marino.html",
+  },
+};
+
 export interface MapPin {
   id: string;
   name: string;

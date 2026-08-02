@@ -2,7 +2,7 @@
 
 import { Sparkles, Dumbbell } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
-import { HOTEL, SERVICE_HOURS } from "@/lib/hotel";
+import { HOTEL, SERVICE_HOURS, REVIEW_LINKS } from "@/lib/hotel";
 import {
   SectionHeader,
   SectionLabel,
@@ -12,6 +12,7 @@ import {
   StatusBadge,
   FloorBadge,
   CallButton,
+  ReviewButtons,
 } from "@/components/ui";
 
 export function WellnessSection({ t }: { t: HotelContent }) {
@@ -49,6 +50,14 @@ export function WellnessSection({ t }: { t: HotelContent }) {
             {w.messegue.callNote}
           </p>
           <CallButton href={HOTEL.phoneHref} label={t.common.bookLabel} trackLabel="prenota-spa" />
+          <p className="mb-3 mt-4 text-[0.8125rem] font-medium text-[var(--color-text)]">{t.common.reviewLabel}</p>
+          <ReviewButtons
+            googleUrl={REVIEW_LINKS.messegue.googleUrl}
+            tripadvisorUrl={REVIEW_LINKS.messegue.tripadvisorUrl}
+            googleLabel={t.common.reviewGoogleLabel}
+            tripadvisorLabel={t.common.reviewTripadvisorLabel}
+            trackPrefix="recensione-messegue"
+          />
         </div>
       </section>
 
