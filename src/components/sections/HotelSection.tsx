@@ -17,6 +17,7 @@ import {
   Scissors,
   Presentation,
   MapPin,
+  Star,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -92,35 +93,6 @@ export function HotelSection({ t }: { t: HotelContent }) {
           <p className="mt-2 whitespace-pre-line">{r.wifi.body}</p>
         </AccordionItem>
 
-        <AccordionItem icon={MapPin} title={f.contactsLabel} defaultOpen>
-          <p className="font-medium text-[var(--color-text)]">{HOTEL.name}</p>
-          <p>
-            {HOTEL.addressLine1}, {HOTEL.addressLine2}
-          </p>
-          <p>{HOTEL.phone}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" trackLabel="chiama-hotel" />
-            <NavigateButton
-              lat={HOTEL.lat}
-              lon={HOTEL.lon}
-              name={HOTEL.name}
-              label={t.common.openInMapsLabel}
-              variant="outline"
-              trackLabel="mappe-hotel"
-            />
-          </div>
-          <p className="mt-4 font-medium text-[var(--color-text)]">{t.common.reviewLabel}</p>
-          <div className="mt-3">
-            <ReviewButtons
-              googleUrl={REVIEW_LINKS.hotel.googleUrl}
-              tripadvisorUrl={REVIEW_LINKS.hotel.tripadvisorUrl}
-              googleLabel={t.common.reviewGoogleLabel}
-              tripadvisorLabel={t.common.reviewTripadvisorLabel}
-              trackPrefix="recensione-hotel"
-            />
-          </div>
-        </AccordionItem>
-
         <AccordionItem icon={Tv} title={r.tvLabel} subtitle={`37 · 1 – 831`}>
           <ChannelGrid channels={r.channels} intro={r.tvIntro} />
         </AccordionItem>
@@ -184,6 +156,37 @@ export function HotelSection({ t }: { t: HotelContent }) {
         <AccordionItem icon={Presentation} title={f.meetingsLabel}>
           <p className="mb-3">{f.meetings.body}</p>
           <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" trackLabel="chiama-meeting" />
+        </AccordionItem>
+
+        <AccordionItem icon={MapPin} title={f.contactsLabel}>
+          <p className="font-medium text-[var(--color-text)]">{HOTEL.name}</p>
+          <p>
+            {HOTEL.addressLine1}, {HOTEL.addressLine2}
+          </p>
+          <p>{HOTEL.phone}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" trackLabel="chiama-hotel" />
+            <NavigateButton
+              lat={HOTEL.lat}
+              lon={HOTEL.lon}
+              name={HOTEL.name}
+              label={t.common.openInMapsLabel}
+              variant="outline"
+              trackLabel="mappe-hotel"
+            />
+          </div>
+        </AccordionItem>
+
+        <AccordionItem icon={Star} title={t.common.reviewLabel} defaultOpen>
+          <div>
+            <ReviewButtons
+              googleUrl={REVIEW_LINKS.hotel.googleUrl}
+              tripadvisorUrl={REVIEW_LINKS.hotel.tripadvisorUrl}
+              googleLabel={t.common.reviewGoogleLabel}
+              tripadvisorLabel={t.common.reviewTripadvisorLabel}
+              trackPrefix="recensione-hotel"
+            />
+          </div>
         </AccordionItem>
       </section>
     </div>
