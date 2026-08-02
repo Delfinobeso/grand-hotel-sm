@@ -73,6 +73,13 @@
      the home indicator (~13px) with clearance. */
   --screen-radius: 55px;
   --dock-inset: 1.375rem;
+
+  /* Distanza reale tra il bordo inferiore del viewport e il bordo superiore
+     della dock mobile — misurata a runtime da page.tsx (ResizeObserver sulla
+     dock vera) e riscritta qui via JS. Questo valore statico è SOLO il
+     fallback prima che l'effetto giri al primo render (evita un salto
+     visibile del FAB del concierge, che la usa per il proprio offset). */
+  --dock-clearance: 6rem;
 }
 
 * {

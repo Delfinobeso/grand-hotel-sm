@@ -384,7 +384,7 @@ export default function ChatAssistant({
           sull'icona (non sul bottone, per non interferire con l'entrata/uscita framer-motion). */}
       <AnimatePresence>
         {!open && !hideFab && (
-          <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] right-4 z-30 lg:bottom-6">
+          <div className="fixed bottom-[calc(var(--dock-clearance)+0.75rem)] right-4 z-30 lg:bottom-6">
             {/* Anello che si espande e svanisce (sonar) DIETRO il bottone (-z-10, non
                 sopra: prima copriva il colore con un flash bianco) — colore del brand
                 (--color-accent), non on-accent, così è coerente per ogni hotel. */}

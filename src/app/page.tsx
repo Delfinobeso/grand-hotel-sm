@@ -70,6 +70,34 @@ export default function Home() {
   const [chatOpen, setChatOpen] = useState(false);
   const keyboardOpen = useKeyboardOpen();
   const mainRef = useRef<HTMLElement>(null);
+  const dockRef = useRef<HTMLElement>(null);
+  // Il FAB del concierge deve stare sempre sopra la dock mobile, qualunque sia
+  // la sua altezza reale (icone/padding possono cambiare, e i calcoli a occhio
+  // via rem hanno già sbagliato due volte, l'ultima con un overlap visibile su
+  // iOS Safari). Misuriamo la posizione VERA della dock e la esponiamo come
+  // variabile CSS che ChatAssistant usa per il proprio offset — mai più un
+  // numero indovinato. Il ResizeObserver copre anche cambi di layout (rotazione,
+  // font dinamici); l'effetto rimisura anche su resize/orientationchange come
+  // rete di sicurezza su motori che non notificano il resize del solo elemento.
+  useEffect(() => {
+    const el = dockRef.current;
+    if (!el) return;
+    const measure = () => {
+      const rect = el.getBoundingClientRect();
+      const clearance = Math.max(0, window.innerHeight - rect.top);
+      document.documentElement.style.setProperty("--dock-clearance", `${clearance}px`);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
+    };
+  }, []);
   // Quando pendingSection viene consumato l'effetto ri-gira con valore null:
   // senza questo flag il ramo "else" farebbe scrollTop=0 annullando lo scroll
   // all'anchor appena eseguito.
@@ -337,6 +365,7 @@ export default function Home() {
           which is what made the bottom margin far larger than the sides. When the
           keyboard opens, the dock slides out of the way. */}
       <nav
+        ref={dockRef}
         aria-label="Primary"
         className={`fixed left-[var(--dock-inset)] right-[var(--dock-inset)] bottom-[var(--dock-inset)] z-30 mx-auto flex max-w-sm items-stretch gap-1 bg-[var(--color-surface)]/80 p-2 shadow-[0_10px_34px_oklch(0.2_0.04_258/0.30)] ring-1 ring-[var(--color-border)] backdrop-blur-xl transition-[transform,opacity] duration-300 lg:hidden ${
           keyboardOpen ? "pointer-events-none translate-y-[160%] opacity-0" : "translate-y-0 opacity-100"
