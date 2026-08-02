@@ -5,7 +5,6 @@ import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { ConciergeBell, Send, Phone, X, MapPin, CalendarCheck, ExternalLink, type LucideIcon } from "lucide-react";
 import { HOTEL } from "@/lib/hotel";
 import type { Lang } from "@/lib/content";
-import { useScrollDirection } from "@/lib/useScrollDirection";
 
 const EASE_IOS = [0.2, 0, 0, 1] as const;
 const SHEET_IN: Transition = { duration: 0.42, ease: EASE_IOS };
@@ -262,7 +261,6 @@ export default function ChatAssistant({
   const bottomRef = useRef<HTMLDivElement>(null);
   const vv = useVisualViewport();
   const isDesktop = useIsDesktop();
-  const scrollHidden = useScrollDirection();
 
   // Cronologia persistente (solo client, per evitare mismatch di idratazione): ripristina
   // al mount se salvata meno di 12 ore fa, altrimenti la scarta.
@@ -381,21 +379,36 @@ export default function ChatAssistant({
 
   return (
     <>
-      {/* FAB */}
+      {/* FAB — sempre visibile durante lo scroll (feedback Manuel/GHSM 2026-08-02): niente più
+          auto-hide legato a scrollHidden, resta fisso e cliccabile. Pulsazione lieve e continua
+          sull'icona (non sul bottone, per non interferire con l'entrata/uscita framer-motion). */}
       <AnimatePresence>
         {!open && !hideFab && (
           <motion.button
             initial={{ scale: 0.6, opacity: 0 }}
-            animate={{ scale: 1, opacity: scrollHidden ? 0 : 1, y: scrollHidden ? 24 : 0 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.6, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
             onClick={() => setOpen(true)}
             aria-label={c.fab}
-            className={`fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-[0_8px_24px_oklch(0.2_0.04_258/0.35)] active:scale-95 lg:bottom-6 ${
-              scrollHidden ? "pointer-events-none" : ""
-            }`}
+            className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-[0_8px_24px_oklch(0.2_0.04_258/0.35)] active:scale-95 lg:bottom-6"
           >
-            <ConciergeBell size={22} strokeWidth={1.75} />
+            {/* Anello che si espande e svanisce (sonar) dietro l'icona — molto più
+                notato di una semplice variazione di scala, resta comunque discreto
+                perché sparisce quasi subito. */}
+            <motion.span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-full bg-[var(--color-on-accent)]"
+              animate={{ scale: [1, 1.4, 1.7], opacity: [0, 0.35, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+            />
+            <motion.span
+              animate={{ scale: [1, 1.12, 1] }}
+              transition={{ duration: 1.8, ease: "easeInOut", repeat: Infinity }}
+              className="relative flex h-full w-full items-center justify-center"
+            >
+              <ConciergeBell size={22} strokeWidth={1.75} />
+            </motion.span>
           </motion.button>
         )}
       </AnimatePresence>

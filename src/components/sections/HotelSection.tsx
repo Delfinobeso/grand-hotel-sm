@@ -17,11 +17,12 @@ import {
   Scissors,
   Presentation,
   MapPin,
+  Star,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
 import type { HotelContent } from "@/lib/content";
-import { HOTEL } from "@/lib/hotel";
+import { HOTEL, REVIEW_LINKS } from "@/lib/hotel";
 import {
   SectionHeader,
   SectionLabel,
@@ -30,6 +31,7 @@ import {
   CallButton,
   NavigateButton,
   FloorBadge,
+  ReviewButtons,
 } from "@/components/ui";
 
 const COMFORT_ICONS: LucideIcon[] = [Phone, Sparkles, Lock, Wind, BedDouble];
@@ -171,6 +173,18 @@ export function HotelSection({ t }: { t: HotelContent }) {
               label={t.common.openInMapsLabel}
               variant="outline"
               trackLabel="mappe-hotel"
+            />
+          </div>
+        </AccordionItem>
+
+        <AccordionItem icon={Star} title={t.common.reviewLabel} defaultOpen>
+          <div>
+            <ReviewButtons
+              googleUrl={REVIEW_LINKS.hotel.googleUrl}
+              tripadvisorUrl={REVIEW_LINKS.hotel.tripadvisorUrl}
+              googleLabel={t.common.reviewGoogleLabel}
+              tripadvisorLabel={t.common.reviewTripadvisorLabel}
+              trackPrefix="recensione-hotel"
             />
           </div>
         </AccordionItem>

@@ -44,6 +44,9 @@ export interface HotelContent {
     openInMapsLabel: string;
     addToCalendarLabel: string;
     callValetLabel: string;
+    reviewLabel: string;
+    reviewGoogleLabel: string;
+    reviewTripadvisorLabel: string;
     youAreHere: string;
     minWalk: string;
     byCar: string;
@@ -248,6 +251,9 @@ const it: HotelContent = {
     openInMapsLabel: "Apri in Mappe",
     addToCalendarLabel: "Aggiungi al calendario",
     callValetLabel: "Chiama il Valet",
+    reviewLabel: "Lasciaci una recensione",
+    reviewGoogleLabel: "Recensiscici su Google",
+    reviewTripadvisorLabel: "Recensiscici su Tripadvisor",
     youAreHere: "Il vostro hotel",
     minWalk: "min a piedi",
     byCar: "in auto",
@@ -671,6 +677,9 @@ const en: HotelContent = {
     openInMapsLabel: "Open in Maps",
     addToCalendarLabel: "Add to calendar",
     callValetLabel: "Call Valet",
+    reviewLabel: "Leave us a review",
+    reviewGoogleLabel: "Review us on Google",
+    reviewTripadvisorLabel: "Review us on Tripadvisor",
     youAreHere: "Your hotel",
     minWalk: "min walk",
     byCar: "by car",
@@ -1094,6 +1103,9 @@ const fr: HotelContent = {
     openInMapsLabel: "Ouvrir dans Plans",
     addToCalendarLabel: "Ajouter au calendrier",
     callValetLabel: "Appeler le voiturier",
+    reviewLabel: "Laissez-nous un avis",
+    reviewGoogleLabel: "Laissez un avis sur Google",
+    reviewTripadvisorLabel: "Laissez un avis sur Tripadvisor",
     youAreHere: "Votre hôtel",
     minWalk: "min à pied",
     byCar: "en voiture",
@@ -1517,6 +1529,9 @@ const de: HotelContent = {
     openInMapsLabel: "In Karten öffnen",
     addToCalendarLabel: "Zum Kalender hinzufügen",
     callValetLabel: "Voiturier anrufen",
+    reviewLabel: "Hinterlassen Sie uns eine Bewertung",
+    reviewGoogleLabel: "Bewerten Sie uns auf Google",
+    reviewTripadvisorLabel: "Bewerten Sie uns auf Tripadvisor",
     youAreHere: "Ihr Hotel",
     minWalk: "Min. zu Fuß",
     byCar: "mit dem Auto",
@@ -1940,6 +1955,9 @@ const es: HotelContent = {
     openInMapsLabel: "Abrir en Mapas",
     addToCalendarLabel: "Añadir al calendario",
     callValetLabel: "Llamar al valet",
+    reviewLabel: "Déjanos una reseña",
+    reviewGoogleLabel: "Déjenos una reseña en Google",
+    reviewTripadvisorLabel: "Déjenos una reseña en Tripadvisor",
     youAreHere: "Su hotel",
     minWalk: "min a pie",
     byCar: "en coche",
