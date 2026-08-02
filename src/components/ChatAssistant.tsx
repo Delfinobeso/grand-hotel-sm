@@ -399,7 +399,7 @@ export default function ChatAssistant({
             <motion.span
               aria-hidden
               className="pointer-events-none absolute inset-0 rounded-full bg-[var(--color-on-accent)]"
-              animate={{ scale: [1, 1.7], opacity: [0.35, 0] }}
+              animate={{ scale: [1, 1.4, 1.7], opacity: [0, 0.35, 0] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
             />
             <motion.span
