@@ -383,7 +383,7 @@ const it: HotelContent = {
     wifiLabel: "Wi-Fi",
     wifi: {
       network: "GRANDHOTELRSM",
-      body: "1. Apri Impostazioni → Wi-Fi\n2. Seleziona la rete GRANDHOTELRSM\n3. Tocca la notifica di registrazione\n\nSe non vedi la notifica, attendi qualche secondo. Nella directory in camera trovi gli screenshot passo-passo.",
+      body: "1. Apri Impostazioni → Wi-Fi\n2. Seleziona la rete GRANDHOTELRSM\n3. Tocca la notifica di registrazione\n\nSe non vedi la notifica, attendi qualche secondo.",
     },
     tvLabel: "Canali TV",
     tvIntro: "La selezione di canali disponibili in camera:",
@@ -809,7 +809,7 @@ const en: HotelContent = {
     wifiLabel: "Wi-Fi",
     wifi: {
       network: "GRANDHOTELRSM",
-      body: "1. Open Settings → Wi-Fi\n2. Select the GRANDHOTELRSM network\n3. Tap the registration notification\n\nIf you don't see the notification, wait a few seconds. Check the printed directory in your room for step-by-step screenshots.",
+      body: "1. Open Settings → Wi-Fi\n2. Select the GRANDHOTELRSM network\n3. Tap the registration notification\n\nIf you don't see the notification, wait a few seconds.",
     },
     tvLabel: "TV Channels",
     tvIntro: "The channels available in your room:",
@@ -1235,7 +1235,7 @@ const fr: HotelContent = {
     wifiLabel: "Wi-Fi",
     wifi: {
       network: "GRANDHOTELRSM",
-      body: "1. Ouvrez Réglages → Wi-Fi\n2. Sélectionnez le réseau GRANDHOTELRSM\n3. Touchez la notification d'enregistrement\n\nSi la notification n'apparaît pas, patientez quelques secondes. Vous trouverez les captures d'écran pas à pas dans le classeur de la chambre.",
+      body: "1. Ouvrez Réglages → Wi-Fi\n2. Sélectionnez le réseau GRANDHOTELRSM\n3. Touchez la notification d'enregistrement\n\nSi la notification n'apparaît pas, patientez quelques secondes.",
     },
     tvLabel: "Chaînes TV",
     tvIntro: "La sélection de chaînes disponibles dans la chambre :",
@@ -1661,7 +1661,7 @@ const de: HotelContent = {
     wifiLabel: "Wi-Fi",
     wifi: {
       network: "GRANDHOTELRSM",
-      body: "1. Öffnen Sie Einstellungen → WLAN\n2. Wählen Sie das Netzwerk GRANDHOTELRSM\n3. Tippen Sie auf die Anmeldebenachrichtigung\n\nWenn die Benachrichtigung nicht erscheint, warten Sie einige Sekunden. Schritt-für-Schritt-Screenshots finden Sie im Zimmerordner.",
+      body: "1. Öffnen Sie Einstellungen → WLAN\n2. Wählen Sie das Netzwerk GRANDHOTELRSM\n3. Tippen Sie auf die Anmeldebenachrichtigung\n\nWenn die Benachrichtigung nicht erscheint, warten Sie einige Sekunden.",
     },
     tvLabel: "TV-Sender",
     tvIntro: "Die im Zimmer verfügbaren Sender:",
@@ -2087,7 +2087,7 @@ const es: HotelContent = {
     wifiLabel: "Wi-Fi",
     wifi: {
       network: "GRANDHOTELRSM",
-      body: "1. Abra Ajustes → Wi-Fi\n2. Seleccione la red GRANDHOTELRSM\n3. Toque la notificación de registro\n\nSi no ve la notificación, espere unos segundos. En la carpeta de la habitación encontrará las capturas paso a paso.",
+      body: "1. Abra Ajustes → Wi-Fi\n2. Seleccione la red GRANDHOTELRSM\n3. Toque la notificación de registro\n\nSi no ve la notificación, espere unos segundos.",
     },
     tvLabel: "Canales de TV",
     tvIntro: "La selección de canales disponibles en la habitación:",
