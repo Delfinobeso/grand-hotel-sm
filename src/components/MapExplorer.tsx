@@ -441,12 +441,14 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
       {/* Bottom overlay stack: category chips, carousel counter, then the place
           carousel. Anchored at the same bottom offset the carousel used alone. */}
       <div className="absolute inset-x-0 bottom-[var(--dock-inset)] z-[1000] flex flex-col gap-1.5 lg:bottom-4">
-        {/* Attribuzione OpenStreetMap — requisito di licenza del tileset. Il control
-            nativo di Leaflet è disattivato perché finirebbe sotto la dock e sotto le
-            card; qui vive nella stessa pila del carosello, discreto ma sempre
-            leggibile. Occupa la riga che prima teneva il contatore da solo. */}
+        {/* Attribuzione OpenStreetMap (requisito di licenza del tileset) + contatore
+            carosello: stessa riga, ai due estremi (justify-between) così nessuno dei
+            due resta orfano su nessun breakpoint. Erano insieme ai chip filtro fino al
+            2026-08-03, ma su mobile la riga si restringeva per fare posto al contatore
+            e l'ultimo chip (label più lunga, es. "I nostri locali") veniva tagliato dal
+            bordo dello scroll — vedi screenshot reale. Ora i chip hanno tutta la riga. */}
         {!chipsHidden && (
-          <div className="flex justify-end px-4">
+          <div className="flex items-center justify-between px-4">
             <a
               href="https://www.openstreetmap.org/copyright"
               target="_blank"
@@ -455,44 +457,39 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
             >
               © OpenStreetMap
             </a>
+            <span className="shrink-0 rounded-full bg-[var(--color-surface)]/80 px-2.5 py-1 text-[0.7rem] font-medium tabular-nums text-[var(--color-text-muted)] backdrop-blur-md">
+              {Math.min(active + 1, filteredPlaces.length)} {t.common.counterOf} {filteredPlaces.length}
+            </span>
           </div>
         )}
 
-        {/* Category chips — hidden while either bottom sheet is open (no visual doubling).
-            Il contatore sta sulla stessa riga dei chip (ml-auto): da solo su una riga
-            propria restava orfano a destra, soprattutto su desktop dove il carosello
-            non arriva al bordo. */}
+        {/* Category chips — hidden while either bottom sheet is open (no visual doubling). */}
         {!chipsHidden && (
-          <div className="relative z-10 flex items-center gap-2 px-4">
-            <div className="flex flex-1 gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
-              {FILTERS.map((f) => {
-                const isActive = filter === f.key;
-                return (
-                  // Outer button = full 44px tap target (invisible padding); the inner
-                  // span carries the compact ~34px pill look the chips are meant to have.
-                  <button key={f.key} onClick={() => chooseFilter(f.key)} className="flex h-11 shrink-0 items-center">
-                    <span
-                      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-[0.8rem] font-semibold backdrop-blur-xl transition-colors duration-200 ${
-                        isActive
-                          ? "bg-[var(--color-accent)] text-[var(--color-on-accent)]"
-                          : "bg-[var(--color-surface)]/85 text-[var(--color-text)] ring-1 ring-[var(--color-border)]"
-                      }`}
-                    >
-                      {f.dot && (
-                        <span
-                          className="h-1.5 w-1.5 shrink-0 rounded-full"
-                          style={{ background: isActive ? "currentColor" : f.dot }}
-                        />
-                      )}
-                      {f.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            <span className="ml-auto shrink-0 rounded-full bg-[var(--color-surface)]/80 px-2.5 py-1 text-[0.7rem] font-medium tabular-nums text-[var(--color-text-muted)] backdrop-blur-md">
-              {Math.min(active + 1, filteredPlaces.length)} {t.common.counterOf} {filteredPlaces.length}
-            </span>
+          <div className="relative z-10 flex gap-2 overflow-x-auto px-4 pb-0.5" style={{ scrollbarWidth: "none" }}>
+            {FILTERS.map((f) => {
+              const isActive = filter === f.key;
+              return (
+                // Outer button = full 44px tap target (invisible padding); the inner
+                // span carries the compact ~34px pill look the chips are meant to have.
+                <button key={f.key} onClick={() => chooseFilter(f.key)} className="flex h-11 shrink-0 items-center">
+                  <span
+                    className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-[0.8rem] font-semibold backdrop-blur-xl transition-colors duration-200 ${
+                      isActive
+                        ? "bg-[var(--color-accent)] text-[var(--color-on-accent)]"
+                        : "bg-[var(--color-surface)]/85 text-[var(--color-text)] ring-1 ring-[var(--color-border)]"
+                    }`}
+                  >
+                    {f.dot && (
+                      <span
+                        className="h-1.5 w-1.5 shrink-0 rounded-full"
+                        style={{ background: isActive ? "currentColor" : f.dot }}
+                      />
+                    )}
+                    {f.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         )}
 
