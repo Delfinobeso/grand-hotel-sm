@@ -6,10 +6,10 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Tooltip, Polyline, useMap } from "react-leaflet";
 import { motion, AnimatePresence } from "framer-motion";
-import { Navigation, LocateFixed, Footprints, Car, ChevronRight, List, X } from "lucide-react";
+import { Navigation, LocateFixed, Footprints, Car, List, X } from "lucide-react";
 import { HOTEL, GHSM_VENUES, POINTS_OF_INTEREST, AIRPORTS } from "@/lib/hotel";
 import type { HotelContent } from "@/lib/content";
-import { mapsUrl, EASE_EXPO } from "@/components/ui";
+import { mapsUrl, SHEET, BACKDROP_FADE } from "@/components/ui";
 
 type LatLng = [number, number];
 type Kind = "poi" | "venue" | "airport";
@@ -53,7 +53,27 @@ function buildPlaces(t: HotelContent): Place[] {
   return [...pois, ...venues, ...airports];
 }
 
-const KIND_COLOR: Record<Kind, string> = { poi: "#0a2444", venue: "#b88746", airport: "#3f7d6e" };
+/** I colori della mappa vivono nei token --map-* (globals.css), definiti in entrambi
+ *  i temi: qui si consumano come var() così i pin e i chip seguono il tema scuro. */
+const KIND_COLOR: Record<Kind, string> = {
+  poi: "var(--map-poi)",
+  venue: "var(--map-venue)",
+  airport: "var(--map-airport)",
+};
+
+/** Lo stroke di una <path> SVG è un attributo di presentazione: non accetta var().
+ *  Per la linea del percorso i token vanno quindi risolti a runtime e riletti
+ *  quando cambia [data-theme]. */
+const ROUTE_FALLBACK = { walk: "#0a2444", drive: "#3f7d6e" };
+
+function readRouteColors() {
+  if (typeof window === "undefined") return ROUTE_FALLBACK;
+  const s = getComputedStyle(document.documentElement);
+  return {
+    walk: s.getPropertyValue("--map-poi").trim() || ROUTE_FALLBACK.walk,
+    drive: s.getPropertyValue("--map-airport").trim() || ROUTE_FALLBACK.drive,
+  };
+}
 
 const hotelIcon = L.divIcon({
   className: "",
@@ -74,7 +94,7 @@ function placeIcon(active: boolean, kind: Kind): L.DivIcon {
   const size = active ? 22 : 14;
   const inner = active
     ? `<span class="ghsm-place-pin-active" style="--pin:${color}"></span>`
-    : `<span style="display:block;width:14px;height:14px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)"></span>`;
+    : `<span style="display:block;width:14px;height:14px;border-radius:50%;background:${color};border:2px solid var(--map-pin-border);box-shadow:0 1px 4px rgba(0,0,0,.4)"></span>`;
   return L.divIcon({ className: "", html: inner, iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
 }
 
@@ -105,9 +125,16 @@ function MapDriver({ active, onRoute }: { active: Place; onRoute: (r: LatLng[]) 
       [active.lat, active.lon],
     ];
     // Frame the whole route; large bottom padding keeps it visible above the banners.
+    // In alto il padding deve superare le DUE file di pill flottanti (header +
+    // "Info e contatti"/"Elenco"/posizione): su mobile erano 100px e il marker
+    // attivo con la sua etichetta finiva sotto le pill. Su lg le pill sono più in
+    // alto e più compatte, quindi il valore originale resta valido.
     const frame = (coords: LatLng[]) => {
+      // Il breakpoint è quello del viewport (lg di Tailwind), non la larghezza del
+      // contenitore mappa, che su desktop è già ridotta dalla sidebar.
+      const topPad = window.matchMedia("(min-width: 1024px)").matches ? 100 : 180;
       map.flyToBounds(L.latLngBounds(coords.length ? coords : straight), {
-        paddingTopLeft: [28, 100],
+        paddingTopLeft: [28, topPad],
         paddingBottomRight: [28, 370],
         maxZoom: 17,
         duration: 0.9,
@@ -157,6 +184,9 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
   const programmatic = useRef(false);
   const rafId = useRef<number>(0);
   const mapRef = useRef<L.Map | null>(null);
+  // Inizializzatore pigro: MapExplorer è caricato con ssr:false, quindi gira già
+  // nel browser e i token sono leggibili al primo render (niente setState in effect).
+  const [routeColors, setRouteColors] = useState(readRouteColors);
   const [userPos, setUserPos] = useState<LatLng | null>(null);
   const [locating, setLocating] = useState(false);
   const [locError, setLocError] = useState(false);
@@ -165,6 +195,13 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
   const pendingScroll = useRef<number | null>(null);
 
   const onRoute = useCallback((r: LatLng[]) => setRoute(r), []);
+
+  // Rilegge i token del percorso a ogni cambio di tema.
+  useEffect(() => {
+    const obs = new MutationObserver(() => setRouteColors(readRouteColors()));
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => obs.disconnect();
+  }, []);
 
   // One-shot geolocation lookup — no watch, nothing sent anywhere but the map itself.
   const locateMe = useCallback(() => {
@@ -309,7 +346,7 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
             key={activePlace.id}
             positions={route}
             pathOptions={{
-              color: activePlace.mode === "drive" ? "#3f7d6e" : "#0a2444",
+              color: activePlace.mode === "drive" ? routeColors.drive : routeColors.walk,
               weight: 4,
               opacity: 0.9,
               lineCap: "round",
@@ -404,43 +441,58 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
       {/* Bottom overlay stack: category chips, carousel counter, then the place
           carousel. Anchored at the same bottom offset the carousel used alone. */}
       <div className="absolute inset-x-0 bottom-[var(--dock-inset)] z-[1000] flex flex-col gap-1.5 lg:bottom-4">
-        {/* Carousel position counter — above the chips so the chips stay attached
-            to the carousel without a gap underneath. */}
+        {/* Attribuzione OpenStreetMap — requisito di licenza del tileset. Il control
+            nativo di Leaflet è disattivato perché finirebbe sotto la dock e sotto le
+            card; qui vive nella stessa pila del carosello, discreto ma sempre
+            leggibile. Occupa la riga che prima teneva il contatore da solo. */}
         {!chipsHidden && (
           <div className="flex justify-end px-4">
-            <span className="rounded-full bg-[var(--color-surface)]/80 px-2.5 py-1 text-[0.7rem] font-medium tabular-nums text-[var(--color-text-muted)] backdrop-blur-md">
-              {Math.min(active + 1, filteredPlaces.length)} {t.common.counterOf} {filteredPlaces.length}
-            </span>
+            <a
+              href="https://www.openstreetmap.org/copyright"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-[var(--color-surface)]/70 px-2 py-0.5 text-[0.625rem] font-medium text-[var(--color-text-muted)] backdrop-blur-md"
+            >
+              © OpenStreetMap
+            </a>
           </div>
         )}
 
-        {/* Category chips — hidden while either bottom sheet is open (no visual doubling). */}
+        {/* Category chips — hidden while either bottom sheet is open (no visual doubling).
+            Il contatore sta sulla stessa riga dei chip (ml-auto): da solo su una riga
+            propria restava orfano a destra, soprattutto su desktop dove il carosello
+            non arriva al bordo. */}
         {!chipsHidden && (
-          <div className="relative z-10 flex gap-2 overflow-x-auto px-4 pb-0.5" style={{ scrollbarWidth: "none" }}>
-            {FILTERS.map((f) => {
-              const isActive = filter === f.key;
-              return (
-                // Outer button = full 44px tap target (invisible padding); the inner
-                // span carries the compact ~34px pill look the chips are meant to have.
-                <button key={f.key} onClick={() => chooseFilter(f.key)} className="flex h-11 shrink-0 items-center">
-                  <span
-                    className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-[0.8rem] font-semibold backdrop-blur-xl transition-colors duration-200 ${
-                      isActive
-                        ? "bg-[var(--color-accent)] text-[var(--color-on-accent)]"
-                        : "bg-[var(--color-surface)]/85 text-[var(--color-text)] ring-1 ring-[var(--color-border)]"
-                    }`}
-                  >
-                    {f.dot && (
-                      <span
-                        className="h-1.5 w-1.5 shrink-0 rounded-full"
-                        style={{ background: isActive ? "currentColor" : f.dot }}
-                      />
-                    )}
-                    {f.label}
-                  </span>
-                </button>
-              );
-            })}
+          <div className="relative z-10 flex items-center gap-2 px-4">
+            <div className="flex flex-1 gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+              {FILTERS.map((f) => {
+                const isActive = filter === f.key;
+                return (
+                  // Outer button = full 44px tap target (invisible padding); the inner
+                  // span carries the compact ~34px pill look the chips are meant to have.
+                  <button key={f.key} onClick={() => chooseFilter(f.key)} className="flex h-11 shrink-0 items-center">
+                    <span
+                      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-[0.8rem] font-semibold backdrop-blur-xl transition-colors duration-200 ${
+                        isActive
+                          ? "bg-[var(--color-accent)] text-[var(--color-on-accent)]"
+                          : "bg-[var(--color-surface)]/85 text-[var(--color-text)] ring-1 ring-[var(--color-border)]"
+                      }`}
+                    >
+                      {f.dot && (
+                        <span
+                          className="h-1.5 w-1.5 shrink-0 rounded-full"
+                          style={{ background: isActive ? "currentColor" : f.dot }}
+                        />
+                      )}
+                      {f.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <span className="ml-auto shrink-0 rounded-full bg-[var(--color-surface)]/80 px-2.5 py-1 text-[0.7rem] font-medium tabular-nums text-[var(--color-text-muted)] backdrop-blur-md">
+              {Math.min(active + 1, filteredPlaces.length)} {t.common.counterOf} {filteredPlaces.length}
+            </span>
           </div>
         )}
 
@@ -473,12 +525,16 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
                   className="rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide"
                   style={{
                     color:
-                      p.kind === "venue" ? "#9a6f33" : p.kind === "airport" ? "#2f6356" : "var(--color-accent)",
+                      p.kind === "venue"
+                        ? "var(--map-badge-venue-text)"
+                        : p.kind === "airport"
+                          ? "var(--map-badge-airport-text)"
+                          : "var(--color-accent)",
                     background:
                       p.kind === "venue"
-                        ? "oklch(0.72 0.09 75 / 0.16)"
+                        ? "var(--map-badge-venue-bg)"
                         : p.kind === "airport"
-                          ? "oklch(0.55 0.07 165 / 0.16)"
+                          ? "var(--map-badge-airport-bg)"
                           : "var(--color-accent-soft)",
                   }}
                 >
@@ -510,9 +566,10 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
                 rel="noopener noreferrer"
                 className="mt-3 inline-flex h-10 items-center gap-1.5 rounded-full bg-[var(--color-accent)] px-4 text-[0.85rem] font-semibold text-[var(--color-on-accent)] transition-opacity duration-200 hover:opacity-90 active:scale-[0.97]"
               >
+                {/* Niente chevron in coda: l'icona di navigazione in testa basta, e
+                    così l'anatomia è identica agli altri bottoni primari dell'app. */}
                 <Navigation size={15} strokeWidth={2} />
                 {t.common.navigateLabel}
-                <ChevronRight size={15} strokeWidth={2.25} className="-mr-1 opacity-70" />
               </a>
             </article>
           );
@@ -535,7 +592,7 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  transition={BACKDROP_FADE}
                   onClick={() => setListOpen(false)}
                   className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
                 />
@@ -543,7 +600,7 @@ export default function MapExplorer({ t, infoSheetOpen = false }: { t: HotelCont
                   initial={{ y: "100%" }}
                   animate={{ y: 0 }}
                   exit={{ y: "100%" }}
-                  transition={{ duration: 0.4, ease: EASE_EXPO }}
+                  transition={SHEET}
                   className="fixed inset-x-0 bottom-0 z-40 max-h-[85svh] overflow-y-auto rounded-t-3xl bg-[var(--color-bg)] pb-[max(1.5rem,env(safe-area-inset-bottom))]"
                 >
                   <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg)]/90 px-5 py-3.5 backdrop-blur-md">

@@ -6,7 +6,7 @@ import { HOTEL, SERVICE_HOURS, REVIEW_LINKS } from "@/lib/hotel";
 import {
   SectionHeader,
   SectionLabel,
-  ImageBanner,
+  CardImage,
   QuoteBlock,
   PriceList,
   StatusBadge,
@@ -25,9 +25,11 @@ export function WellnessSection({ t }: { t: HotelContent }) {
 
       {/* ── Centro Mességué ── */}
       <section className="space-y-3">
-        <ImageBanner src="/images/wellness.webp" alt={w.messegueLabel} />
         <div className="rounded-2xl bg-[var(--color-surface)] px-4 py-4 lg:px-5 lg:py-5">
-          <div className="mb-2 flex items-center gap-2">
+          {/* Immagine dentro la card (stesso pattern di Ristorante) invece del banner
+              staccato: una superficie sola invece di due impilate. */}
+          <CardImage src="/images/wellness.webp" alt={w.messegueLabel} />
+          <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
               <Sparkles size={16} strokeWidth={1.875} />
             </span>
@@ -71,14 +73,17 @@ export function WellnessSection({ t }: { t: HotelContent }) {
       {/* ── Palestra ── */}
       <section className="space-y-3">
         <div className="rounded-2xl bg-[var(--color-surface)] px-4 py-4 lg:px-5 lg:py-5">
+          {/* Stessa anatomia della card Mességué qui sopra: riga alta con icona e
+              badge, poi il titolo serif, poi il testo. Prima il titolo era sans e
+              il badge di piano finiva sotto al titolo invece che accanto all'icona. */}
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
               <Dumbbell size={16} strokeWidth={1.875} />
             </span>
-            <h4 className="flex-1 font-semibold text-[var(--color-text)]">{f.gymLabel}</h4>
+            <FloorBadge>{t.common.floorThirdMessegue}</FloorBadge>
             <StatusBadge hours={SERVICE_HOURS.gym} labels={t.common.status} />
           </div>
-          <FloorBadge>{t.common.floorThirdMessegue}</FloorBadge>
+          <h4 className="font-display text-xl font-semibold leading-snug text-[var(--color-text)]">{f.gymLabel}</h4>
           <p className="mt-2 text-[0.95rem] leading-relaxed text-[var(--color-text-secondary)]">{f.gym.body}</p>
         </div>
       </section>
