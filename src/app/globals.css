@@ -25,6 +25,22 @@
   --color-danger-text: oklch(0.47 0.16 27);
   /* navy hero overlay for legible white text over photos */
   --hero-tint: oklch(0.24 0.066 258 / 0.62);
+
+  /* Superficie della citazione (QuoteBlock) — stesso valore di --color-accent-soft,
+     promosso a token proprio così può divergere senza toccare l'accent. */
+  --color-surface-quote: oklch(0.27 0.068 257 / 0.08);
+
+  /* ── Mappa (Leaflet) ── i valori light sono identici agli hex già in uso,
+     così l'aspetto in tema chiaro non cambia di un pixel. */
+  --map-pin-border: #fff;
+  --map-hotel-dot: #0a2444;
+  --map-poi: #0a2444;
+  --map-venue: #b88746;
+  --map-airport: #3f7d6e;
+  --map-badge-venue-text: #9a6f33;
+  --map-badge-venue-bg: oklch(0.72 0.09 75 / 0.16);
+  --map-badge-airport-text: #2f6356;
+  --map-badge-airport-bg: oklch(0.55 0.07 165 / 0.16);
 }
 
 [data-theme="dark"] {
@@ -50,14 +66,33 @@
   --color-danger-text: oklch(0.7 0.17 27);
   --hero-tint: oklch(0.12 0.01 258 / 0.55);
   --channel-logo-filter: invert(0.85);
+
+  --color-surface-quote: oklch(0.8 0.072 245 / 0.14);
+
+  /* ── Mappa (Leaflet) — tema scuro ──
+     Le tile OSM sono chiare: in dark vengono attenuate (vedi .leaflet-tile sotto),
+     quindi i pin navy pieni sparivano e i badge testo-scuro-su-tinta-chiara
+     risultavano illeggibili sulla surface scura. Stesse famiglie di tinta,
+     lightness alzata per il contrasto. */
+  --map-pin-border: oklch(0.95 0.006 80);
+  --map-hotel-dot: oklch(0.5 0.09 258);
+  --map-poi: oklch(0.5 0.09 258);
+  --map-venue: oklch(0.8 0.12 80);
+  --map-airport: oklch(0.75 0.11 165);
+  --map-badge-venue-text: oklch(0.8 0.12 80);
+  --map-badge-venue-bg: oklch(0.8 0.12 80 / 0.16);
+  --map-badge-airport-text: oklch(0.75 0.11 165);
+  --map-badge-airport-bg: oklch(0.75 0.11 165 / 0.16);
 }
 
 /* ── Motion tokens ── */
 :root {
   --ease-out: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-ios: cubic-bezier(0.2, 0, 0, 1);
+  /* DEPRECATO — non reintrodurre --ease-spring (cubic-bezier(0.34, 1.56, 0.64, 1)):
+     ha overshoot e il sistema di motion di questo progetto è tutto decelerazione
+     pura. Per i "pop" usare --ease-out-expo. */
 
   /* All Tailwind transitions default to the quart ease-out curve (audit: consistent easing). */
   --default-transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
@@ -213,6 +248,14 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Le tile OSM esistono solo in versione chiara: in tema scuro la mappa era un
+   rettangolo bianco abbagliante dentro una UI scura. Le attenuiamo con un filtro
+   (stesso pattern di --channel-logo-filter) invece di cambiare tileset.
+   Il filtro colpisce solo le immagini delle tile, non pin/etichette/percorsi. */
+[data-theme="dark"] .leaflet-tile {
+  filter: brightness(0.7) contrast(1.05) saturate(0.85);
+}
+
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
   background: var(--color-surface);
@@ -265,15 +308,15 @@ body {
   position: absolute;
   inset: 7px;
   border-radius: 50%;
-  background: #0a2444;
-  border: 3px solid #fff;
+  background: var(--map-hotel-dot);
+  border: 3px solid var(--map-pin-border);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 .ghsm-hotel-pulse {
   position: absolute;
   inset: 3px;
   border-radius: 50%;
-  background: #0a2444;
+  background: var(--map-hotel-dot);
   opacity: 0.35;
   animation: ghsm-pulse 2s var(--ease-out) infinite;
 }
@@ -318,10 +361,10 @@ body {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--pin, #0a2444);
-  border: 3px solid #fff;
+  background: var(--pin, var(--map-poi));
+  border: 3px solid var(--map-pin-border);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
-  animation: ghsm-pop 0.36s var(--ease-spring);
+  animation: ghsm-pop 0.3s var(--ease-out-expo);
 }
 @keyframes ghsm-pop {
   from {
