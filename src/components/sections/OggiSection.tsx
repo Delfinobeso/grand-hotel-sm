@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL, SERVICE_HOURS } from "@/lib/hotel";
-import { SectionLabel, CopyField, CallButton, StatusBadge, EASE_EXPO } from "@/components/ui";
+import { SectionLabel, CopyField, CallButton, StatusBadge, REVEAL } from "@/components/ui";
 import type { TabKey } from "@/lib/nav";
 import { formatHoursCaption, type ServiceHours } from "@/lib/hours";
 
@@ -87,7 +87,7 @@ export function OggiSection({
       label: h.quick.wifi.label,
       detail: (
         <>
-          <CopyField value={h.quick.wifi.value} copiedLabel={h.quick.wifi.copyDone} />
+          <CopyField value={h.quick.wifi.value} copiedLabel={h.quick.wifi.copyDone} label={h.quick.wifi.label} />
           <p className="mt-2 text-[0.875rem] leading-relaxed text-[var(--color-text-secondary)]">{h.quick.wifi.note}</p>
         </>
       ),
@@ -149,6 +149,18 @@ export function OggiSection({
               "linear-gradient(180deg, oklch(0% 0 0 / 0.22) 0%, transparent 26%, transparent 52%, oklch(0% 0 0 / 0.55) 100%)",
           }}
         />
+        {/* Marchio in overlay: su Oggi (e solo lì) l'header è trasparente e nasconde
+            il logo, quindi finora la home era l'unica schermata senza brand su
+            mobile. Su lg il logo è già nella sidebar, qui sparisce. Stessa origine
+            (left-5 / top safe-area) del logo dell'header nelle altre schede, così
+            passando da tab a tab non si sposta. */}
+        <img
+          src="/brand/logo-full.svg"
+          alt=""
+          aria-hidden
+          className="absolute left-5 top-[max(0.75rem,env(safe-area-inset-top))] h-14 w-14 drop-shadow-[0_2px_10px_oklch(0_0_0/0.35)] md:left-6 lg:hidden"
+        />
+
         <div className="relative flex h-[409px] flex-col items-center justify-end gap-1.5 px-6 pb-8 pt-[max(2rem,env(safe-area-inset-top))] text-center lg:px-9 lg:pb-10">
           <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-white/85">{h.eyebrow}</p>
           <h2 className="font-display text-[2.25rem] font-semibold leading-[1.04] text-white lg:text-[3rem]">
@@ -162,10 +174,15 @@ export function OggiSection({
       {/* ── GHSM Group strip ── */}
       <section>
         <SectionLabel>{h.groupLabel}</SectionLabel>
-        <div className="-mx-5 overflow-x-auto scroll-pl-5 md:-mx-6 md:scroll-pl-6 lg:mx-0 lg:scroll-pl-0">
-          <ul className="flex w-max gap-3 px-5 md:px-6 lg:px-0">
+        {/* Mobile/tablet: carosello con bleed, la card tagliata al bordo È l'invito
+            allo scroll. Desktop (lg+): niente scroll — cinque colonne fluide che
+            finiscono esatte sul bordo della colonna contenuti, come l'hero. Prima
+            la quinta card veniva tagliata a metà dal bordo senza scrollbar né
+            frecce: sembrava un errore di layout, non un carosello. */}
+        <div className="-mx-5 overflow-x-auto scroll-pl-5 md:-mx-6 md:scroll-pl-6 lg:mx-0 lg:overflow-visible lg:scroll-pl-0">
+          <ul className="flex w-max gap-3 px-5 md:px-6 lg:grid lg:w-auto lg:grid-cols-5 lg:px-0">
             {GROUP.map((g) => (
-              <li key={g.name} className="w-40 shrink-0">
+              <li key={g.name} className="w-40 shrink-0 lg:w-auto">
                 <button
                   onClick={() => onNavigate(g.tab, g.sectionId)}
                   className="group block w-full text-left"
@@ -228,12 +245,11 @@ export function OggiSection({
                 className="flex flex-col items-center gap-1.5"
               >
                 <span
-                  className={`flex items-center justify-center rounded-full transition-colors duration-200 ${
+                  className={`flex h-14 w-14 items-center justify-center rounded-full transition-colors duration-200 ${
                     on
                       ? "bg-[var(--color-accent)] text-[var(--color-on-accent)]"
                       : "bg-[var(--color-surface)] text-[var(--color-accent)]"
                   }`}
-                  style={{ height: "3.5rem", width: "3.5rem" }}
                 >
                   <Icon size={22} strokeWidth={1.875} />
                 </span>
@@ -251,7 +267,7 @@ export function OggiSection({
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: EASE_EXPO }}
+              transition={REVEAL}
               className="overflow-hidden"
             >
               <div className="mt-3 rounded-2xl bg-[var(--color-surface)] px-4 py-4 lg:px-5 lg:py-5">{activeDetail}</div>
@@ -301,10 +317,13 @@ export function OggiSection({
       {/* ── GHSM Hotel Collection ── */}
       <section>
         <SectionLabel>{h.hotelsLabel}</SectionLabel>
-        <div className="-mx-5 overflow-x-auto scroll-pl-5 md:-mx-6 md:scroll-pl-6 lg:mx-0 lg:scroll-pl-0">
-          <ul className="flex w-max gap-3 px-5 md:px-6 lg:px-0">
+        {/* Stessa griglia a 5 colonne della strip GHSM Group: gli hotel sono 3, ma
+            tenendo il passo identico le card restano della stessa taglia e in
+            colonna con quelle sopra invece di dilatarsi. */}
+        <div className="-mx-5 overflow-x-auto scroll-pl-5 md:-mx-6 md:scroll-pl-6 lg:mx-0 lg:overflow-visible lg:scroll-pl-0">
+          <ul className="flex w-max gap-3 px-5 md:px-6 lg:grid lg:w-auto lg:grid-cols-5 lg:px-0">
             {h.hotels.map((hotel) => (
-              <li key={hotel.name} className="w-40 shrink-0">
+              <li key={hotel.name} className="w-40 shrink-0 lg:w-auto">
                 <a href={hotel.url} target="_blank" rel="noopener noreferrer" className="block">
                   <div className="overflow-hidden rounded-2xl bg-[var(--color-surface-muted)]">
                     <img

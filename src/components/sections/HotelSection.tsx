@@ -89,7 +89,7 @@ export function HotelSection({ t }: { t: HotelContent }) {
         <SectionLabel>{r.servicesLabel}</SectionLabel>
 
         <AccordionItem icon={Wifi} title={r.wifiLabel} subtitle={r.wifi.network} defaultOpen>
-          <CopyField value={r.wifi.network} copiedLabel={t.home.quick.wifi.copyDone} />
+          <CopyField value={r.wifi.network} copiedLabel={t.home.quick.wifi.copyDone} label={r.wifiLabel} />
           <p className="mt-2 whitespace-pre-line">{r.wifi.body}</p>
         </AccordionItem>
 
