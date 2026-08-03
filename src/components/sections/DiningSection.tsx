@@ -2,7 +2,7 @@
 
 import { UtensilsCrossed } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
-import { GHSM_VENUES, SERVICE_HOURS, HOTEL, REVIEW_LINKS } from "@/lib/hotel";
+import { GHSM_VENUES, SERVICE_HOURS, REVIEW_LINKS } from "@/lib/hotel";
 import {
   SectionHeader,
   SectionLabel,
@@ -34,8 +34,10 @@ export function DiningSection({ t }: { t: HotelContent }) {
       <SectionHeader title={t.nav.dining} intro={d.intro} />
 
       {/* ── L'Arengo ── stessa anatomia delle card dei locali GHSM qui sotto e della
-          card Mességué: immagine, riga kicker (icona + badge), titolo, testo, azioni. */}
-      <section className="space-y-3">
+          card Mességué: immagine, riga kicker (icona + badge), titolo, testo, azioni.
+          id usato dalla card "Ristorante" nella strip Home per atterrare qui
+          direttamente (feedback Manuel 2026-08-03). */}
+      <section id="venue-arengo" className="space-y-3">
         <div className="rounded-2xl bg-[var(--color-surface)] px-4 py-4 lg:px-5 lg:py-5">
           <CardImage src="/images/dining.webp" alt={d.arengoLabel} />
           <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -51,10 +53,10 @@ export function DiningSection({ t }: { t: HotelContent }) {
             {d.arengo.paragraphs.map((p, i) => (
               <p key={i}>{p}</p>
             ))}
+            {/* Feedback Manuel 2026-08-03: niente più bottone di chiamata esterna
+                qui — l'ospite è già in hotel, il tasto 9 dal telefono in camera è
+                il canale giusto (nel testo di d.arengo.reservation qui sotto). */}
             <p className="font-medium text-[var(--color-text)]">{d.arengo.reservation}</p>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <CallButton href={HOTEL.phoneHref} label={t.common.bookLabel} trackLabel="prenota-larengo" />
           </div>
         </div>
 

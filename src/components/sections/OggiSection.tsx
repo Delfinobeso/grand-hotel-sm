@@ -24,10 +24,15 @@ import { SectionLabel, CopyField, CallButton, StatusBadge, REVEAL } from "@/comp
 import type { TabKey } from "@/lib/nav";
 import { formatHoursCaption, type ServiceHours } from "@/lib/hours";
 
-/* ── GHSM Group strip (non-hotel venues) ── */
+/* ── GHSM Group strip (non-hotel venues, tranne la 2a card: vedi sotto) ── */
 const GROUP: { name: string; category: keyof HotelContent["home"]["groupCategories"]; img: string; tab: TabKey; sectionId?: string }[] = [
   { name: "Centro Mességué", category: "wellness", img: "/images/group-wellness.webp", tab: "wellness" },
-  { name: "Ristorante La Terrazza", category: "dining", img: "/images/group-laterrazza.webp", tab: "dining", sectionId: "venue-laTerrazza" },
+  // Feedback Manuel 2026-08-03: prima card ristorante = L'Arengo (il ristorante
+  // dell'hotel), non La Terrazza (locale del gruppo fuori sede) — atterra in cima
+  // al tab Ristorante (id "venue-arengo", il primo contenuto della pagina) invece
+  // di saltare direttamente a La Terrazza, che resta comunque raggiungibile
+  // scorrendo la stessa pagina subito dopo.
+  { name: "Ristorante L'Arengo", category: "dining", img: "/images/dining.webp", tab: "dining", sectionId: "venue-arengo" },
   { name: "Caffè Titano", category: "cafe", img: "/images/venue-caffetitano.webp", tab: "dining", sectionId: "venue-caffeTitano" },
   { name: "La Loggia", category: "bar", img: "/images/group-laloggia.webp", tab: "dining", sectionId: "venue-laLoggia" },
   { name: "La Cremeria del Titano", category: "gelato", img: "/images/group-cremeria.webp", tab: "dining", sectionId: "venue-cremeria" },
