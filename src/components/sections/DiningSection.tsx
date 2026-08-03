@@ -13,6 +13,7 @@ import {
   NavigateButton,
   BookButton,
   ReviewButtons,
+  CtaRow,
 } from "@/components/ui";
 
 const VENUE_IMG: Record<string, string> = {
@@ -78,7 +79,7 @@ export function DiningSection({ t }: { t: HotelContent }) {
               )}
               <p className="mt-2 text-[0.95rem] leading-relaxed text-[var(--color-text-secondary)]">{v.body}</p>
               {pin && (
-                <div className="mt-4 flex flex-wrap gap-2">
+                <CtaRow className="mt-4">
                   {pin.bookingUrl && <BookButton href={pin.bookingUrl} label={t.common.bookLabel} trackLabel={`prenota-${v.id}`} />}
                   <NavigateButton
                     lat={pin.lat}
@@ -91,7 +92,7 @@ export function DiningSection({ t }: { t: HotelContent }) {
                   {pin.phoneHref && (
                     <CallButton href={pin.phoneHref} label={t.common.callLabel} variant="outline" trackLabel={`chiama-${v.id}`} />
                   )}
-                </div>
+                </CtaRow>
               )}
               {reviewLinks && (
                 <div className="mt-4 border-t border-[var(--color-border)] pt-4">

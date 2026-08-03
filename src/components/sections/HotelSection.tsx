@@ -30,6 +30,7 @@ import {
   CopyField,
   CallButton,
   NavigateButton,
+  CtaRow,
   FloorBadge,
   ReviewButtons,
 } from "@/components/ui";
@@ -164,7 +165,7 @@ export function HotelSection({ t }: { t: HotelContent }) {
             {HOTEL.addressLine1}, {HOTEL.addressLine2}
           </p>
           <p>{HOTEL.phone}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <CtaRow className="mt-3">
             <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} variant="outline" trackLabel="chiama-hotel" />
             <NavigateButton
               lat={HOTEL.lat}
@@ -174,7 +175,7 @@ export function HotelSection({ t }: { t: HotelContent }) {
               variant="outline"
               trackLabel="mappe-hotel"
             />
-          </div>
+          </CtaRow>
         </AccordionItem>
 
         <AccordionItem icon={Star} title={t.common.reviewLabel} defaultOpen>

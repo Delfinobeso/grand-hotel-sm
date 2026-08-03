@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { Children, useEffect, useState, type ReactNode } from "react";
 import { motion, AnimatePresence, type Transition } from "framer-motion";
 import {
   ChevronDown,
@@ -11,7 +11,6 @@ import {
   Copy,
   Quote,
   CalendarCheck,
-  Star,
   type LucideIcon,
 } from "lucide-react";
 import type { HoursRow, MassageItem } from "@/lib/content";
@@ -404,6 +403,48 @@ const ctaBase =
 const ctaSolid = `${ctaBase} bg-[var(--color-accent)] text-[var(--color-on-accent)] hover:opacity-90`;
 const ctaOutline = `${ctaBase} bg-[var(--color-surface-muted)] text-[var(--color-text)] hover:bg-[var(--color-border)]`;
 
+/** Riga di CTA a larghezza uniforme (Prenota/Apri in Mappe/Chiama...): senza questo
+ *  wrapper i bottoni avevano larghezza intrinseca (in base al testo), quindi righe
+ *  disomogenee e — quando il numero è dispari — l'ultimo bottone isolato e piccolo
+ *  su una riga tutta sua. Griglia 2 colonne uguali; se il conteggio è dispari
+ *  l'ultimo bottone occupa l'intera riga invece di restare orfano a metà larghezza.
+ *  Children.toArray scarta automaticamente i figli falsy (es. `{cond && <Btn/>}`),
+ *  quindi il conteggio riflette sempre i bottoni davvero renderizzati. */
+export function CtaRow({ children, className = "" }: { children: ReactNode; className?: string }) {
+  const items = Children.toArray(children);
+  return (
+    <div className={`grid grid-cols-2 gap-2 ${className}`}>
+      {items.map((child, i) => {
+        const isLastOdd = i === items.length - 1 && items.length % 2 === 1;
+        return (
+          <div key={i} className={`[&>a]:w-full [&>button]:w-full ${isLastOdd ? "col-span-2" : ""}`}>
+            {child}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** "G" ufficiale (Simple Icons, monocromo currentColor) — non l'icona generica Star,
+ *  per rendere il bottone recensione riconoscibile a colpo d'occhio come Google. */
+function GoogleIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden focusable="false">
+      <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
+    </svg>
+  );
+}
+
+/** Logo ufficiale Tripadvisor (Simple Icons, monocromo currentColor), stesso motivo. */
+function TripadvisorIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden focusable="false">
+      <path d="M12.006 4.295c-2.67 0-5.338.784-7.645 2.353H0l1.963 2.135a5.997 5.997 0 0 0 4.04 10.43 5.976 5.976 0 0 0 4.075-1.6L12 19.705l1.922-2.09a5.972 5.972 0 0 0 4.072 1.598 6 6 0 0 0 6-5.998 5.982 5.982 0 0 0-1.957-4.432L24 6.648h-4.35a13.573 13.573 0 0 0-7.644-2.353zM12 6.255c1.531 0 3.063.303 4.504.903C13.943 8.138 12 10.43 12 13.1c0-2.671-1.942-4.962-4.504-5.942A11.72 11.72 0 0 1 12 6.256zM6.002 9.157a4.059 4.059 0 1 1 0 8.118 4.059 4.059 0 0 1 0-8.118zm11.992.002a4.057 4.057 0 1 1 .003 8.115 4.057 4.057 0 0 1-.003-8.115zm-11.992 1.93a2.128 2.128 0 0 0 0 4.256 2.128 2.128 0 0 0 0-4.256zm11.992 0a2.128 2.128 0 0 0 0 4.256 2.128 2.128 0 0 0 0-4.256z" />
+    </svg>
+  );
+}
+
 export function CallButton({
   href,
   label,
@@ -494,7 +535,7 @@ export function ReviewButtons({
   trackPrefix: string;
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <CtaRow>
       <a
         href={googleUrl}
         target="_blank"
@@ -502,7 +543,7 @@ export function ReviewButtons({
         className={ctaOutline}
         onClick={() => { import("@/lib/analytics/tracker").then(m => m.trackClick(`${trackPrefix}-google`)); }}
       >
-        <Star size={16} strokeWidth={1.875} />
+        <GoogleIcon />
         {googleLabel}
       </a>
       <a
@@ -512,10 +553,10 @@ export function ReviewButtons({
         className={ctaOutline}
         onClick={() => { import("@/lib/analytics/tracker").then(m => m.trackClick(`${trackPrefix}-tripadvisor`)); }}
       >
-        <Star size={16} strokeWidth={1.875} />
+        <TripadvisorIcon />
         {tripadvisorLabel}
       </a>
-    </div>
+    </CtaRow>
   );
 }
 

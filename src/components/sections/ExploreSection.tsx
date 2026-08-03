@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL, AIRPORTS } from "@/lib/hotel";
-import { SectionLabel, NavigateButton, CallButton, AddToCalendarButton, SHEET, BACKDROP_FADE } from "@/components/ui";
+import { SectionLabel, NavigateButton, CallButton, AddToCalendarButton, CtaRow, SHEET, BACKDROP_FADE } from "@/components/ui";
 
 const MapExplorer = dynamic(() => import("@/components/MapExplorer"), {
   ssr: false,
@@ -174,10 +174,10 @@ export function ExploreSection({ t }: { t: HotelContent }) {
                       {HOTEL.addressLine1}, {HOTEL.addressLine2}
                     </p>
                     <p className="mt-0.5 text-[0.95rem] text-[var(--color-text-secondary)]">{HOTEL.phone}</p>
-                    <div className="mt-4 flex flex-wrap gap-2">
+                    <CtaRow className="mt-4">
                       <CallButton href={HOTEL.phoneHref} label={t.common.callLabel} trackLabel="chiama-reception" />
                       <NavigateButton lat={HOTEL.lat} lon={HOTEL.lon} name={HOTEL.name} label={t.common.openInMapsLabel} trackLabel="mappe-hotel" />
-                    </div>
+                    </CtaRow>
                   </div>
                 </section>
               </div>
