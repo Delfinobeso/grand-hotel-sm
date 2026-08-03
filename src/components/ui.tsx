@@ -11,6 +11,7 @@ import {
   Copy,
   Quote,
   CalendarCheck,
+  BookOpen,
   type LucideIcon,
 } from "lucide-react";
 import type { HoursRow, MassageItem } from "@/lib/content";
@@ -514,6 +515,26 @@ export function BookButton({
     <a href={href} target="_blank" rel="noopener noreferrer" className={variant === "solid" ? ctaSolid : ctaOutline}
       onClick={() => { if (trackLabel) import("@/lib/analytics/tracker").then(m => m.trackClick(trackLabel)); }}>
       <CalendarCheck size={16} strokeWidth={1.875} />
+      {label}
+    </a>
+  );
+}
+
+export function MenuButton({
+  href,
+  label,
+  variant = "outline",
+  trackLabel,
+}: {
+  href: string;
+  label: string;
+  variant?: "solid" | "outline";
+  trackLabel?: string;
+}) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={variant === "solid" ? ctaSolid : ctaOutline}
+      onClick={() => { if (trackLabel) import("@/lib/analytics/tracker").then(m => m.trackClick(trackLabel)); }}>
+      <BookOpen size={16} strokeWidth={1.875} />
       {label}
     </a>
   );

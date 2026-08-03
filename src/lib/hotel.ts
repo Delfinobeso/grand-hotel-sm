@@ -46,6 +46,10 @@ export interface MapPin {
   phoneHref?: string;
   walkMinutes?: number;
   bookingUrl?: string;
+  /** Solo per i locali con menu online reale (stessa fonte del concierge AI,
+   *  vedi src/lib/concierge.ts § MENÙ e src/lib/menus.ts). L'Arengo, Cremeria
+   *  e La Loggia non hanno menu online: nessun bottone per loro. */
+  menuUrl?: string;
 }
 
 /** TheFork booking widget for Ristorante La Terrazza. */
@@ -73,6 +77,7 @@ export const GHSM_VENUES: MapPin[] = [
     walkMinutes: 6,
     bookingUrl:
       "https://widget.thefork.com/it/bdef5000-1a1c-435f-9501-170ed277ac99?origin=facebook&utm_medium=integration&utm_source=instagram&step=date",
+    menuUrl: "https://linktr.ee/laterrazza",
   },
   {
     id: "caffeTitano",
@@ -82,6 +87,7 @@ export const GHSM_VENUES: MapPin[] = [
     phone: "+39 0549 992473",
     phoneHref: "tel:+390549992473",
     walkMinutes: 5,
+    menuUrl: "https://linktr.ee/caffetitanosanmarino",
   },
   {
     id: "cremeria",

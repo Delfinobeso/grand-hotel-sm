@@ -40,6 +40,7 @@ export interface HotelContent {
     status: StatusLabels;
     callLabel: string;
     bookLabel: string;
+    menuLabel: string;
     navigateLabel: string;
     openInMapsLabel: string;
     addToCalendarLabel: string;
@@ -247,6 +248,7 @@ const it: HotelContent = {
     },
     callLabel: "Chiama",
     bookLabel: "Prenota",
+    menuLabel: "Vedi il menù",
     navigateLabel: "Naviga",
     openInMapsLabel: "Apri in Mappe",
     addToCalendarLabel: "Aggiungi al calendario",
@@ -673,6 +675,7 @@ const en: HotelContent = {
     },
     callLabel: "Call",
     bookLabel: "Book",
+    menuLabel: "View menu",
     navigateLabel: "Navigate",
     openInMapsLabel: "Open in Maps",
     addToCalendarLabel: "Add to calendar",
@@ -1099,6 +1102,7 @@ const fr: HotelContent = {
     },
     callLabel: "Appeler",
     bookLabel: "Réserver",
+    menuLabel: "Voir le menu",
     navigateLabel: "Naviguer",
     openInMapsLabel: "Ouvrir dans Plans",
     addToCalendarLabel: "Ajouter au calendrier",
@@ -1525,6 +1529,7 @@ const de: HotelContent = {
     },
     callLabel: "Anrufen",
     bookLabel: "Buchen",
+    menuLabel: "Speisekarte ansehen",
     navigateLabel: "Navigieren",
     openInMapsLabel: "In Karten öffnen",
     addToCalendarLabel: "Zum Kalender hinzufügen",
@@ -1951,6 +1956,7 @@ const es: HotelContent = {
     },
     callLabel: "Llamar",
     bookLabel: "Reservar",
+    menuLabel: "Ver el menú",
     navigateLabel: "Navegar",
     openInMapsLabel: "Abrir en Mapas",
     addToCalendarLabel: "Añadir al calendario",

@@ -12,6 +12,7 @@ import {
   CallButton,
   NavigateButton,
   BookButton,
+  MenuButton,
   ReviewButtons,
   CtaRow,
 } from "@/components/ui";
@@ -89,6 +90,7 @@ export function DiningSection({ t }: { t: HotelContent }) {
                     variant={pin.bookingUrl ? "outline" : "solid"}
                     trackLabel={`mappe-${v.id}`}
                   />
+                  {pin.menuUrl && <MenuButton href={pin.menuUrl} label={t.common.menuLabel} trackLabel={`menu-${v.id}`} />}
                   {pin.phoneHref && (
                     <CallButton href={pin.phoneHref} label={t.common.callLabel} variant="outline" trackLabel={`chiama-${v.id}`} />
                   )}
