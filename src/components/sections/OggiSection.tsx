@@ -153,12 +153,14 @@ export function OggiSection({
             il logo, quindi finora la home era l'unica schermata senza brand su
             mobile. Su lg il logo è già nella sidebar, qui sparisce. Stessa origine
             (left-5 / top safe-area) del logo dell'header nelle altre schede, così
-            passando da tab a tab non si sposta. */}
+            passando da tab a tab non si sposta, e stessa altezza 44px delle pill
+            lingua/tema che gli stanno di fronte: i due lati chiudono sulla stessa
+            riga ottica invece di sfalsarsi. */}
         <img
           src="/brand/logo-full.svg"
           alt=""
           aria-hidden
-          className="absolute left-5 top-[max(0.75rem,env(safe-area-inset-top))] h-14 w-14 drop-shadow-[0_2px_10px_oklch(0_0_0/0.35)] md:left-6 lg:hidden"
+          className="absolute left-5 top-[max(0.75rem,env(safe-area-inset-top))] h-11 w-11 drop-shadow-[0_2px_10px_oklch(0_0_0/0.35)] md:left-6 lg:hidden"
         />
 
         <div className="relative flex h-[409px] flex-col items-center justify-end gap-1.5 px-6 pb-8 pt-[max(2rem,env(safe-area-inset-top))] text-center lg:px-9 lg:pb-10">
@@ -317,11 +319,14 @@ export function OggiSection({
       {/* ── GHSM Hotel Collection ── */}
       <section>
         <SectionLabel>{h.hotelsLabel}</SectionLabel>
-        {/* Stessa griglia a 5 colonne della strip GHSM Group: gli hotel sono 3, ma
-            tenendo il passo identico le card restano della stessa taglia e in
-            colonna con quelle sopra invece di dilatarsi. */}
+        {/* Come la strip GHSM Group: su lg niente scroll, la griglia chiude esatta
+            sul bordo della colonna. Qui però le colonne sono 3, quante sono gli
+            hotel. Con 5 colonne (passo identico alla strip sopra) le card
+            scendevano a 144px: la descrizione non entrava più nelle due righe di
+            line-clamp e veniva troncata coi puntini, e restavano 300px vuoti a
+            destra. Il bordo allineato conta più del passo identico. */}
         <div className="-mx-5 overflow-x-auto scroll-pl-5 md:-mx-6 md:scroll-pl-6 lg:mx-0 lg:overflow-visible lg:scroll-pl-0">
-          <ul className="flex w-max gap-3 px-5 md:px-6 lg:grid lg:w-auto lg:grid-cols-5 lg:px-0">
+          <ul className="flex w-max gap-3 px-5 md:px-6 lg:grid lg:w-auto lg:grid-cols-3 lg:gap-4 lg:px-0">
             {h.hotels.map((hotel) => (
               <li key={hotel.name} className="w-40 shrink-0 lg:w-auto">
                 <a href={hotel.url} target="_blank" rel="noopener noreferrer" className="block">
