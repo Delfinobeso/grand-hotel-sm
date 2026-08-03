@@ -39,20 +39,6 @@ export function ExploreSection({ t }: { t: HotelContent }) {
       {/* Full-screen interactive map + place banners */}
       <MapExplorer t={t} infoSheetOpen={sheet} />
 
-      {/* Marchio in overlay: su Esplora l'header è trasparente (come su Oggi) e il
-          logo sparisce, lasciando la mappa senza brand su mobile. La fascia più in
-          alto è già occupata da "Info e contatti" e dai controlli lingua/tema, così
-          il marchio si allinea alla seconda fila di pill ("Elenco" a sinistra, "la
-          mia posizione" a destra), dove il centro è sempre libero. Su lg il logo è
-          già nella sidebar. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+4.5rem)] z-20 flex h-11 justify-center lg:hidden"
-      >
-        <img src="/brand/logo-full.svg" alt="" className="logo-light h-11 w-11 drop-shadow-[0_2px_10px_oklch(0_0_0/0.3)]" />
-        <img src="/brand/logo-full-dark.svg" alt="" className="logo-dark h-11 w-11 drop-shadow-[0_2px_10px_oklch(0_0_0/0.3)]" />
-      </div>
-
       {/* Info / events trigger */}
       <button
         onClick={() => setSheet(true)}
