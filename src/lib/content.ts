@@ -453,7 +453,7 @@ const it: HotelContent = {
         "In cucina si tramandano le ricette della tradizione locale: lasagne, ravioli e tortellacci preparati secondo le ricette di famiglia.",
         "Su richiesta sono disponibili menu speciali ipocalorici o pensati per intolleranze alimentari e patologie particolari, grazie alla sinergia con il Centro Medico Mességué e all'utilizzo di materie prime di origine certificata.",
       ],
-      reservation: "La prenotazione è gradita.",
+      reservation: "La prenotazione è gradita: può chiamare anche il tasto 9 dal telefono in camera.",
     },
     groupLabel: "Il gruppo GHSM",
     groupIntro:
@@ -880,7 +880,7 @@ const en: HotelContent = {
         "Our kitchen carries on local tradition: lasagne, ravioli and tortellacci prepared according to family recipes.",
         "Special low-calorie menus, or menus for food intolerances and specific medical conditions, are available on request, thanks to our synergy with the Mességué Medical Centre and the use of certified-origin ingredients.",
       ],
-      reservation: "Reservations are recommended.",
+      reservation: "Reservations are recommended: you can also dial 9 on the room phone.",
     },
     groupLabel: "The GHSM Group",
     groupIntro:
@@ -1307,7 +1307,7 @@ const fr: HotelContent = {
         "En cuisine se transmettent les recettes de la tradition locale : lasagnes, raviolis et tortellacci préparés selon des recettes familiales.",
         "Sur demande, des menus spéciaux hypocaloriques ou adaptés aux intolérances alimentaires et pathologies particulières sont disponibles, grâce à la synergie avec le Centre Médical Mességué et à l'utilisation de matières premières d'origine certifiée.",
       ],
-      reservation: "La réservation est recommandée.",
+      reservation: "La réservation est recommandée : vous pouvez aussi composer le 9 depuis le téléphone de la chambre.",
     },
     groupLabel: "Le groupe GHSM",
     groupIntro:
@@ -1734,7 +1734,7 @@ const de: HotelContent = {
         "In der Küche werden die Rezepte der lokalen Tradition weitergegeben: Lasagne, Ravioli und Tortellacci nach Familienrezepten zubereitet.",
         "Auf Anfrage sind spezielle kalorienarme Menüs oder Menüs für Lebensmittelunverträglichkeiten und besondere Erkrankungen erhältlich, dank der Zusammenarbeit mit dem Mességué-Gesundheitszentrum und der Verwendung zertifizierter Zutaten.",
       ],
-      reservation: "Eine Reservierung wird empfohlen.",
+      reservation: "Eine Reservierung wird empfohlen: Sie können auch die 9 am Zimmertelefon wählen.",
     },
     groupLabel: "Die GHSM Group",
     groupIntro:
@@ -2161,7 +2161,7 @@ const es: HotelContent = {
         "En la cocina se transmiten las recetas de la tradición local: lasañas, raviolis y tortellacci preparados según recetas familiares.",
         "Bajo petición hay disponibles menús especiales hipocalóricos o pensados para intolerancias alimentarias y patologías particulares, gracias a la sinergia con el Centro Médico Mességué y al uso de materias primas de origen certificado.",
       ],
-      reservation: "Se recomienda reserva.",
+      reservation: "Se recomienda reserva: también puede marcar el 9 desde el teléfono de la habitación.",
     },
     groupLabel: "El grupo GHSM",
     groupIntro:
