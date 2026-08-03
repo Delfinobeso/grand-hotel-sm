@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import type { HotelContent } from "@/lib/content";
 import { HOTEL, AIRPORTS } from "@/lib/hotel";
-import { SectionLabel, NavigateButton, CallButton, AddToCalendarButton, EASE_EXPO } from "@/components/ui";
+import { SectionLabel, NavigateButton, CallButton, AddToCalendarButton, SHEET, BACKDROP_FADE } from "@/components/ui";
 
 const MapExplorer = dynamic(() => import("@/components/MapExplorer"), {
   ssr: false,
@@ -32,6 +32,10 @@ export function ExploreSection({ t }: { t: HotelContent }) {
 
   return (
     <div className="relative h-full w-full overflow-hidden">
+      {/* Le altre sezioni aprono con un SectionHeader: qui il titolo è la mappa
+          stessa, quindi il nome della scheda resta solo per lo screen reader. */}
+      <h2 className="sr-only">{t.nav.explore}</h2>
+
       {/* Full-screen interactive map + place banners */}
       <MapExplorer t={t} infoSheetOpen={sheet} />
 
@@ -52,7 +56,7 @@ export function ExploreSection({ t }: { t: HotelContent }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={BACKDROP_FADE}
               onClick={() => setSheet(false)}
               className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
             />
@@ -60,7 +64,7 @@ export function ExploreSection({ t }: { t: HotelContent }) {
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ duration: 0.4, ease: EASE_EXPO }}
+              transition={SHEET}
               className="fixed inset-x-0 bottom-0 z-40 max-h-[85svh] overflow-y-auto rounded-t-3xl bg-[var(--color-bg)] pb-[max(1.5rem,env(safe-area-inset-bottom))]"
             >
               <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg)]/90 px-5 py-3.5 backdrop-blur-md">

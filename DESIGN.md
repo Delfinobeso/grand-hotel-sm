@@ -64,9 +64,10 @@ Scelta esplicita del cliente: font Apple. Nessun import next/font: stack di sist
 ```
 --ease-out:      cubic-bezier(0.25, 1, 0.5, 1)      /* default state */
 --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1)      /* entrate */
---ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1)  /* micro FAB/check */
 --ease-ios:      cubic-bezier(0.2, 0, 0, 1)         /* sheet/menu nativi */
 ```
+`--ease-spring` (overshoot) rimosso il 2026-08-03 durante l'audit estetico: era l'unico bounce del progetto, sostituito con `--ease-out-expo` sull'animazione ghsm-pop. Nessun token con overshoot: non reintrodurne.
+
 Durate 150–250ms (stati), 300–400ms (sheet/accordion). Active state via `background`/opacity, scale solo micro (≤0.98). No bounce decorativo, no animazione di layout-props.
 
 ## Componenti & stati

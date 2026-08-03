@@ -21,7 +21,19 @@ import { buildEventIcsUri, type EventDate } from "@/lib/ics";
 export const EASE_OUT = [0.25, 1, 0.5, 1] as const;
 export const EASE_EXPO = [0.16, 1, 0.3, 1] as const;
 export const TRANSITION: Transition = { duration: 0.28, ease: EASE_OUT };
-const REVEAL: Transition = { duration: 0.32, ease: EASE_EXPO };
+
+/* Motion condiviso — unica fonte di verità per le transizioni ricorrenti.
+   Tutte decelerazione pura: nessuna curva con overshoot (vedi nota su
+   --ease-spring, deprecato, in globals.css). */
+
+/** Apertura/chiusura in altezza: accordion, righe che si espandono in posto. */
+export const REVEAL: Transition = { duration: 0.32, ease: EASE_EXPO };
+/** Ingresso di un pannello/sheet che scorre sopra il contenuto. */
+export const SHEET: Transition = { duration: 0.4, ease: EASE_EXPO };
+/** Uscita dello sheet — leggermente più rapida dell'ingresso, come su iOS. */
+export const SHEET_EXIT: Transition = { duration: 0.32, ease: EASE_EXPO };
+/** Dissolvenza degli scrim/backdrop dietro sheet e pannelli. */
+export const BACKDROP_FADE: Transition = { duration: 0.25, ease: EASE_OUT };
 
 /* ── Headings ── */
 
@@ -90,16 +102,37 @@ export function AccordionItem({
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-200 hover:bg-[var(--color-surface-muted)] lg:px-5 lg:py-4"
+        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-200 hover:bg-[var(--color-surface-muted)] active:bg-[var(--color-surface-muted)] lg:px-5 lg:py-4"
       >
         <IconBadge icon={icon} />
+        {/* NOTA (audit 2026-08-03): provato a togliere flex-1 su desktop per avvicinare
+            il chevron al testo. Sugli screenshot il risultato è peggiore: i chevron
+            finiscono a x diverse riga per riga e il bordo destro diventa frastagliato.
+            Il chevron resta allineato a destra (pattern disclosure standard); il senso
+            di "riga vuota" su desktop dipende dalla larghezza della colonna contenuti,
+            non da questo primitivo. */}
         <span className="min-w-0 flex-1">
           <span className="block text-[1.0625rem] font-semibold leading-snug text-[var(--color-text)]">
             {title}
           </span>
-          {subtitle && (
-            <span className="mt-0.5 block text-sm text-[var(--color-text-secondary)]">{subtitle}</span>
-          )}
+          {/* Il subtitle è un'anteprima del contenuto: ad accordion aperto diventa un
+              doppione di ciò che si legge subito sotto, quindi collassa con la stessa
+              curva/durata del corpo. Nessun testo viene modificato. */}
+          <AnimatePresence initial={false}>
+            {subtitle && !open && (
+              <motion.span
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={REVEAL}
+                className="block overflow-hidden"
+              >
+                <span className="mt-0.5 block text-sm text-[var(--color-text-secondary)]">
+                  {subtitle}
+                </span>
+              </motion.span>
+            )}
+          </AnimatePresence>
           {badge && <span className="mt-1.5 block">{badge}</span>}
         </span>
         <motion.span
@@ -148,7 +181,7 @@ export function QuickAnswer({
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-200 hover:bg-[var(--color-surface-muted)]"
+        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-200 hover:bg-[var(--color-surface-muted)] active:bg-[var(--color-surface-muted)]"
       >
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
           <Icon size={17} strokeWidth={1.875} />
@@ -186,7 +219,17 @@ export function QuickAnswer({
   );
 }
 
-export function CopyField({ value, copiedLabel }: { value: string; copiedLabel: string }) {
+export function CopyField({
+  value,
+  copiedLabel,
+  label,
+}: {
+  value: string;
+  copiedLabel: string;
+  /** Nome del campo (es. l'etichetta già presente accanto al valore). Serve solo
+   *  a dare un nome accessibile stabile al bottone: non produce testo visibile. */
+  label?: string;
+}) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     try {
@@ -200,13 +243,17 @@ export function CopyField({ value, copiedLabel }: { value: string; copiedLabel: 
   return (
     <button
       onClick={copy}
-      className="flex w-full items-center justify-between gap-3 rounded-xl bg-[var(--color-surface-muted)] px-3.5 py-2.5 text-left transition-colors duration-200 hover:bg-[var(--color-border)]"
+      aria-label={label ? `${label}: ${value}` : value}
+      className="flex w-full items-center justify-between gap-3 rounded-xl bg-[var(--color-surface-muted)] px-3.5 py-2.5 text-left transition-colors duration-200 hover:bg-[var(--color-border)] active:bg-[var(--color-border)]"
     >
       <span className="font-mono text-[0.95rem] font-semibold tracking-wide text-[var(--color-text)]">
         {value}
       </span>
-      <span className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-[var(--color-accent)]">
-        {copied ? <Check size={14} strokeWidth={2.25} /> : <Copy size={14} strokeWidth={2} />}
+      <span
+        aria-live="polite"
+        className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-[var(--color-accent)]"
+      >
+        {copied ? <Check size={16} strokeWidth={2.25} /> : <Copy size={16} strokeWidth={2} />}
         {copied ? copiedLabel : ""}
       </span>
     </button>
@@ -221,7 +268,7 @@ export function HoursTable({ rows }: { rows: HoursRow[] }) {
       {rows.map((row, i) => (
         <div
           key={row.label}
-          className={`flex items-center justify-between gap-4 py-3 ${
+          className={`flex items-center justify-between gap-4 py-3.5 ${
             i !== 0 ? "border-t border-[var(--color-border)]" : ""
           }`}
         >
@@ -241,7 +288,7 @@ export function PriceList({ items }: { items: MassageItem[] }) {
       {items.map((item, i) => (
         <div
           key={item.name}
-          className={`flex items-start justify-between gap-4 py-3 ${
+          className={`flex items-start justify-between gap-4 py-3.5 ${
             i !== 0 ? "border-t border-[var(--color-border)]" : ""
           }`}
         >
@@ -281,7 +328,7 @@ export function ChipGrid({ items }: { items: string[] }) {
 
 export function QuoteBlock({ quote, author }: { quote: string; author: string }) {
   return (
-    <figure className="rounded-2xl bg-[var(--color-accent-soft)] px-5 py-5">
+    <figure className="rounded-2xl bg-[var(--color-surface-quote)] px-5 py-5">
       <Quote size={22} strokeWidth={1.5} className="text-[var(--color-accent)]" />
       <blockquote className="mt-2 font-display text-xl italic leading-snug text-[var(--color-text)] lg:text-2xl">
         {quote}

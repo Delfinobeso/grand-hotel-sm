@@ -5,9 +5,13 @@ import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { ConciergeBell, Send, Phone, X, MapPin, CalendarCheck, ExternalLink, type LucideIcon } from "lucide-react";
 import { HOTEL } from "@/lib/hotel";
 import type { Lang } from "@/lib/content";
+import { EASE_EXPO, SHEET, SHEET_EXIT, BACKDROP_FADE } from "@/components/ui";
 
-const EASE_IOS = [0.2, 0, 0, 1] as const;
-const SHEET_IN: Transition = { duration: 0.42, ease: EASE_IOS };
+/** Desktop: il pannello è un widget ancorato in basso a destra, non uno sheet che
+ *  sale — entra con una scala breve dal proprio angolo. Stessa curva (expo, pura
+ *  decelerazione) di SHEET/SHEET_EXIT così tutto il motion dell'app è coerente. */
+const WIDGET_IN: Transition = { duration: 0.3, ease: EASE_EXPO };
+const WIDGET_OUT: Transition = { duration: 0.22, ease: EASE_EXPO };
 
 /** Size the mobile panel to the visual viewport so the header stays fixed and the
  * keyboard pushes only the message area up (iOS-reliable; resizes-content is ignored in PWAs). */
@@ -136,7 +140,7 @@ function ChatActions({ actions }: { actions: ChatAction[] }) {
             key={i}
             href={a.url}
             {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent)] px-3.5 py-2 text-[0.8125rem] font-semibold text-[var(--color-on-accent)] transition-opacity duration-200 hover:opacity-90 active:scale-[0.97]"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-[var(--color-accent)] px-3.5 py-2 text-[0.8125rem] font-semibold text-[var(--color-on-accent)] transition-[opacity,transform] duration-200 hover:opacity-90 active:scale-[0.97]"
           >
             <Icon size={14} strokeWidth={2} />
             {a.label}
@@ -259,8 +263,36 @@ export default function ChatAssistant({
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const vv = useVisualViewport();
   const isDesktop = useIsDesktop();
+
+  /* Il reveal va solo sui messaggi arrivati mentre il pannello è aperto: senza questa
+     soglia l'ultima risposta della cronologia ri-animava a ogni riapertura (il sottoalbero
+     viene smontato da AnimatePresence). La soglia si fissa in fase di render, non in un
+     effetto, perché la bolla è già nel DOM — e quindi già animata — al primo paint. */
+  const [revealFrom, setRevealFrom] = useState(0);
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) setRevealFrom(messages.length);
+  }
+
+  // Escape chiude il pannello (atteso da un dialog, su desktop è il gesto naturale).
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, setOpen]);
+
+  // Focus sull'input solo su desktop: su mobile aprirebbe la tastiera e farebbe
+  // saltare il pannello prima ancora che l'ospite abbia letto il saluto.
+  useEffect(() => {
+    if (open && isDesktop) inputRef.current?.focus();
+  }, [open, isDesktop]);
 
   // Cronologia persistente (solo client, per evitare mismatch di idratazione): ripristina
   // al mount se salvata meno di 12 ore fa, altrimenti la scarta.
@@ -387,11 +419,14 @@ export default function ChatAssistant({
           <div className="fixed bottom-[calc(var(--dock-clearance)+0.75rem)] right-4 z-30 lg:bottom-6">
             {/* Anello che si espande e svanisce (sonar) DIETRO il bottone (-z-10, non
                 sopra: prima copriva il colore con un flash bianco) — colore del brand
-                (--color-accent), non on-accent, così è coerente per ogni hotel. */}
+                (--color-accent), non on-accent, così è coerente per ogni hotel.
+                Scala contenuta a 1.35x e picco di opacità a 0.25: a 1.7x l'alone
+                arrivava sulle card sottostanti (Caffè Titano su Oggi, riga Reception
+                su Hotel) e leggeva come una macchia grigia, non come un accento. */}
             <motion.span
               aria-hidden
               className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-[var(--color-accent)]"
-              animate={{ scale: [1, 1.4, 1.7], opacity: [0, 0.35, 0] }}
+              animate={{ scale: [1, 1.2, 1.35], opacity: [0, 0.25, 0] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
             />
             <motion.button
@@ -401,7 +436,7 @@ export default function ChatAssistant({
               transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
               onClick={() => setOpen(true)}
               aria-label={c.fab}
-              className="relative flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-[0_8px_24px_oklch(0.2_0.04_258/0.35)] active:scale-95"
+              className="relative flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] shadow-[0_8px_24px_oklch(0.2_0.04_258/0.35)] transition-transform duration-200 active:scale-95"
             >
               <motion.span
                 animate={{ scale: [1, 1.12, 1] }}
@@ -418,13 +453,16 @@ export default function ChatAssistant({
       <AnimatePresence>
         {open && (
           <>
-            {/* Scrim */}
+            {/* Scrim — niente backdrop-blur: a pannello aperto lo sheet copre tutto lo
+                schermo, quindi la sfocatura non si vede mai e costa solo GPU. Le durate
+                arrivano dalle costanti condivise (ui.tsx) così l'uscita dello scrim non
+                finisce più prima dello sheet. */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden"
+              exit={{ opacity: 0, transition: SHEET_EXIT }}
+              transition={BACKDROP_FADE}
+              className="fixed inset-0 z-50 bg-black/40 lg:hidden"
               onClick={() => setOpen(false)}
             />
 
@@ -445,11 +483,23 @@ export default function ChatAssistant({
               }
             >
             <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={SHEET_IN}
-              className="absolute inset-0 flex flex-col bg-[var(--color-bg)] lg:relative lg:h-full lg:w-full lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl"
+              role="dialog"
+              aria-modal={!isDesktop}
+              aria-label={c.title}
+              {...(isDesktop
+                ? {
+                    initial: { opacity: 0, scale: 0.95, y: 12 },
+                    animate: { opacity: 1, scale: 1, y: 0 },
+                    exit: { opacity: 0, scale: 0.95, y: 12, transition: WIDGET_OUT },
+                    transition: WIDGET_IN,
+                  }
+                : {
+                    initial: { y: "100%" },
+                    animate: { y: 0 },
+                    exit: { y: "100%", transition: SHEET_EXIT },
+                    transition: SHEET,
+                  })}
+              className="absolute inset-0 flex origin-bottom-right flex-col bg-[var(--color-bg)] lg:relative lg:h-full lg:w-full lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl"
             >
               {/* Header */}
           <div className="flex shrink-0 items-center gap-3 border-b border-[var(--color-border)] px-4 pt-[max(0.875rem,env(safe-area-inset-top))] pb-3.5 lg:rounded-t-3xl">
@@ -457,20 +507,24 @@ export default function ChatAssistant({
               <ConciergeBell size={18} strokeWidth={1.75} />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-[0.95rem] font-semibold leading-tight text-[var(--color-text)]">{c.title}</p>
-              <p className="text-xs text-[var(--color-text-muted)]">Grand Hotel San Marino</p>
+              <p className="truncate text-[0.95rem] font-semibold leading-tight text-[var(--color-text)]">{c.title}</p>
+              <p className="truncate text-xs text-[var(--color-text-muted)]">Grand Hotel San Marino</p>
             </div>
+            {/* Pill Reception: stessa resa su mobile e desktop (l'etichetta non è più
+                nascosta sotto sm — un'icona telefono da sola non dice cosa chiama).
+                h-11 su touch per il target minimo, h-9 da lg dove il puntatore è preciso
+                e l'header del widget deve restare compatto. */}
             <a
               href={HOTEL.phoneHref}
-              className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[var(--color-surface-muted)] px-3 text-xs font-semibold text-[var(--color-text)] transition-colors hover:bg-[var(--color-border)]"
+              className="flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-[var(--color-surface-muted)] px-3 text-xs font-semibold text-[var(--color-text)] transition-[background-color,transform] duration-200 hover:bg-[var(--color-border)] active:scale-[0.97] lg:h-9"
             >
               <Phone size={14} strokeWidth={2} />
-              <span className="hidden sm:inline">{c.reception}</span>
+              <span>{c.reception}</span>
             </a>
             <button
               onClick={() => setOpen(false)}
               aria-label="Close"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-muted)]"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[var(--color-text-muted)] transition-[background-color,transform] duration-200 hover:bg-[var(--color-surface-muted)] active:scale-[0.97] lg:h-9 lg:w-9"
             >
               <X size={18} strokeWidth={2} />
             </button>
@@ -485,7 +539,7 @@ export default function ChatAssistant({
           >
             {messages.length === 0 && (
               <div className="space-y-4">
-                <div className="max-w-[85%] rounded-2xl rounded-tl-md bg-[var(--color-surface)] px-3.5 py-2.5 text-[0.95rem] leading-relaxed text-[var(--color-text)]">
+                <div className="max-w-[85%] rounded-2xl rounded-tl-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3.5 py-2.5 text-[0.95rem] leading-relaxed text-[var(--color-text)] shadow-sm">
                   {c.greeting}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -493,7 +547,7 @@ export default function ChatAssistant({
                     <button
                       key={s}
                       onClick={() => send(s)}
-                      className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-[0.8125rem] text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-muted)]"
+                      className="inline-flex min-h-11 items-center rounded-full border border-[var(--color-border)] px-3 text-[0.8125rem] text-[var(--color-text-secondary)] transition-colors duration-200 hover:bg-[var(--color-surface-muted)] active:bg-[var(--color-surface-muted)]"
                     >
                       {s}
                     </button>
@@ -514,9 +568,14 @@ export default function ChatAssistant({
               }
               const { clean, actions } = parseActions(m.text, lang);
               const isLast = i === messages.length - 1;
+              const isFromThisSession = i >= revealFrom;
               return (
                 <div key={i} className="flex justify-start">
-                  <div className={`max-w-[88%] rounded-2xl rounded-tl-md bg-[var(--color-surface)] px-3.5 py-2.5 shadow-sm ${isLast ? "message-reveal" : ""}`}>
+                  <div
+                    className={`max-w-[88%] rounded-2xl rounded-tl-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3.5 py-2.5 shadow-sm ${
+                      isLast && isFromThisSession ? "message-reveal" : ""
+                    }`}
+                  >
                   <div
                     className="whitespace-pre-line text-[0.95rem] leading-relaxed text-[var(--color-text)] [&_strong]:font-semibold [&_em]:italic"
                     dangerouslySetInnerHTML={{ __html: renderMarkdown(clean) }}
@@ -529,7 +588,7 @@ export default function ChatAssistant({
 
             {loading && (
               <div className="flex justify-start" role="status" aria-label={c.typing}>
-                <div className="flex gap-1 rounded-2xl rounded-tl-md bg-[var(--color-surface)] px-4 py-3.5">
+                <div className="flex gap-1 rounded-2xl rounded-tl-md border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3.5 shadow-sm">
                   {[0, 1, 2].map((i) => (
                     <span
                       key={i}
@@ -550,6 +609,7 @@ export default function ChatAssistant({
           >
             <div className="flex items-center gap-2">
               <input
+                ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -561,14 +621,16 @@ export default function ChatAssistant({
                 onClick={() => send(input)}
                 disabled={!input.trim() || loading}
                 aria-label="Send"
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] transition-opacity disabled:opacity-40"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] transition-[opacity,transform] duration-200 active:scale-[0.97] disabled:opacity-40 disabled:active:scale-100"
               >
                 <Send size={17} strokeWidth={1.875} />
               </button>
             </div>
             <p className="mt-2 text-center text-[0.6875rem] text-[var(--color-text-muted)]">
               {c.disclosurePrefix}{" "}
-              <a href="/privacy" className="underline-offset-2 hover:underline">
+              {/* Underline sempre visibile: su touch non esiste hover, e senza sottolineatura
+                  il link Privacy era indistinguibile dal testo della disclosure. */}
+              <a href="/privacy" className="underline underline-offset-2">
                 {c.disclosureLink}
               </a>
             </p>
@@ -578,7 +640,7 @@ export default function ChatAssistant({
                 href="https://blasat.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-[var(--color-text-secondary)] underline-offset-2 hover:underline"
+                className="font-medium text-[var(--color-text-secondary)] underline underline-offset-2"
               >
                 Blasat AI
               </a>

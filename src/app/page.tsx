@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, MotionConfig } from "framer-motion";
 import {
   Phone,
   Sun,
@@ -23,6 +23,7 @@ import { DiningSection } from "@/components/sections/DiningSection";
 import { WellnessSection } from "@/components/sections/WellnessSection";
 import { ExploreSection } from "@/components/sections/ExploreSection";
 import ChatAssistant from "@/components/ChatAssistant";
+import { EASE_OUT, REVEAL } from "@/components/ui";
 import { useScrollDirection } from "@/lib/useScrollDirection";
 
 const INSTALL_LINK_LABEL: Record<Lang, string> = {
@@ -218,11 +219,15 @@ export default function Home() {
   const visualHeader = activeTab === "oggi" || activeTab === "explore";
 
   return (
+    // prefers-reduced-motion era rispettato solo dalle transizioni CSS: tutto ciò
+    // che passa da framer-motion (cambio tab, sheet, pannello concierge) continuava
+    // ad animare. MotionConfig lo estende a ogni animazione JS dell'app.
+    <MotionConfig reducedMotion="user">
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-[var(--color-bg)]">
       <div className="relative mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden lg:flex-row lg:gap-6 lg:px-6 lg:py-6 xl:max-w-6xl xl:gap-8 xl:px-8 xl:py-8">
         {/* ── HEADER / SIDEBAR ── on the map it floats over the full-bleed map with a gradient (no hard line) */}
         <header
-          className={`z-20 flex items-center justify-between gap-3 px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 lg:sticky lg:top-6 lg:w-64 lg:shrink-0 lg:flex-col lg:items-stretch lg:gap-6 lg:self-start lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:bg-[var(--color-surface-2)] lg:bg-none lg:p-6 lg:pb-6 lg:backdrop-blur-none xl:w-72 ${
+          className={`z-20 flex items-center justify-between gap-3 px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 lg:sticky lg:w-64 lg:shrink-0 lg:flex-col lg:items-stretch lg:gap-6 lg:self-start lg:rounded-3xl lg:border lg:border-[var(--color-border)] lg:bg-[var(--color-surface-2)] lg:bg-none lg:p-6 lg:pb-6 lg:backdrop-blur-none xl:w-72 ${
             visualHeader
               ? "pointer-events-none absolute inset-x-0 top-0"
               : "sticky top-0 border-b border-[var(--color-border)] bg-[var(--color-bg)]/85 backdrop-blur-md"
@@ -300,7 +305,7 @@ export default function Home() {
           {/* Desktop persistent reception CTA */}
           <a
             href={HOTEL.phoneHref}
-            className="pointer-events-auto hidden h-12 items-center justify-center gap-2 rounded-full bg-[var(--color-accent)] text-[0.95rem] font-semibold text-[var(--color-on-accent)] transition-opacity duration-200 hover:opacity-90 active:scale-[0.98] lg:flex"
+            className="pointer-events-auto hidden h-12 items-center justify-center gap-2 rounded-full bg-[var(--color-accent)] text-[0.95rem] font-semibold text-[var(--color-on-accent)] transition-[opacity,transform] duration-200 ease-out hover:opacity-90 active:scale-[0.97] lg:flex"
           >
             <Phone size={17} strokeWidth={1.875} />
             {t.common.receptionCta}
@@ -309,14 +314,26 @@ export default function Home() {
 
         {/* ── CONTENT ── */}
         {activeTab === "explore" ? (
-          <main className="min-h-0 flex-1 overflow-hidden">{sections.explore}</main>
+          <main className="min-h-0 flex-1 overflow-hidden">
+            {/* Solo fade, nessuno slide: la mappa Leaflet monta al primo frame e
+                traslarla farebbe partire il tiling da una posizione sbagliata. */}
+            <motion.div
+              key="explore"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.28, ease: EASE_OUT }}
+              className="h-full"
+            >
+              {sections.explore}
+            </motion.div>
+          </main>
         ) : (
-          <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto px-5 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:pt-2 lg:pb-0">
+          <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto px-5 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-5 md:px-6 md:py-6 lg:px-0 lg:pt-0 lg:pb-24">
             <motion.div
               key={activeTab}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              transition={REVEAL}
             >
               {sections[activeTab]}
             </motion.div>
@@ -380,7 +397,9 @@ export default function Home() {
               onClick={() => setActiveTab(key)}
               aria-current={active ? "page" : undefined}
               aria-label={navLabels[key]}
-              className={`flex items-center justify-center gap-2 rounded-full py-3.5 leading-none transition-colors duration-300 ${
+              // transition-colors non copre transform: la lista è esplicita perché
+              // il feedback alla pressione (scale) deve animarsi insieme al colore.
+              className={`flex items-center justify-center gap-2 rounded-full py-3.5 leading-none transition-[color,background-color,transform] duration-200 ease-out active:scale-[0.97] ${
                 active
                   ? "flex-none bg-[var(--color-accent-soft)] px-4 text-[0.8125rem] font-semibold text-[var(--color-accent)]"
                   : "flex-1 px-2 text-[var(--color-text-muted)] active:bg-[var(--color-surface-muted)]"
@@ -395,5 +414,6 @@ export default function Home() {
 
       <ChatAssistant lang={lang} open={chatOpen} onOpenChange={setChatOpen} hideFab={activeTab === "explore"} />
     </div>
+    </MotionConfig>
   );
 }
