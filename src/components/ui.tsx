@@ -467,8 +467,14 @@ export function CallButton({
 }
 
 export function mapsUrl(lat: number, lon: number, name: string): string {
-  // Google Maps universal link — works on iOS (opens app), Android, and desktop
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}%20${lat},${lon}`;
+  // Google Maps universal link — works on iOS (opens app), Android, and desktop.
+  // Prima si mandava "nome lat,lon" nello stesso query: non è il formato
+  // documentato da Google (che vuole o solo testo o solo "lat,lon") e per nomi
+  // comuni tipo "La Terrazza" Maps ignorava le coordinate e mostrava una lista
+  // di tutti i locali con quel nome nel mondo (segnalato da Manuel via
+  // feedback portale 2026-08-03). "<nome>, San Marino" invece disambigua col
+  // solo testo, stesso schema già in uso per i link recensione in hotel.ts.
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name}, San Marino`)}`;
 }
 
 export function NavigateButton({
