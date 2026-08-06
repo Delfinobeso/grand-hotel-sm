@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse, after } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { MENUS } from "@/lib/menus";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { SYSTEM_PROMPT_BASE, TRAILING, FALLBACK_STREAM_ERROR, FALLBACK_FATAL_ERROR } from "@/lib/concierge";
@@ -41,6 +41,10 @@ function logExchange(req: NextRequest, question: string, answer: string, ok: str
       a: answer.slice(0, 700),
       ok,
     }),
+    // Tetto duro: questa POST viene attesa prima di chiudere lo stream, quindi
+    // un analytics lento terrebbe acceso l'indicatore "sto scrivendo". Meglio
+    // perdere un record che far sembrare la chat impallata.
+    signal: AbortSignal.timeout(800),
   })
     .then(() => {})
     .catch(() => {});
@@ -86,7 +90,7 @@ export async function POST(req: NextRequest) {
   // (question/risposta parziale) anche quando l'errore scoppia a metà.
   let question = "";
   let answerAcc = "";
-  let finishLog: ((answer: string, ok: string) => void) | null = null;
+  let finishLog: ((answer: string, ok: string) => Promise<void>) | null = null;
 
   try {
     const ip = getClientIp(req);
@@ -137,21 +141,18 @@ export async function POST(req: NextRequest) {
     const lastUserMsg = [...history].reverse().find((m) => m.role === "user");
     question = lastUserMsg ? lastUserMsg.content : "";
 
-    // after(): la Promise tiene viva la funzione DOPO la chiusura dello
-    // stream, così la POST di log non aggiunge un millisecondo percepito.
-    // Registrata QUI (nel corpo dell'handler, non dentro start() dello
-    // stream, dove il contesto è meno garantito). finishLog è idempotente
-    // (one-shot) e ogni ramo terminale sotto la chiama esattamente una
-    // volta; la race con il timer è la cintura di sicurezza contro un ramo
-    // dimenticato che terrebbe la lambda appesa.
-    let logDone: () => void = () => {};
-    const logSettled = new Promise<void>((resolve) => {
-      logDone = resolve;
-    });
-    after(Promise.race([logSettled, new Promise<void>((r) => setTimeout(r, 15000))]));
+    // Il log si ATTENDE prima di chiudere lo stream. Verificato sul campo
+    // (preview Vercel, 2026-08-06): con after() di Next la POST non parte
+    // mai su una risposta streaming — la funzione viene congelata alla
+    // chiusura dello stream e il lavoro differito si perde in SILENZIO.
+    // Costo reale di questa scelta: ~100-300ms in cui l'indicatore "sto
+    // scrivendo" resta acceso DOPO che il testo è già tutto a schermo (il
+    // client chiude su close(), non su [DONE]). Impercettibile, e in cambio
+    // il log è deterministico. finishLog è one-shot: ogni ramo terminale lo
+    // chiama, il primo vince.
     finishLog = (answer: string, ok: string) => {
-      finishLog = null; // one-shot
-      logExchange(req, question, answer, ok).finally(logDone);
+      finishLog = null; // one-shot: i chiamanti usano finishLog?.()
+      return logExchange(req, question, answer, ok);
     };
 
     const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
@@ -172,7 +173,7 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const err = await response.text();
       console.error("DeepSeek API error:", err);
-      finishLog?.("", "upstream_error");
+      await finishLog?.("", "upstream_error");
       return NextResponse.json({ error: "Errore del servizio" }, { status: 502 });
     }
 
@@ -215,8 +216,8 @@ export async function POST(req: NextRequest) {
               }
             }
           }
+          await finishLog?.(answerAcc, "ok");
           controller.close();
-          finishLog?.(answerAcc, "ok");
         } catch (e) {
           console.error("Stream error:", e);
           controller.enqueue(
@@ -224,8 +225,8 @@ export async function POST(req: NextRequest) {
               `data: ${JSON.stringify({ error: FALLBACK_STREAM_ERROR })}\n\n`,
             ),
           );
+          await finishLog?.(answerAcc, "stream_error");
           controller.close();
-          finishLog?.(answerAcc, "stream_error");
         }
       },
     });
@@ -239,7 +240,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Chat API error:", error);
-    finishLog?.(answerAcc, "fatal");
+    await finishLog?.(answerAcc, "fatal");
     // Il client legge SOLO lo stream SSE (mai il body JSON diretto): rispondere qui con
     // NextResponse.json lascerebbe l'utente senza alcun messaggio. Emettiamo quindi lo
     // stesso formato SSE del ramo di streaming (già gestito dal client, vedi c.error).
