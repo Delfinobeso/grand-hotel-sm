@@ -1,10 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { MENUS } from "@/lib/menus";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { SYSTEM_PROMPT_BASE, TRAILING, FALLBACK_STREAM_ERROR, FALLBACK_FATAL_ERROR } from "@/lib/concierge";
+import { getVerifiedAnswers, buildKbBlock, type KbItem } from "@/lib/conciergeKb";
 
-function buildSystemPrompt(): string {
-  return SYSTEM_PROMPT_BASE + "\n\n" + MENUS + "\n\n" + TRAILING;
+// Il blocco KB va IN CODA: la recency dà priorità reale alle risposte
+// verificate e mette le regole di guardia anti-injection come ultima parola.
+function buildSystemPrompt(kbItems: KbItem[]): string {
+  return SYSTEM_PROMPT_BASE + "\n\n" + MENUS + "\n\n" + TRAILING + buildKbBlock(kbItems);
 }
 
 interface ChatMsg {
@@ -19,16 +22,28 @@ const PROJECT_ID_BY_HOST: Record<string, string> = {
   "titanosuites.blasat.com": "titano-suites",
 };
 
-/** Logga in modo anonimo la sola domanda dell'ospite (nessuna risposta, nessun IP).
- *  Fire-and-forget: non deve mai rallentare o far fallire la risposta della chat. */
-function logQuestionAnonymously(req: NextRequest, question: string) {
+/** Logga in modo anonimo lo scambio completo domanda+risposta (nessun IP).
+ *  UN solo record per scambio, scritto a stream chiuso: "questa risposta a
+ *  questa domanda" senza id di correlazione fragili. `ok` distingue gli esiti
+ *  (ok | stream_error | upstream_error | fatal) così una risposta parziale o
+ *  assente è misurabile invece che invisibile.
+ *  Mai un throw: non deve mai rallentare o far fallire la chat. */
+function logExchange(req: NextRequest, question: string, answer: string, ok: string): Promise<void> {
   const host = req.headers.get("host") || "unknown";
   const projectId = PROJECT_ID_BY_HOST[host] || host;
-  fetch("https://analytics.blasat.com/api/track", {
+  return fetch("https://analytics.blasat.com/api/track", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ project: projectId, event: "chatq", q: question.slice(0, 200) }),
-  }).catch(() => {});
+    body: JSON.stringify({
+      project: projectId,
+      event: "chatq",
+      q: question.slice(0, 200),
+      a: answer.slice(0, 700),
+      ok,
+    }),
+  })
+    .then(() => {})
+    .catch(() => {});
 }
 
 /** Verifica che la richiesta provenga da un contesto browser autorizzato.
@@ -67,6 +82,12 @@ function isAllowedCaller(req: NextRequest): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  // Dichiarati FUORI dal try: il catch fatale deve poter loggare lo scambio
+  // (question/risposta parziale) anche quando l'errore scoppia a metà.
+  let question = "";
+  let answerAcc = "";
+  let finishLog: ((answer: string, ok: string) => void) | null = null;
+
   try {
     const ip = getClientIp(req);
 
@@ -108,12 +129,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "API key non configurata" }, { status: 500 });
     }
 
-    const systemPrompt = buildSystemPrompt();
+    // KB verificata: la fetch parte qui (si sovrappone al lavoro già fatto)
+    // e si risolve da cache nella quasi totalità dei casi. Mai un throw.
+    const kbItems = await getVerifiedAnswers();
+    const systemPrompt = buildSystemPrompt(kbItems);
 
     const lastUserMsg = [...history].reverse().find((m) => m.role === "user");
-    if (lastUserMsg) {
-      logQuestionAnonymously(req, lastUserMsg.content);
-    }
+    question = lastUserMsg ? lastUserMsg.content : "";
+
+    // after(): la Promise tiene viva la funzione DOPO la chiusura dello
+    // stream, così la POST di log non aggiunge un millisecondo percepito.
+    // Registrata QUI (nel corpo dell'handler, non dentro start() dello
+    // stream, dove il contesto è meno garantito). finishLog è idempotente
+    // (one-shot) e ogni ramo terminale sotto la chiama esattamente una
+    // volta; la race con il timer è la cintura di sicurezza contro un ramo
+    // dimenticato che terrebbe la lambda appesa.
+    let logDone: () => void = () => {};
+    const logSettled = new Promise<void>((resolve) => {
+      logDone = resolve;
+    });
+    after(Promise.race([logSettled, new Promise<void>((r) => setTimeout(r, 15000))]));
+    finishLog = (answer: string, ok: string) => {
+      finishLog = null; // one-shot
+      logExchange(req, question, answer, ok).finally(logDone);
+    };
 
     const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
@@ -133,6 +172,7 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const err = await response.text();
       console.error("DeepSeek API error:", err);
+      finishLog?.("", "upstream_error");
       return NextResponse.json({ error: "Errore del servizio" }, { status: 502 });
     }
 
@@ -166,6 +206,7 @@ export async function POST(req: NextRequest) {
                   const parsed = JSON.parse(data);
                   const content = parsed.choices?.[0]?.delta?.content;
                   if (content) {
+                    answerAcc += content; // accumulo per il log, stesso parse dell'enqueue
                     controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
                   }
                 } catch {
@@ -175,6 +216,7 @@ export async function POST(req: NextRequest) {
             }
           }
           controller.close();
+          finishLog?.(answerAcc, "ok");
         } catch (e) {
           console.error("Stream error:", e);
           controller.enqueue(
@@ -183,6 +225,7 @@ export async function POST(req: NextRequest) {
             ),
           );
           controller.close();
+          finishLog?.(answerAcc, "stream_error");
         }
       },
     });
@@ -196,6 +239,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Chat API error:", error);
+    finishLog?.(answerAcc, "fatal");
     // Il client legge SOLO lo stream SSE (mai il body JSON diretto): rispondere qui con
     // NextResponse.json lascerebbe l'utente senza alcun messaggio. Emettiamo quindi lo
     // stesso formato SSE del ramo di streaming (già gestito dal client, vedi c.error).
