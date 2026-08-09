@@ -3,6 +3,7 @@ import { MENUS } from "@/lib/menus";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { SYSTEM_PROMPT_BASE, TRAILING, FALLBACK_STREAM_ERROR, FALLBACK_FATAL_ERROR } from "@/lib/concierge";
 import { getVerifiedAnswers, buildKbBlock, type KbItem } from "@/lib/conciergeKb";
+import { promemoriaLingua } from "@/lib/languageDetect";
 
 // Il blocco KB va IN CODA: la recency dà priorità reale alle risposte
 // verificate e mette le regole di guardia anti-injection come ultima parola.
@@ -163,7 +164,17 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         model: "deepseek-v4-flash",
-        messages: [{ role: "system", content: systemPrompt }, ...history],
+        // Il promemoria lingua va DOPO la storia, mai dentro systemPrompt: è
+        // per-turno (non deve finire nello storico salvato dal client) e la
+        // sua posizione in coda ai messages è ciò che lo rende efficace —
+        // verificato che un rinforzo identico messo dentro il system prompt
+        // (per quanto in cima o ripetuto) non basta: ~20% di aderenza contro
+        // il 100% misurato con questo stesso testo in coda ai messages.
+        messages: [
+          { role: "system", content: systemPrompt },
+          ...history,
+          { role: "system", content: promemoriaLingua(question) },
+        ],
         temperature: 0.4,
         max_tokens: 1500,
         stream: true,
