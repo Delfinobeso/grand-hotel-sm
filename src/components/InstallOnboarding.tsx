@@ -12,8 +12,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
  *   (molto più affidabile di una ricostruzione finta); altrimenti mostriamo un fallback
  *   testuale che spiega come farlo dal menu di Chrome.
  *
- * Mostrata automaticamente una sola volta (persistenza in localStorage), riapribile in
- * qualunque momento da un link nel footer tramite l'evento custom `blasat:show-onboarding`.
+ * Apertura automatica al primo avvio SOLO su Android (una sola volta, persistenza in
+ * localStorage). **Su iOS non si apre mai da sola** (scelta Aziz 2026-08-13: il primo
+ * avvio da link deve restare pulito) — su iPhone la guida resta comunque completa e
+ * raggiungibile in qualunque momento dal link nel footer, che passa dall'evento custom
+ * `blasat:show-onboarding` e non dall'apertura automatica.
  */
 
 const DISMISS_KEY = "blasat-onboarding-dismissed-v1";
@@ -515,6 +518,13 @@ export default function InstallOnboarding({
     setLang(detectLang());
 
     if (standaloneRef.current || !detectedPlatform) return;
+
+    // iOS: nessuna apertura automatica (scelta Aziz 2026-08-13). Il popup al primo
+    // avvio da link era invasivo su iPhone; la guida resta intatta e raggiungibile
+    // dal link nel footer, che entra da `blasat:show-onboarding` (effetto sotto) e
+    // non passa mai di qui. Android tiene l'apertura automatica: lì c'è anche il
+    // prompt nativo `beforeinstallprompt` e il percorso è molto meno ostico.
+    if (detectedPlatform === "ios") return;
 
     let alreadyDismissed = false;
     try {
