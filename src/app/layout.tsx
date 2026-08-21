@@ -3,7 +3,9 @@ import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import SwRegister from "@/components/SwRegister";
-import InstallOnboarding from "@/components/InstallOnboarding";
+// PROVA (branch prova/pwa-install-libreria): l'interruttore sceglie fra il
+// nostro onboarding e quello della libreria, con ?install=nuovo|nostro.
+import InstallOnboardingProva from "@/components/InstallOnboardingProva";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -38,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <AnalyticsProvider project="grand-hotel-sm" />
         <SwRegister />
-        <InstallOnboarding
+        <InstallOnboardingProva
           appName="Grand Hotel SM"
           stepImages={[
             "/onboarding/step-1-share.png",
