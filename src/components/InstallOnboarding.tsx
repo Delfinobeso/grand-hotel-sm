@@ -243,10 +243,24 @@ export default function InstallOnboarding({
       #pwa-install-element .install-dialog .close {
         color: ${accent};
       }
-      /* Le icone della guida (Condividi, Aggiungi...) prendono anche loro il
-         colore del marchio: erano azzurro di sistema, uguale su tutti e tre. */
+      /* LE ICONE SI COLORANO CON la proprieta' fill, NON con color. Misurato:
+         gli svg della libreria hanno un fill proprio (rgb(27,36,48)), quindi
+         impostare solo il colore del testo non cambiava niente — il [+] restava
+         grigio scuro sopra il pulsante corallo. */
       #pwa-install-element .install-dialog svg {
         color: ${accent};
+        fill: ${accent};
+      }
+      /* Dentro il pulsante l'icona deve stare col testo, cioe' bianca: il colore
+         del marchio sul fondo del marchio sarebbe invisibile. */
+      #pwa-install-element .install-dialog button:not(.close) svg {
+        color: #ffffff;
+        fill: #ffffff;
+      }
+      /* La x era del colore giusto ma a meta' opacita' (0,5): sembrava grigia.
+         Su un elemento che e' l'unico modo di dire "no", mezza tinta non va. */
+      #pwa-install-element .install-dialog .close {
+        opacity: 1;
       }
       /* IL VETRO SMERIGLIATO, e solo dove la sfocatura c'e' davvero.
          Su Safari e Chrome moderni si ottiene il vetro chiesto da Aziz: bianco
@@ -335,6 +349,15 @@ export default function InstallOnboarding({
     const contenitore = sr.querySelector("aside") as HTMLElement | null;
     if (contenitore) contenitore.style.setProperty("opacity", "1", "important");
 
+    // Le icone: stessa storia della x, i selettori da soli non bastano sempre.
+    // Dentro il pulsante vanno bianche (col testo), fuori del colore del marchio.
+    sr.querySelectorAll("svg").forEach((sv) => {
+      const dentroPulsante = !!sv.closest("button:not(.close)");
+      const colore = dentroPulsante ? "#ffffff" : accent;
+      (sv as SVGElement).style.setProperty("fill", colore, "important");
+      (sv as SVGElement).style.setProperty("color", colore, "important");
+    });
+
     const chiudi = sr.querySelector(".close") as HTMLElement | null;
     if (chiudi) {
       // LA CHIUSURA LA FACCIAMO NOI. Provato e misurato: con questa
@@ -353,6 +376,7 @@ export default function InstallOnboarding({
         });
       }
       chiudi.style.setProperty("color", accent, "important");
+      chiudi.style.setProperty("opacity", "1", "important");
       chiudi.style.setProperty("min-width", "44px", "important");
       chiudi.style.setProperty("min-height", "44px", "important");
       chiudi.style.setProperty("display", "flex", "important");
