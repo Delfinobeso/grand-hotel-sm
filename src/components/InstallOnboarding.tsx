@@ -417,15 +417,25 @@ export default function InstallOnboarding({
       if (!el || !el.shadowRoot || osservatore) return;
       osservatore = new MutationObserver(() => applicaStile(el));
       osservatore.observe(el.shadowRoot, { childList: true, subtree: true });
+      applicaStile(el);
     };
-    const t = window.setInterval(() => {
-      if (osservatore) return window.clearInterval(t);
-      avvia();
-    }, 300);
+    // Un colpo subito, poi qualche ripasso ravvicinato. Perche': la libreria
+    // disegna il suo shadow root quando vuole lei, e c'e' una finestra in cui il
+    // dialogo esiste gia' ma i nostri stili non sono ancora stati messi. In
+    // quella finestra si vedono i suoi colori al posto di quelli del marchio —
+    // misurato in produzione: nello stesso giro un hotel giusto e due sbagliati,
+    // e al giro dopo l'inverso. Non e' il deploy: e' il tempismo.
+    avvia();
+    const ripassi = [50, 150, 400, 900, 1800, 3000].map((ms) =>
+      window.setTimeout(() => {
+        avvia();
+        if (ref.current) applicaStile(ref.current);
+      }, ms),
+    );
 
     return () => {
       annullato = true;
-      window.clearInterval(t);
+      ripassi.forEach((r) => window.clearTimeout(r));
       osservatore?.disconnect();
       window.removeEventListener("blasat:show-onboarding", apri);
     };
