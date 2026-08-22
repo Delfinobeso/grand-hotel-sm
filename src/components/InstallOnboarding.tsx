@@ -54,6 +54,20 @@ import type { PWAInstallElement } from "@khmyznikov/pwa-install";
  *    mentre iOS dice "Aggiungi alla schermata Home". Le riscriviamo a DOM, ma
  *    solo in italiano: e' l'unica lingua in cui sappiamo con certezza cosa dice
  *    davvero il telefono (vedi CORREZIONI).
+ * 8. IL SUO PULSANTE E' UNA GRIGLIA CON line-height PARI ALL'ALTEZZA (50px):
+ *    e' cosi' che tiene la scritta in mezzo. Appena si porta il line-height a
+ *    22 — e va portato, o in tedesco la riga lunga non ci sta — il contenuto
+ *    resta appoggiato in alto e il centro dell'etichetta finisce a 11,8 su una
+ *    capsula da 50. Qui il pulsante diventa una riga flex centrata nei due
+ *    assi. Misurato sui pixel il 22/08, su tutti e tre gli hotel.
+ * 9. <use> SI PORTA DIETRO LO STILE INLINE DELL'ORIGINALE. Il [+] del pulsante
+ *    non e' un disegno suo: e' <use href="#pwa-add">, cioe' un clone dell'icona
+ *    della guida che sta piu' in basso. Colorare l'originale (foglio o inline)
+ *    colora anche il clone, e il clone finisce SUL FONDO DEL MARCHIO: sulle
+ *    Suites erano 1705 pixel di #ed3427 su #e72113, un fantasma a 1,05:1.
+ *    Percio' gli svg che qualche <use> clona non si colorano mai addosso: il
+ *    colore arriva per eredita' dal contenitore (.svg-wrap nella guida, l'svg
+ *    bianco dentro il pulsante), che e' anche il modo della libreria stessa.
  *
  * COMPORTAMENTO (deciso da Aziz il 2026-08-22, e NON si tocca):
  *  - si apre DA SOLA al primo avvio, su iPhone come su Android;
@@ -184,7 +198,10 @@ const TEMI = {
     anelloIcona: "rgba(0, 0, 0, 0.06)",
     titolo: "#1b2430",
     beneficio: "#46536a",
-    footnote: "#6b7688",
+    // 4,93:1 sul vetro chiaro misurato (#e9e9e9). Il #6b7688 di prima stava
+    // a 3,78: passa su bianco pieno (4,59) ma non sul vetro, che e' quello
+    // che l'ospite vede davvero.
+    footnote: "#5a6474",
     hairline: "rgba(10, 36, 68, 0.12)",
     xFondo: "rgba(10, 36, 68, 0.08)",
     xGlifo: "#46536a",
@@ -538,6 +555,16 @@ export default function InstallOnboarding({
         color: #ffffff;
         background-color: ${accentButton};
         transition: filter 120ms ease-out;
+        /* IL CONTENUTO AL CENTRO, non appoggiato al bordo di sopra. Il pulsante
+           della libreria e' una griglia con line-height 50 (l'altezza intera):
+           appena si porta il line-height a 22 per far stare due righe in
+           tedesco, la riga di testo resta incollata in alto e il centro
+           dell'etichetta finisce a 11,8 invece che a 25 su una capsula da 50.
+           Misurato sui pixel, uguale su tutti e tre gli hotel. Qui la griglia
+           diventa una riga flex centrata nei due assi. */
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       #pwa-install-element .install-dialog.apple .action-buttons .button-text {
         justify-content: center;
@@ -586,13 +613,24 @@ export default function InstallOnboarding({
       }
 
       /* LE ICONE SI COLORANO CON fill, NON con color (difetto 2): i suoi svg
-         hanno un fill proprio, quindi impostare il colore del testo non basta. */
-      #pwa-install-element .install-dialog svg {
+         hanno un fill proprio, quindi impostare il colore del testo non basta.
+         ECCEZIONE, ed e' il difetto 9: gli svg che <use> clona altrove
+         (#pwa-add, #arrow-left) NON si colorano sull'originale, o il clone si
+         porta quel colore dentro il pulsante. Il loro colore arriva per
+         EREDITA' dal contenitore, che e' anche il modo in cui lo fa la
+         libreria stessa (.svg-wrap ha fill, i suoi svg non ce l'hanno). */
+      #pwa-install-element .install-dialog svg:not(#pwa-add):not(#arrow-left) {
+        color: ${accent};
+        fill: ${accent};
+      }
+      #pwa-install-element .install-dialog .svg-wrap {
         color: ${accent};
         fill: ${accent};
       }
       /* Dentro il pulsante l'icona sta col testo, cioe' bianca: il colore del
-         marchio sul fondo del marchio sarebbe invisibile. */
+         marchio sul fondo del marchio sarebbe invisibile. Il [+] del pulsante e'
+         un <use href="#pwa-add">: bianco lo eredita da qui, perche' l'originale
+         non ha piu' un colore scritto addosso. */
       #pwa-install-element .install-dialog button:not(.close) svg {
         color: #ffffff;
         fill: #ffffff;
@@ -689,7 +727,7 @@ export default function InstallOnboarding({
         // L'ENTRATA, una volta sola per apertura (difetto 6: applicaStile viene
         // richiamata dai sei ripassi e dall'osservatore). Solo a guscio gia'
         // visibile, altrimenti l'animazione si consuma mentre e' nascosto.
-        if (visibileOra && !animato.current) {
+        if (visibileOra && !animato.current && !chiudendo.current) {
           animato.current = true;
           p("animation", motoRidotto() ? ENTRATA_PIANO : ENTRATA);
         }
@@ -718,7 +756,29 @@ export default function InstallOnboarding({
 
       // Le icone: stessa storia, i selettori da soli non bastano sempre. Tre
       // casi: dentro il pulsante bianche, la x neutra, tutte le altre del marchio.
+      // Gli id che qualche <use> clona altrove: su questi NON si scrive niente
+      // inline (difetto 9), perche' lo stile inline dell'originale il clone se
+      // lo porta dietro e vince sull'eredita' del posto dove finisce.
+      const clonati = new Set<string>();
+      sr.querySelectorAll("use").forEach((u) => {
+        const href =
+          u.getAttribute("href") || u.getAttribute("xlink:href") || "";
+        if (href.startsWith("#")) clonati.add(href.slice(1));
+      });
       sr.querySelectorAll("svg").forEach((sv) => {
+        if (sv.id && clonati.has(sv.id)) {
+          sv.style.removeProperty("fill");
+          sv.style.removeProperty("color");
+          // Il colore lo prende il contenitore, e da li' scende per eredita'
+          // solo sull'originale: il clone nel pulsante eredita invece il bianco
+          // dell'svg che lo ospita.
+          const nido = sv.parentElement as HTMLElement | null;
+          if (nido) {
+            nido.style.setProperty("fill", accent, "important");
+            nido.style.setProperty("color", accent, "important");
+          }
+          return;
+        }
         const colore = sv.closest("button:not(.close)")
           ? "#ffffff"
           : sv.closest(".close")
@@ -848,8 +908,11 @@ export default function InstallOnboarding({
     window.setTimeout(() => {
       if (guscio.current) guscio.current.style.display = "none";
       if (dialogo) dialogo.style.removeProperty("animation");
+      // Solo a uscita finita: azzerarlo subito riapriva la porta all'entrata se
+      // la libreria ridisegnava proprio dentro quei 200ms.
+      animato.current = false;
+      chiudendo.current = false;
     }, durata);
-    animato.current = false;
     // Chi chiude ha detto no per oggi: si riprova domani, non subito.
     const s = leggiStato();
     scriviStato({ volte: Math.max(s.volte, 1), ultimo: Date.now() });
