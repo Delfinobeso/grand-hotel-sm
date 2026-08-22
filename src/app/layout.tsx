@@ -40,6 +40,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SwRegister />
         <InstallOnboarding
           appName="Grand Hotel SM"
+          // Colori presi dall'icona vera dell'hotel. `accentButton` e' lo stesso
+          // tono appena piu' scuro: serve solo al pulsante, dove il testo bianco
+          // sul colore pieno non arrivava a 4,5:1.
+          accent="#0a2444"
+          accentButton="#0a2444"
         />
         {children}
       </body>

@@ -156,7 +156,24 @@ function scriviStato(s: Stato) {
   }
 }
 
-export default function InstallOnboarding({ appName }: { appName: string }) {
+/**
+ * `accent` e' il colore del marchio dell'hotel, preso dalla sua icona vera.
+ * `accentButton` e' lo stesso colore appena piu' scuro, e serve SOLO al pulsante:
+ * col testo bianco sopra, il verde del Titano stava a 3,89:1 e il corallo delle
+ * Suites a 4,10:1, sotto la soglia di 4,5 per il testo normale. Bastano 3-5% di
+ * luminosita' in meno per passare (4,62 e 4,54) restando sulla stessa tinta.
+ * Sulla x invece il colore di marca pieno va bene: e' un elemento grafico, la
+ * soglia e' 3:1 e la passano entrambi.
+ */
+export default function InstallOnboarding({
+  appName,
+  accent = "#1b2430",
+  accentButton = "#1b2430",
+}: {
+  appName: string;
+  accent?: string;
+  accentButton?: string;
+}) {
   const ref = useRef<PWAInstallElement | null>(null);
   // Contenitore che decide la visibilita'. Non si usa lo `style` sul custom
   // element perche' i suoi tipi JSX pretendono un CSSStyleDeclaration intero.
@@ -177,6 +194,10 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
     const regole = `
       #pwa-install-element .install-dialog,
       #pwa-install-element .install-dialog.apple {
+        /* Bianco PIENO come base. Il vetro smerigliato arriva sotto, ma solo
+           dove la sfocatura esiste davvero: senza di lei il 70% di bianco
+           lascia leggere le foto attraverso il testo, ed e' esattamente lo
+           stato illeggibile da cui siamo partiti. Meglio opaco che rotto. */
         --background-color: #ffffff;
         --text-color-normal: #1b2430;
         --text-color-primary: #1b2430;
@@ -189,9 +210,10 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
            colore di marca dei singoli hotel: due dei tre non espongono un token
            di marca leggibile, e indovinarlo su un'app cliente e' peggio che
            restare neutri. Se un giorno servisse, basta passarlo come prop. */
-        --background-color-button: #1b2430;
-        --background-color-button-active: #0f1720;
+        --background-color-button: ${accentButton};
+        --background-color-button-active: ${accentButton};
         --text-color-button: #ffffff;
+        --icon-how-to-color: ${accent};
       }
       @media (prefers-color-scheme: dark) {
         #pwa-install-element .install-dialog,
@@ -201,9 +223,11 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
           --text-color-primary: #1b2430;
           --text-color-secondary: #46536a;
           --text-color-description: #46536a;
-          --background-color-button: #1b2430;
-          --background-color-button-active: #0f1720;
+          --background-color: #ffffff;
+          --background-color-button: ${accentButton};
+          --background-color-button-active: ${accentButton};
           --text-color-button: #ffffff;
+          --icon-how-to-color: ${accent};
         }
       }
       /* La libreria colora il testo del pulsante con una variabile propria che
@@ -213,11 +237,30 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
          (visto a schermo: restava un cerchio grigio vuoto). */
       #pwa-install-element .install-dialog button:not(.close) {
         color: #ffffff;
-        background-color: #1b2430;
+        background-color: ${accentButton};
       }
       /* La × torna scura su fondo chiaro, com'e' nel tema chiaro della libreria. */
       #pwa-install-element .install-dialog .close {
-        color: #1b2430;
+        color: ${accent};
+      }
+      /* Le icone della guida (Condividi, Aggiungi...) prendono anche loro il
+         colore del marchio: erano azzurro di sistema, uguale su tutti e tre. */
+      #pwa-install-element .install-dialog svg {
+        color: ${accent};
+      }
+      /* IL VETRO SMERIGLIATO, e solo dove la sfocatura c'e' davvero.
+         Su Safari e Chrome moderni si ottiene il vetro chiesto da Aziz: bianco
+         al 70% con il fondo sfocato, cosi' sotto il testo il fondo diventa una
+         superficie uniforme invece di un collage di foto. Dove @supports non
+         passa (browser vecchi, o motori che dichiarano di non saper sfocare)
+         resta il bianco pieno di sopra: illeggibile mai. */
+      @supports ((backdrop-filter: blur(24px)) or (-webkit-backdrop-filter: blur(24px))) {
+        #pwa-install-element .install-dialog,
+        #pwa-install-element .install-dialog.apple {
+          --background-color: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(24px) saturate(180%);
+          -webkit-backdrop-filter: blur(24px) saturate(180%);
+        }
       }
     `;
     const sr = el.shadowRoot;
@@ -270,10 +313,24 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
     // nessuna regola della libreria puo' scavalcare.
     const dialogo = sr.querySelector(".install-dialog") as HTMLElement | null;
     if (dialogo) {
-      dialogo.style.setProperty("background-color", "#ffffff", "important");
+      // Stessa scelta delle regole sopra, ma decisa qui a runtime perche' una
+      // dichiarazione inline non puo' stare dentro @supports. Se il browser non
+      // sa sfocare, il fondo resta bianco pieno.
+      const saSfocare =
+        typeof CSS !== "undefined" &&
+        typeof CSS.supports === "function" &&
+        (CSS.supports("backdrop-filter", "blur(24px)") ||
+          CSS.supports("-webkit-backdrop-filter", "blur(24px)"));
+      dialogo.style.setProperty(
+        "background-color",
+        saSfocare ? "rgba(255, 255, 255, 0.7)" : "#ffffff",
+        "important",
+      );
       dialogo.style.setProperty("opacity", "1", "important");
-      dialogo.style.setProperty("backdrop-filter", "none", "important");
-      dialogo.style.setProperty("-webkit-backdrop-filter", "none", "important");
+      if (saSfocare) {
+        dialogo.style.setProperty("backdrop-filter", "blur(24px) saturate(180%)", "important");
+        dialogo.style.setProperty("-webkit-backdrop-filter", "blur(24px) saturate(180%)", "important");
+      }
     }
     const contenitore = sr.querySelector("aside") as HTMLElement | null;
     if (contenitore) contenitore.style.setProperty("opacity", "1", "important");
@@ -295,14 +352,14 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
           scriviStato({ volte: Math.max(s.volte, 1), ultimo: Date.now() });
         });
       }
-      chiudi.style.setProperty("color", "#1b2430", "important");
+      chiudi.style.setProperty("color", accent, "important");
       chiudi.style.setProperty("min-width", "44px", "important");
       chiudi.style.setProperty("min-height", "44px", "important");
       chiudi.style.setProperty("display", "flex", "important");
       chiudi.style.setProperty("align-items", "center", "important");
       chiudi.style.setProperty("justify-content", "center", "important");
     }
-  }, []);
+  }, [accent, accentButton]);
 
   useEffect(() => {
     setLingua(linguaDispositivo());
