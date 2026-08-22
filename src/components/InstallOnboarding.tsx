@@ -836,11 +836,14 @@ export default function InstallOnboarding({
 
       // ANDROID. La sua e' un'altra scheda (pwa-bottom-sheet) con un altro shadow
       // root, un altro DOM e una fisica di trascinamento tutta sua: qui le
-      // passiamo solo i colori — tema del sito invece di prefers-color-scheme
-      // (difetto 4) e pulsante del marchio al posto dell'indaco di serie. La
-      // grammatica Material completa (carta inset, scrim, gerarchia a tre voci)
-      // non e' un ri-stile ma una ricostruzione del suo DOM, e da qui non e'
-      // verificabile su un Android vero: e' rimasta fuori apposta.
+      // passiamo cio' che si puo' scrivere senza ricostruire il suo DOM: colori
+      // (tema del sito invece di prefers-color-scheme, difetto 4), pulsante del
+      // marchio al posto dell'indaco di serie, e la grammatica Material di
+      // superficie — carta, elevazione, gerarchia a tre voci.
+      // ⚠️ RESTA FUORI, e apposta: trascinamento, altezze e griglia interna sono
+      // fisica sua, e da qui non sono verificabili su un Android vero. Nessuno
+      // in squadra ha un Android: quello che segue e' verificato per stili
+      // calcolati, non a schermo.
       const foglioAndroid = sr.querySelector(
         "pwa-bottom-sheet",
       ) as HTMLElement | null;
@@ -871,6 +874,35 @@ export default function InstallOnboarding({
         }
         .dialog-body .how-to-body .description-step .svg-wrap svg {
           fill: ${accent};
+        }
+        /* GRAMMATICA MATERIAL, la parte che si puo' scrivere senza ricostruire
+           il suo DOM: carta, elevazione e gerarchia. Su Android il materiale non
+           e' il vetro ma l'ELEVAZIONE, quindi superficie opaca e due ombre —
+           niente blur, niente saturate. Il raggio 28 e' lo stesso della carta
+           iOS e insieme quello dei bottom sheet M3: qui i due mondi coincidono.
+           NON tocchiamo trascinamento, altezze o griglia interna: quella e'
+           fisica sua, e da qui non e' verificabile su un Android vero. */
+        .dialog-body {
+          border-radius: 28px 28px 0 0;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18), 0 1px 3px rgba(0, 0, 0, 0.10);
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
+        }
+        /* Le tre voci, come su iOS ma coi pesi Material: su Roboto il 600
+           sintetico sporca, quindi 500. */
+        .dialog-body .name {
+          font-size: 20px;
+          font-weight: 500;
+          line-height: 1.25;
+        }
+        .dialog-body .description.app-description {
+          font-size: 15px;
+          font-weight: 400;
+          line-height: 1.35;
+        }
+        .dialog-body .description.install-description {
+          font-size: 13px;
+          font-weight: 400;
         }
       `;
         adotta(
