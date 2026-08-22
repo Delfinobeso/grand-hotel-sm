@@ -130,9 +130,23 @@ export default function Home() {
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute("content", initialTheme === "dark" ? "#1d1c1a" : "#f4f1ea");
 
-    const storedLang = localStorage.getItem("lang");
+    // Lingua di partenza (regola di Aziz del 2026-08-22): vince sempre una scelta
+    // esplicita gia' fatta dall'ospite; se non c'e', si segue la lingua del
+    // DISPOSITIVO; se quella non e' fra le nostre cinque si ripiega sull'INGLESE,
+    // mai sull'italiano. Prima partiva sempre in italiano ignorando il telefono:
+    // un ospite tedesco atterrava su una pagina italiana e doveva cercarsi il
+    // selettore da solo, in un hotel che vive di ospiti stranieri.
     const validLangs: Lang[] = ["it", "en", "fr", "de", "es"];
-    setLang(validLangs.includes(storedLang as Lang) ? (storedLang as Lang) : "it");
+    const storedLang = localStorage.getItem("lang");
+    if (validLangs.includes(storedLang as Lang)) {
+      setLang(storedLang as Lang);
+    } else {
+      const preferite = navigator.languages?.length ? navigator.languages : [navigator.language || ""];
+      const trovata = preferite
+        .map((l) => l.slice(0, 2).toLowerCase() as Lang)
+        .find((l) => validLangs.includes(l));
+      setLang(trovata ?? "en");
+    }
   }, []);
 
   // Scroll to top (or to a section) when switching pillar.

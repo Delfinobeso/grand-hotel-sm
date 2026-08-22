@@ -40,12 +40,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SwRegister />
         <InstallOnboarding
           appName="Grand Hotel SM"
-          stepImages={[
-            "/onboarding/step-1-share.png",
-            "/onboarding/step-2-more.png",
-            "/onboarding/step-3-addhome.png",
-            "/onboarding/step-4-confirm.png",
-          ]}
         />
         {children}
       </body>
