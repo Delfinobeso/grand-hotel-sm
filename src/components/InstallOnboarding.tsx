@@ -117,6 +117,19 @@ interface Stato {
   ultimo: number;
 }
 
+/**
+ * Gia' dentro l'app installata? Allora l'invito non ha senso, ne' da solo ne'
+ * dal link nel footer. Aziz l'ha visto comparire proprio li' (22/08).
+ * Non ci fidiamo solo di `isUnderStandaloneMode` della libreria: leggiamo noi
+ * le due bandiere, quella standard e quella di Safari, che e' l'unica che
+ * risponde davvero su iPhone.
+ */
+function dentroApp(): boolean {
+  if (typeof window === "undefined") return false;
+  const nav = window.navigator as Navigator & { standalone?: boolean };
+  return window.matchMedia("(display-mode: standalone)").matches || nav.standalone === true;
+}
+
 function leggiStato(): Stato {
   try {
     const raw = localStorage.getItem(CHIAVE);
@@ -248,6 +261,23 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
     // non controlliamo: qui il valore lo scriviamo dove nessuno lo puo' battere.
     // Nello stesso passaggio si porta il bersaglio a 44px: ne misurava 26, sotto
     // il minimo tattile, ed e' l'unico modo che ha l'ospite per dire "no".
+    // FONDO E OPACITA' SULL'ELEMENTO. Il foglio adottato imposta le variabili
+    // giuste e in un browser simulato basta (misurato: rgb(255,255,255),
+    // opacita' 1). Su iPhone vero no: Aziz ha mandato due schermate a distanza
+    // di un'ora con il dialogo ancora traslucido, e attraverso ci si leggeva la
+    // pagina. Non passiamo piu' per le variabili: i tre valori che decidono la
+    // leggibilita' li scriviamo direttamente sul nodo, che e' l'unico posto che
+    // nessuna regola della libreria puo' scavalcare.
+    const dialogo = sr.querySelector(".install-dialog") as HTMLElement | null;
+    if (dialogo) {
+      dialogo.style.setProperty("background-color", "#ffffff", "important");
+      dialogo.style.setProperty("opacity", "1", "important");
+      dialogo.style.setProperty("backdrop-filter", "none", "important");
+      dialogo.style.setProperty("-webkit-backdrop-filter", "none", "important");
+    }
+    const contenitore = sr.querySelector("aside") as HTMLElement | null;
+    if (contenitore) contenitore.style.setProperty("opacity", "1", "important");
+
     const chiudi = sr.querySelector(".close") as HTMLElement | null;
     if (chiudi) {
       // LA CHIUSURA LA FACCIAMO NOI. Provato e misurato: con questa
@@ -288,7 +318,7 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
       applicaStile(el);
 
       // Gia' installata e aperta dall'icona: non si chiede niente a nessuno.
-      if (el.isUnderStandaloneMode) return;
+      if (dentroApp() || el.isUnderStandaloneMode) return;
 
       const stato = leggiStato();
       if (stato.volte >= MAX_INVITI) return;
@@ -311,6 +341,8 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
     const apri = () => {
       const el = ref.current;
       if (!el || !pronta.current) return;
+      // Anche dal footer: dentro l'app installata l'invito non ha senso.
+      if (dentroApp() || el.isUnderStandaloneMode) return;
       if (guscio.current) guscio.current.style.display = "";
       el.showDialog(true);
       applicaStile(el);
