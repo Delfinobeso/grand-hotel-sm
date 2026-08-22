@@ -80,26 +80,35 @@ function linguaDispositivo(): Lingua {
 }
 
 // Solo le due righe che scriviamo NOI (la libreria traduce le sue da sola).
-const TESTI: Record<Lingua, { descrizione: (h: string) => string; invito: string }> = {
+/**
+ * Le due righe che scriviamo noi. Il copy e' stato rifatto il 22/08 perche' le
+ * prime dicevano due volte la stessa cosa ("si apre come un'app" sopra, "si apre
+ * a tutto schermo" sotto) e ripetevano il nome dell'hotel che e' gia' scritto
+ * grande due centimetri piu' su. Adesso la prima riga dice cosa ci GUADAGNA
+ * l'ospite, la seconda toglie l'unica obiezione vera ("mi occupa spazio?").
+ * Il nome dell'hotel non compare piu' nel testo: lo mette gia' la libreria come
+ * titolo, e ripeterlo mangiava la riga senza aggiungere niente.
+ */
+const TESTI: Record<Lingua, { descrizione: () => string; invito: string }> = {
   it: {
-    descrizione: (h) => `Aggiungi ${h} alla schermata Home: si apre come un'app, anche senza rete.`,
-    invito: "Si apre a tutto schermo, senza la barra del browser.",
+    descrizione: () => "Orari, servizi e concierge a portata di pollice, anche senza rete.",
+    invito: "Non si scarica niente: resta un'icona sulla schermata Home.",
   },
   en: {
-    descrizione: (h) => `Add ${h} to your Home Screen: it opens like an app, even offline.`,
-    invito: "It opens full screen, without the browser bar.",
+    descrizione: () => "Opening hours, services and concierge at your fingertips, even offline.",
+    invito: "Nothing to download: it stays as an icon on your Home Screen.",
   },
   fr: {
-    descrizione: (h) => `Ajoutez ${h} à votre écran d'accueil : s'ouvre comme une app, même hors ligne.`,
-    invito: "S'ouvre en plein écran, sans la barre du navigateur.",
+    descrizione: () => "Horaires, services et conciergerie à portée de main, même hors ligne.",
+    invito: "Rien à télécharger : une simple icône sur votre écran d'accueil.",
   },
   de: {
-    descrizione: (h) => `${h} zum Home-Bildschirm hinzufügen: öffnet sich wie eine App, auch offline.`,
-    invito: "Öffnet sich im Vollbild, ohne Browserleiste.",
+    descrizione: () => "Öffnungszeiten, Services und Concierge griffbereit, auch offline.",
+    invito: "Nichts herunterzuladen: nur ein Symbol auf dem Home-Bildschirm.",
   },
   es: {
-    descrizione: (h) => `Añade ${h} a la pantalla de inicio: se abre como una app, incluso sin conexión.`,
-    invito: "Se abre a pantalla completa, sin la barra del navegador.",
+    descrizione: () => "Horarios, servicios y conserjería a mano, incluso sin conexión.",
+    invito: "No se descarga nada: queda como un icono en la pantalla de inicio.",
   },
 };
 
@@ -198,20 +207,37 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
         color: #1b2430;
       }
     `;
-    try {
-      el.styles = { blasat: regole } as unknown as Record<string, string>;
-    } catch {
-      /* se l'API cambia, sotto c'e' comunque l'iniezione nello shadow root */
-    }
-    // Rete di sicurezza: iniettiamo anche direttamente nello shadow root, cosi'
-    // il contrasto non dipende da un'API non documentata della libreria.
     const sr = el.shadowRoot;
     if (!sr) return;
-    if (!sr.querySelector("style[data-blasat]")) {
-      const st = document.createElement("style");
-      st.setAttribute("data-blasat", "1");
-      st.textContent = regole.replace(/;/g, " !important;");
-      sr.appendChild(st);
+
+    // FOGLIO ADOTTATO, non un <style> figlio. Perche': un <style> appeso allo
+    // shadow root e' un nodo come gli altri, e quando la libreria ri-disegna
+    // (succede a ogni showDialog dal link del footer) se lo porta via. Il
+    // risultato, visto sul telefono di Aziz: aprendo dal footer tornavano il
+    // fondo traslucido e la x invisibile, mentre all'apertura automatica era
+    // tutto a posto — due strade, due risultati, e la differenza era solo che
+    // una arrivava dopo un render. Un foglio adottato non e' un nodo del DOM:
+    // sopravvive a qualunque render della libreria.
+    const css = regole.replace(/;/g, " !important;");
+    try {
+      const gia = (sr.adoptedStyleSheets || []).some(
+        (f) => (f as CSSStyleSheet & { dataBlasat?: boolean }).dataBlasat,
+      );
+      if (!gia) {
+        const foglio = new CSSStyleSheet();
+        foglio.replaceSync(css);
+        (foglio as CSSStyleSheet & { dataBlasat?: boolean }).dataBlasat = true;
+        sr.adoptedStyleSheets = [...(sr.adoptedStyleSheets || []), foglio];
+      }
+    } catch {
+      // Safari molto vecchi non hanno i fogli costruibili: si ricade sul nodo
+      // <style>, che e' meglio di niente anche se la libreria puo' toglierlo.
+      if (!sr.querySelector("style[data-blasat]")) {
+        const st = document.createElement("style");
+        st.setAttribute("data-blasat", "1");
+        st.textContent = css;
+        sr.appendChild(st);
+      }
     }
 
     // La x di chiusura la sistemiamo sull'ELEMENTO, non con un selettore.
@@ -290,8 +316,28 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
       applicaStile(el);
     };
     window.addEventListener("blasat:show-onboarding", apri);
+
+    // La x la sistemiamo sull'elemento, quindi ogni volta che la libreria
+    // ri-disegna il suo shadow root ne nasce una nuova, di nuovo bianca su
+    // bianco e di nuovo a 26px. L'osservatore la ricorregge appena compare.
+    // Solo `childList`: osservare anche gli attributi farebbe rincorrere le
+    // nostre stesse scritture di stile all'infinito.
+    let osservatore: MutationObserver | null = null;
+    const avvia = () => {
+      const el = ref.current;
+      if (!el || !el.shadowRoot || osservatore) return;
+      osservatore = new MutationObserver(() => applicaStile(el));
+      osservatore.observe(el.shadowRoot, { childList: true, subtree: true });
+    };
+    const t = window.setInterval(() => {
+      if (osservatore) return window.clearInterval(t);
+      avvia();
+    }, 300);
+
     return () => {
       annullato = true;
+      window.clearInterval(t);
+      osservatore?.disconnect();
       window.removeEventListener("blasat:show-onboarding", apri);
     };
   }, [applicaStile]);
@@ -312,7 +358,7 @@ export default function InstallOnboarding({ appName }: { appName: string }) {
       manual-apple="true"
       manual-chrome="true"
       name={appName}
-      description={t.descrizione(appName)}
+      description={t.descrizione()}
       install-description={t.invito}
       manifest-url="/manifest.json"
     />
