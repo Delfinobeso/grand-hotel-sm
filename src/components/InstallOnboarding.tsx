@@ -132,16 +132,17 @@ const LINGUE: Lingua[] = ["it", "en", "fr", "de", "es"];
  * soltanto il dispositivo: un ospite che metteva l'app in inglese si ritrovava
  * le istruzioni di installazione in italiano.
  */
-function linguaScelta(): Lingua {
-  if (typeof window === "undefined") return "en";
+function sceltaEsplicita(): Lingua | null {
+  if (typeof window === "undefined") return null;
   try {
     const salvata = window.localStorage.getItem("lang");
     if (salvata && (LINGUE as string[]).includes(salvata)) return salvata as Lingua;
   } catch {
-    /* storage bloccato: si ripiega sul dispositivo */
+    /* storage bloccato: vale come "non ha ancora scelto" */
   }
-  return linguaDispositivo();
+  return null;
 }
+
 
 /**
  * DIFETTO 10 DELLA LIBRERIA: la sua lingua non e' configurabile. La sceglie da
@@ -156,22 +157,36 @@ function linguaScelta(): Lingua {
  * la lingua al primo arrivo, e falsarlo vorrebbe dire far dipendere quella
  * scelta da se stessa.
  */
-let linguaPerLaLibreria: Lingua = "en";
+let linguaImposta: Lingua | null = null; // null = l'ospite non ha scelto
+let linguaDelTelefono = "";
 let getterInstallato = false;
 
-function imponiLinguaAllaLibreria(l: Lingua) {
-  linguaPerLaLibreria = l;
+function imponiLinguaAllaLibreria(l: Lingua | null) {
+  linguaImposta = l;
   if (getterInstallato || typeof navigator === "undefined") return;
+  linguaDelTelefono = navigator.language;
   try {
     Object.defineProperty(navigator, "language", {
       configurable: true,
-      get: () => linguaPerLaLibreria,
+      // Finche' non c'e' una scelta esplicita passa il valore VERO, non il
+      // nostro ripiego. Non e' un dettaglio: la libreria parla una trentina di
+      // lingue, noi ne scriviamo cinque. Imponendole sempre la nostra, un
+      // ospite giapponese si vedeva la guida in inglese invece che nella sua —
+      // e proprio la guida e' la cosa che DEVE stare nella lingua del telefono,
+      // perche' nomina voci di iOS ("Condividi", "Aggiungi alla schermata
+      // Home") che l'ospite legge sul suo schermo in quella lingua li'.
+      get: () => linguaImposta ?? linguaDelTelefono,
     });
     getterInstallato = true;
   } catch {
     // Browser che non lascia ridefinire la proprieta': l'invito resta nella
     // lingua del telefono. Nessun danno oltre a quello.
   }
+}
+
+/** In che lingua sta davvero disegnando la libreria: serve alle correzioni a DOM. */
+function linguaLibreria(): Lingua {
+  return (linguaImposta ?? linguaDelTelefono).slice(0, 2).toLowerCase() as Lingua;
 }
 
 // Solo le due righe che scriviamo NOI (la libreria traduce le sue da sola).
@@ -447,6 +462,12 @@ export default function InstallOnboarding({
   // provvisorio lo congela li'. Misurato: su un telefono italiano restava la
   // descrizione inglese mentre il resto del dialogo era gia' in italiano.
   const [lingua, setLingua] = useState<Lingua | null>(null);
+  // Distinta da `lingua`: qui `null` significa "l'ospite non ha scelto, comanda
+  // il telefono". Serve anche nella `key` dell'elemento, perche' passare da
+  // "telefono giapponese" a "scelto inglese" non cambia `lingua` (in entrambi i
+  // casi le nostre righe sono in inglese) ma DEVE ricreare l'elemento, o la
+  // libreria resterebbe in giapponese.
+  const [scelta, setScelta] = useState<Lingua | null>(null);
   const pronta = useRef(false);
   // L'entrata deve scattare UNA volta per apertura. Senza questa bandiera
   // ripartirebbe a ogni ripasso (50-3000ms) e a ogni colpo dell'osservatore: la
@@ -873,7 +894,7 @@ export default function InstallOnboarding({
 
       // LE PAROLE DEL TELEFONO (difetto 7). Si riscrive solo se e' diverso,
       // altrimenti l'osservatore rincorrerebbe se stesso all'infinito.
-      const correzioni = CORREZIONI[linguaPerLaLibreria];
+      const correzioni = CORREZIONI[linguaLibreria()];
       if (correzioni) {
         sr.querySelectorAll(
           ".dialog-button.button.install .button-text > span, .description-step .step-text",
@@ -1008,9 +1029,10 @@ export default function InstallOnboarding({
   // scheda che ha scritto — cioe' proprio la nostra.
   useEffect(() => {
     const cambia = () => {
-      const nuova = linguaScelta();
-      imponiLinguaAllaLibreria(nuova);
-      setLingua(nuova);
+      const esplicita = sceltaEsplicita();
+      imponiLinguaAllaLibreria(esplicita);
+      setScelta(esplicita);
+      setLingua(esplicita ?? linguaDispositivo());
     };
     window.addEventListener("blasat:lang", cambia);
     return () => window.removeEventListener("blasat:lang", cambia);
@@ -1019,9 +1041,10 @@ export default function InstallOnboarding({
   useEffect(() => {
     // Va imposta PRIMA dell'import qui sotto: la libreria legge la lingua nel
     // connectedCallback, cioe' appena l'elemento entra nel DOM.
-    const scelta = linguaScelta();
-    imponiLinguaAllaLibreria(scelta);
-    setLingua(scelta);
+    const esplicita = sceltaEsplicita();
+    imponiLinguaAllaLibreria(esplicita);
+    setScelta(esplicita);
+    setLingua(esplicita ?? linguaDispositivo());
     let annullato = false;
 
     // Apre il guscio e riarma le bandiere; lo scrim e l'entrata li accende
@@ -1141,7 +1164,7 @@ export default function InstallOnboarding({
     // osservatore dello shadow root, ripassi. La pulizia qui sopra e' completa,
     // quindi rifare l'effetto non lascia residui. L'invito automatico non si
     // ripropone: chi l'ha gia' visto e' fermato da `ultimo` in leggiStato().
-  }, [applicaStile, lingua]);
+  }, [applicaStile, lingua, scelta]);
 
   if (lingua === null) return null;
   const t = TESTI[lingua];
@@ -1173,7 +1196,7 @@ export default function InstallOnboarding({
       <pwa-install
         // Ricrea l'elemento al cambio lingua: e' l'unico modo per far rileggere
         // la lingua alla libreria, che la guarda solo entrando nel DOM.
-        key={lingua}
+        key={`${lingua}-${scelta ?? "telefono"}`}
         ref={ref}
         manual-apple="true"
         manual-chrome="true"
