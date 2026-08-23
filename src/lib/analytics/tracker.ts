@@ -6,11 +6,77 @@ const SRC_KEY = 'bl_src';           // sessionStorage: fonte della visita corren
 const PWA_SEEN_KEY = 'bl_pwa_seen'; // localStorage: "YYYY-MM" dell'ultimo mese
                                     // in cui questo dispositivo è stato visto in
                                     // modalità app (dedup della stima installati)
+const OPT_OUT_KEY = 'bl_notrack';   // localStorage: '1' = dispositivo escluso per
+                                    // sempre dalle statistiche (vedi escluso())
 
 // Valori accettati dal parametro ?src= sui supporti fisici. 'direct' non è in
 // whitelist perché non arriva mai dall'URL: è il fallback quando il parametro
 // manca (bookmark, icona in home, link diretto).
 const SRC_FROM_URL = ['qr', 'nfc'];
+
+// --- Chi NON deve finire nelle statistiche del cliente -----------------------
+// ENDPOINT è assoluto: senza questo filtro anche una pagina aperta su un dev
+// server locale scrive nei dati veri che vede l'albergatore. È già successo il
+// 2026-08-22, quando circa 90 run Playwright hanno portato il Grand Hotel da
+// ~13 a 98 "aperture app" in giornata, sporcando anche i contatori cumulativi
+// (che non essendo datati non si possono più separare: si stimano soltanto).
+//
+// Il risultato è calcolato una volta sola e messo in cache: la decisione non può
+// cambiare a metà visita, e push() la interroga a ogni evento.
+let _escluso: boolean | null = null;
+
+// Ambienti che non sono l'app pubblicata: dev server, rete locale, preview.
+function ambienteDiLavoro(host: string): boolean {
+  return host === 'localhost' || host === '127.0.0.1' || host === '::1'
+    || host.endsWith('.local')
+    || /^\d{1,3}(\.\d{1,3}){3}$/.test(host)  // IP di LAN: telefono sul dev server
+    || host.endsWith('.vercel.app');           // deploy di preview
+}
+
+// Browser pilotato da un'automazione. navigator.webdriver è imposto dallo
+// standard e Playwright NON lo maschera: resta true anche quando lo user agent
+// è quello di un iPhone vero, che è esattamente come giravano i nostri test.
+// Lo user agent da solo non basterebbe proprio per quel motivo.
+function automazione(nav: Navigator & { webdriver?: boolean }): boolean {
+  if (nav.webdriver === true) return true;
+  return /headless|electron|phantom|puppeteer|playwright|selenium|lighthouse|bot|crawler|spider/i
+    .test(nav.userAgent);
+}
+
+// Opt-out permanente del dispositivo, per chi lavora sull'app: una visita con
+// ?bl_track=off e quel browser non conta più; ?bl_track=on lo riattiva.
+// Il parametro viene tolto dall'URL subito dopo, come si fa con ?src: un link
+// copiato e girato a un ospite non deve zittire anche le sue visite.
+// Va fatto una volta per browser: su iOS l'app aggiunta alla Home ha uno
+// storage separato da Safari, quindi lì l'opt-out va ripetuto dentro l'app.
+function dispositivoEscluso(): boolean {
+  try {
+    const scelta = new URLSearchParams(window.location.search).get('bl_track');
+    if (scelta === 'off') window.localStorage.setItem(OPT_OUT_KEY, '1');
+    else if (scelta === 'on') window.localStorage.removeItem(OPT_OUT_KEY);
+    if (scelta !== null) stripParamFromUrl('bl_track');
+    return window.localStorage.getItem(OPT_OUT_KEY) === '1';
+  } catch {
+    // Storage bloccato (navigazione privata): non è un motivo per escludere,
+    // è un ospite qualunque con Safari in incognito.
+    return false;
+  }
+}
+
+function escluso(): boolean {
+  if (_escluso !== null) return _escluso;
+  if (typeof window === 'undefined') return true; // SSR: nessun evento
+  const nav = window.navigator as Navigator & { webdriver?: boolean };
+  _escluso = ambienteDiLavoro(window.location.hostname)
+    || automazione(nav)
+    || dispositivoEscluso();
+  if (_escluso) {
+    // Unico modo per verificare dal telefono che l'opt-out ha preso, senza
+    // aggiungere interfaccia visibile agli ospiti.
+    console.info('[blasat] visita esclusa dalle statistiche');
+  }
+  return _escluso;
+}
 
 let _project = '';
 let _tab = '';
@@ -19,25 +85,30 @@ let _timer: ReturnType<typeof setInterval> | null = null;
 let _onAppInstalled: (() => void) | null = null;
 
 function flush() {
-  if (!_batch.length) return;
+  if (escluso() || !_batch.length) return;
   const payload = JSON.stringify(_batch);
   _batch = [];
   navigator.sendBeacon(ENDPOINT, new Blob([payload], { type: 'application/json' }));
 }
 
+// Unico punto di scrittura: il filtro sta qui e non solo in initTracker perché
+// setTab() e trackClick() sono importati dinamicamente dai componenti e possono
+// partire per conto loro, senza passare da initTracker().
 function push(event: object) {
+  if (escluso()) return;
   _batch.push(event);
   if (_batch.length >= 10) flush();
 }
 
-// Rimuove ?src dall'URL senza toccare gli altri parametri né la history entry.
-// Serve a evitare che un ospite condivida un link col src di qualcun altro
-// attaccato: l'attribuzione vale per chi ha inquadrato il QR / avvicinato il tag.
-function stripSrcFromUrl() {
+// Rimuove un parametro dall'URL senza toccare gli altri né la history entry.
+// Serve a evitare che un ospite condivida un link con addosso il parametro di
+// qualcun altro: per ?src l'attribuzione vale per chi ha inquadrato il QR /
+// avvicinato il tag, per ?bl_track l'esclusione vale per chi l'ha chiesta.
+function stripParamFromUrl(nome: string) {
   try {
     const url = new URL(window.location.href);
-    if (!url.searchParams.has('src')) return;
-    url.searchParams.delete('src');
+    if (!url.searchParams.has(nome)) return;
+    url.searchParams.delete(nome);
     const qs = url.searchParams.toString();
     window.history.replaceState(
       window.history.state,
@@ -61,7 +132,7 @@ function resolveSrc(): 'qr' | 'nfc' | 'direct' {
   } catch {
     /* URL malformato: si prosegue col valore in sessione */
   }
-  if (fromUrl !== null) stripSrcFromUrl();
+  if (fromUrl !== null) stripParamFromUrl('src');
 
   if (fromUrl && SRC_FROM_URL.includes(fromUrl)) {
     try {
@@ -114,6 +185,9 @@ function isFirstStandaloneOfMonth(): boolean {
 
 export function initTracker(project: string) {
   _project = project;
+  // Escluso: non si registra nulla, nemmeno il timer o i listener. Va valutato
+  // qui e non solo in push() per non lasciare in giro un intervallo inutile.
+  if (escluso()) return;
 
   const standalone = isStandaloneDisplay();
   // Un solo evento 'session' per apertura reale dell'app — separato dai cambi
