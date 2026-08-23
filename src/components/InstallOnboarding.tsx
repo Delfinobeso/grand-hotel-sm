@@ -69,8 +69,12 @@ import type { PWAInstallElement } from "@khmyznikov/pwa-install";
  *    colore arriva per eredita' dal contenitore (.svg-wrap nella guida, l'svg
  *    bianco dentro il pulsante), che e' anche il modo della libreria stessa.
  *
- * COMPORTAMENTO (deciso da Aziz il 2026-08-22, e NON si tocca):
- *  - si apre DA SOLA al primo avvio, su iPhone come su Android;
+ * COMPORTAMENTO (Aziz, 2026-08-22; innesco rivisto il 2026-08-23):
+ *  - si apre DA SOLA, su iPhone come su Android, ma non piu' a tempo fisso dal
+ *    caricamento: aspetta il primo fra un GESTO DI INTENZIONE (una CTA toccata,
+ *    la seconda sezione visitata, o il concierge usato e chiuso) e una RETE A
+ *    TEMPO di 60 secondi a schermo — 20 per chi arriva dal QR in camera.
+ *    Mai sopra il concierge aperto: in quel caso si aspetta che lo chiuda;
  *  - se non e' stata installata, si ripropone IL GIORNO DOPO, al massimo tre
  *    volte in tutto. Insistere all'infinito con un ospite che ha gia' detto no
  *    due volte non fa installare l'app, fa chiudere la pagina;
@@ -92,9 +96,24 @@ const CHIAVE = "blasat-install-v2";
 const CHIAVE_LEGACY = "blasat-onboarding-dismissed-v1";
 const GIORNO_MS = 24 * 60 * 60 * 1000;
 const MAX_INVITI = 3;
-// Un attimo dopo il primo disegno: aprirla mentre la pagina si sta ancora
-// componendo la fa sembrare un errore, non un invito.
-const RITARDO_MS = 1200;
+// QUANDO CHIEDERE. Fino al 2026-08-22 l'invito compariva 1200ms dopo il primo
+// disegno, cioe' prima di aver mostrato un orario, un menu, una risposta. Su
+// iPhone non esiste il prompt di sistema — e' una guida manuale in tre passi —
+// quindi era lavoro vero chiesto a chi non sapeva ancora se ne valesse la pena,
+// e ognuno dei tre tentativi bruciati li' valeva pochissimo. Ora si aspetta il
+// primo fra un gesto di intenzione e la rete a tempo.
+//
+// Rete a tempo: chi guarda e basta l'invito lo riceve comunque, ma dopo aver
+// avuto il tempo di vedere qualcosa. Si contano solo i secondi a schermo: una
+// scheda lasciata aperta in tasca non e' un ospite che sta usando l'app.
+const RETE_MS = 60_000;
+// Chi ha inquadrato il QR in camera non e' un curioso di passaggio: e' un ospite
+// gia' dentro l'hotel, con davanti dei giorni di soggiorno. Per lui l'app vale
+// di piu' e si puo' chiedere prima.
+const RETE_QR_MS = 20_000;
+// Silenzio dopo l'ultimo gesto prima di comparire: spuntare sotto il dito
+// mentre sta ancora toccando sembra un errore, non un invito.
+const CALMA_MS = 1500;
 
 type Lingua = "it" | "en" | "fr" | "de" | "es";
 
@@ -468,6 +487,15 @@ export default function InstallOnboarding({
   // casi le nostre righe sono in inglese) ma DEVE ricreare l'elemento, o la
   // libreria resterebbe in giapponese.
   const [scelta, setScelta] = useState<Lingua | null>(null);
+  // Segnali raccolti per decidere QUANDO chiedere. Stanno in ref e non fra le
+  // variabili dell'effetto perche' l'effetto si ri-esegue appena si risolve la
+  // lingua: tenendoli li' dentro, la prima sezione visitata andava persa e
+  // l'ospite doveva muoversi due volte perche' contasse.
+  const sezioniViste = useRef<Set<string>>(new Set());
+  const intenzione = useRef(false);
+  const conciergeAperto = useRef(false);
+  const msAttivi = useRef(0);
+  const invitato = useRef(false);
   const pronta = useRef(false);
   // L'entrata deve scattare UNA volta per apertura. Senza questa bandiera
   // ripartirebbe a ogni ripasso (50-3000ms) e a ogni colpo dell'osservatore: la
@@ -1047,6 +1075,88 @@ export default function InstallOnboarding({
     setLingua(esplicita ?? linguaDispositivo());
     let annullato = false;
 
+    // --- QUANDO CHIEDERE: raccolta dei segnali ---------------------------
+    // Si ascolta da subito, prima che l'import qui sotto si risolva: i gesti
+    // dei primi secondi sono proprio quelli che contano.
+    // Due strade che si coprono a vicenda: il tracker salva la fonte in
+    // sessionStorage e ripulisce l'URL, ma non gira per tutti (dev server,
+    // automazioni, dispositivi che hanno chiesto di restare fuori dalle
+    // statistiche) — e quando non gira il parametro resta nell'URL. Chiedere a
+    // entrambe significa non dipendere dal fatto che le statistiche siano attive.
+    const daQr = (() => {
+      try {
+        if (new URLSearchParams(window.location.search).get("src") === "qr") return true;
+        return window.sessionStorage.getItem("bl_src") === "qr";
+      } catch {
+        return false;
+      }
+    })();
+    const rete = daQr ? RETE_QR_MS : RETE_MS;
+
+    let quotaOk = false;          // elemento pronto E quota giornaliera disponibile
+    let statoQuota: Stato | null = null;
+    let calma: number | null = null;
+
+    const valuta = (motivo: "gesto" | "tempo") => {
+      if (annullato || invitato.current || !quotaOk || conciergeAperto.current) return;
+      if (motivo === "gesto" && !intenzione.current) return;
+      if (calma !== null) window.clearTimeout(calma);
+      calma = window.setTimeout(() => {
+        // Ricontrollo: fra l'attesa e adesso puo' essere cambiato tutto
+        // (concierge riaperto, componente smontato, elemento sparito).
+        if (annullato || invitato.current || conciergeAperto.current || !ref.current || !statoQuota) return;
+        invitato.current = true;
+        mostra(ref.current);
+        scriviStato({ volte: statoQuota.volte + 1, ultimo: Date.now() });
+      }, CALMA_MS);
+    };
+
+    // Il battito si SPEGNE quando la rete scatta. Senza, chiamerebbe valuta()
+    // ogni secondo e ogni chiamata rimanderebbe di CALMA_MS il timer che deve
+    // far comparire l'invito: siccome il battito e' piu' fitto della calma,
+    // quel timer non scadrebbe mai e l'invito non arriverebbe piu'.
+    let battito = 0;
+    battito = window.setInterval(() => {
+      if (document.visibilityState === "visible") msAttivi.current += 1000;
+      if (msAttivi.current >= rete) {
+        window.clearInterval(battito);
+        valuta("tempo");
+      }
+    }, 1000);
+
+    const suSegnale = (e: Event) => {
+      const d = (e as CustomEvent).detail as { tipo?: string; valore?: string } | null;
+      if (!d) return;
+      if (d.tipo === "sezione") {
+        sezioniViste.current.add(String(d.valore));
+        // La prima sezione e' quella su cui e' atterrato: non ha scelto niente.
+        // Dalla seconda in poi si e' mosso, ed e' quello il segnale.
+        if (sezioniViste.current.size >= 2) intenzione.current = true;
+      } else if (d.tipo === "azione") {
+        // Ogni CTA tracciata e' un gesto voluto: menu, prenotazioni, telefono,
+        // mappe, recensioni. Non ci sono clic accidentali in quella lista.
+        intenzione.current = true;
+      }
+      valuta("gesto");
+    };
+
+    const suConcierge = (e: Event) => {
+      const aperto = (e as CustomEvent).detail === true;
+      const eraAperto = conciergeAperto.current;
+      conciergeAperto.current = aperto;
+      // Vale come segnale solo una chiusura VERA, cioe' preceduta da
+      // un'apertura: la pagina annuncia lo stato anche appena si monta, e quel
+      // primo "chiuso" non e' un ospite che ha usato il concierge — leggerlo
+      // come tale faceva comparire l'invito subito, in ogni scenario.
+      if (!aperto && eraAperto) {
+        intenzione.current = true;
+        valuta("gesto");
+      }
+    };
+
+    window.addEventListener("blasat:segnale", suSegnale);
+    window.addEventListener("blasat:concierge", suConcierge);
+
     // Apre il guscio e riarma le bandiere; lo scrim e l'entrata li accende
     // applicaStile, che e' l'unico posto che sa cosa c'e' davvero disegnato.
     const mostra = (el: PWAInstallElement) => {
@@ -1096,11 +1206,12 @@ export default function InstallOnboarding({
         if (stato.volte >= MAX_INVITI) return;
         if (stato.ultimo && Date.now() - stato.ultimo < GIORNO_MS) return;
 
-        window.setTimeout(() => {
-          if (annullato || !ref.current) return;
-          mostra(ref.current);
-          scriviStato({ volte: stato.volte + 1, ultimo: Date.now() });
-        }, RITARDO_MS);
+        // Quota disponibile: da qui in poi decidono i segnali raccolti sopra.
+        // La valutazione immediata serve al caso in cui l'ospite si sia gia'
+        // mosso mentre la libreria si caricava.
+        statoQuota = stato;
+        quotaOk = true;
+        valuta("gesto");
       });
     });
 
@@ -1154,6 +1265,10 @@ export default function InstallOnboarding({
 
     return () => {
       annullato = true;
+      window.clearInterval(battito);
+      if (calma !== null) window.clearTimeout(calma);
+      window.removeEventListener("blasat:segnale", suSegnale);
+      window.removeEventListener("blasat:concierge", suConcierge);
       ripassi.forEach((r) => window.clearTimeout(r));
       osservatore?.disconnect();
       occhioTema.disconnect();

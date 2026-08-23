@@ -69,6 +69,13 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<TabKey>("oggi");
   const [pendingSection, setPendingSection] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
+
+  // L'invito a installare non deve comparire sopra il concierge aperto, e
+  // "ha usato il concierge" e' il segnale di intenzione piu' forte che abbiamo.
+  // Il componente dell'invito vive in layout.tsx e questo stato non lo vede.
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("blasat:concierge", { detail: chatOpen }));
+  }, [chatOpen]);
   const keyboardOpen = useKeyboardOpen();
   const mainRef = useRef<HTMLElement>(null);
   const dockRef = useRef<HTMLElement>(null);

@@ -218,13 +218,29 @@ export function initTracker(project: string) {
   window.addEventListener('appinstalled', _onAppInstalled);
 }
 
+// I gesti che l'app considera degni di misura sono anche i gesti che dicono
+// "questa cosa mi serve": l'invito a installare li ascolta per capire QUANDO
+// chiedere (vedi InstallOnboarding). Sta fuori da push() di proposito — un
+// dispositivo escluso dalle statistiche deve comportarsi come tutti gli altri,
+// altrimenti l'opt-out cambierebbe l'app invece che solo i numeri.
+function segnala(tipo: 'sezione' | 'azione', valore: string) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.dispatchEvent(new CustomEvent('blasat:segnale', { detail: { tipo, valore } }));
+  } catch {
+    /* ambiente senza CustomEvent: si perde solo l'innesco, non il tracciamento */
+  }
+}
+
 export function setTab(tab: string) {
   if (tab === _tab) return;
   _tab = tab;
+  segnala('sezione', tab);
   push({ project: _project, event: 'pageview', tab, timestamp: Date.now() });
 }
 
 export function trackClick(label: string) {
+  segnala('azione', label);
   push({ project: _project, event: 'click', label, timestamp: Date.now() });
 }
 
