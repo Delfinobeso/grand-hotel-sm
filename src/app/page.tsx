@@ -204,6 +204,11 @@ export default function Home() {
     setLang(next);
     document.documentElement.lang = next;
     localStorage.setItem("lang", next);
+    // L'invito a installare vive in layout.tsx, fuori da questo componente, e
+    // non puo' vedere questo stato: senza l'annuncio resterebbe nella lingua di
+    // partenza mentre il resto dell'app cambia. L'evento `storage` non serve,
+    // non scatta nella scheda che ha scritto.
+    window.dispatchEvent(new CustomEvent("blasat:lang", { detail: next }));
   };
 
   const t = content[lang];

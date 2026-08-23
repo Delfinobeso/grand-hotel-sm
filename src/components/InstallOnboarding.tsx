@@ -123,6 +123,57 @@ function linguaDispositivo(): Lingua {
   return "en";
 }
 
+const LINGUE: Lingua[] = ["it", "en", "fr", "de", "es"];
+
+/**
+ * Lingua dell'invito. Vince SEMPRE la scelta fatta dall'ospite col selettore in
+ * pagina (chiave `lang` in localStorage, scritta da changeLang in page.tsx); il
+ * dispositivo si guarda solo se una scelta non c'e' ancora. Prima si guardava
+ * soltanto il dispositivo: un ospite che metteva l'app in inglese si ritrovava
+ * le istruzioni di installazione in italiano.
+ */
+function linguaScelta(): Lingua {
+  if (typeof window === "undefined") return "en";
+  try {
+    const salvata = window.localStorage.getItem("lang");
+    if (salvata && (LINGUE as string[]).includes(salvata)) return salvata as Lingua;
+  } catch {
+    /* storage bloccato: si ripiega sul dispositivo */
+  }
+  return linguaDispositivo();
+}
+
+/**
+ * DIFETTO 10 DELLA LIBRERIA: la sua lingua non e' configurabile. La sceglie da
+ * sola leggendo `navigator.language` UNA volta sola, dentro connectedCallback, e
+ * non espone ne' attributo ne' proprieta' per imporgliela (verificato sui tipi
+ * pubblici e sul bundle della 0.6.4). Ma la lingua di questi siti la decide
+ * l'ospite col selettore, non il telefono: l'unico punto in cui possiamo farci
+ * sentire e' quella lettura, e ci mettiamo davanti un getter.
+ *
+ * Si tocca SOLO `navigator.language`. `navigator.languages` resta autentico
+ * apposta: e' quello che page.tsx e linguaDispositivo() leggono per indovinare
+ * la lingua al primo arrivo, e falsarlo vorrebbe dire far dipendere quella
+ * scelta da se stessa.
+ */
+let linguaPerLaLibreria: Lingua = "en";
+let getterInstallato = false;
+
+function imponiLinguaAllaLibreria(l: Lingua) {
+  linguaPerLaLibreria = l;
+  if (getterInstallato || typeof navigator === "undefined") return;
+  try {
+    Object.defineProperty(navigator, "language", {
+      configurable: true,
+      get: () => linguaPerLaLibreria,
+    });
+    getterInstallato = true;
+  } catch {
+    // Browser che non lascia ridefinire la proprieta': l'invito resta nella
+    // lingua del telefono. Nessun danno oltre a quello.
+  }
+}
+
 // Solo le due righe che scriviamo NOI (la libreria traduce le sue da sola).
 /**
  * Le due righe che scriviamo noi. Il copy e' stato rifatto il 22/08 perche' le
@@ -822,7 +873,7 @@ export default function InstallOnboarding({
 
       // LE PAROLE DEL TELEFONO (difetto 7). Si riscrive solo se e' diverso,
       // altrimenti l'osservatore rincorrerebbe se stesso all'infinito.
-      const correzioni = CORREZIONI[linguaDispositivo()];
+      const correzioni = CORREZIONI[linguaPerLaLibreria];
       if (correzioni) {
         sr.querySelectorAll(
           ".dialog-button.button.install .button-text > span, .description-step .step-text",
@@ -951,8 +1002,26 @@ export default function InstallOnboarding({
   }, []);
   chiudiRif.current = chiudiFoglio;
 
+  // L'ospite cambia lingua col selettore mentre l'app e' aperta: page.tsx
+  // annuncia la scelta con `blasat:lang` e l'invito la segue. Serve un evento e
+  // non l'evento `storage` del browser, che per progetto NON scatta nella
+  // scheda che ha scritto — cioe' proprio la nostra.
   useEffect(() => {
-    setLingua(linguaDispositivo());
+    const cambia = () => {
+      const nuova = linguaScelta();
+      imponiLinguaAllaLibreria(nuova);
+      setLingua(nuova);
+    };
+    window.addEventListener("blasat:lang", cambia);
+    return () => window.removeEventListener("blasat:lang", cambia);
+  }, []);
+
+  useEffect(() => {
+    // Va imposta PRIMA dell'import qui sotto: la libreria legge la lingua nel
+    // connectedCallback, cioe' appena l'elemento entra nel DOM.
+    const scelta = linguaScelta();
+    imponiLinguaAllaLibreria(scelta);
+    setLingua(scelta);
     let annullato = false;
 
     // Apre il guscio e riarma le bandiere; lo scrim e l'entrata li accende
@@ -1067,7 +1136,12 @@ export default function InstallOnboarding({
       occhioTema.disconnect();
       window.removeEventListener("blasat:show-onboarding", apri);
     };
-  }, [applicaStile]);
+    // `lingua` fra le dipendenze: al cambio lingua l'elemento viene ricreato
+    // (vedi `key` piu' sotto) e tutto va riagganciato al nodo nuovo — stili,
+    // osservatore dello shadow root, ripassi. La pulizia qui sopra e' completa,
+    // quindi rifare l'effetto non lascia residui. L'invito automatico non si
+    // ripropone: chi l'ha gia' visto e' fermato da `ultimo` in leggiStato().
+  }, [applicaStile, lingua]);
 
   if (lingua === null) return null;
   const t = TESTI[lingua];
@@ -1097,6 +1171,9 @@ export default function InstallOnboarding({
         }}
       />
       <pwa-install
+        // Ricrea l'elemento al cambio lingua: e' l'unico modo per far rileggere
+        // la lingua alla libreria, che la guarda solo entrando nel DOM.
+        key={lingua}
         ref={ref}
         manual-apple="true"
         manual-chrome="true"
