@@ -12,9 +12,12 @@
  * rinforzo finale porta l'aderenza al 100% nei test — ma un rilevamento
  * SBAGLIATO che nomina la lingua sbagliata è peggio di nessun rilevamento:
  * forzerebbe attivamente la lingua sbagliata. Da qui la soglia di fiducia:
- * si nomina la lingua SOLO quando il margine sul secondo candidato è netto,
+ * si nomina la lingua quando il margine sul secondo candidato è netto OPPURE
+ * quando una sola lingua matcha del tutto (1-contro-0, non ambiguo);
  * altrimenti `confident` è false e il chiamante deve ripiegare su un
- * messaggio generico (mai indovinare).
+ * messaggio generico (mai indovinare). Le liste sono state ampliate il
+ * 2026-08-25 (soprattutto l'inglese) perché una frase inglese normale poteva
+ * pescare troppo poche parole-spia e cadere sotto soglia.
  */
 
 export type LinguaConcierge = "italiano" | "inglese" | "francese" | "tedesco" | "spagnolo";
@@ -33,26 +36,49 @@ const PAROLE: Record<LinguaConcierge, string[]> = {
     "posso", "può", "puoi", "avete", "è", "sono", "per", "con", "del", "della",
     "dei", "delle", "una", "un", "mi", "ci", "si", "vorrei", "grazie", "buongiorno",
     "camera", "ristorante", "prenotare", "orario", "quanto",
+    // Ampliata 2026-08-25: stesso buco delle altre lingue (parole di contenuto).
+    "aperto", "aperta", "qualcosa", "dopo", "adesso", "cibo", "mangiare", "stasera",
+    "stanotte", "oggi", "tardi", "mezzanotte", "colazione", "ancora", "vicino", "niente",
   ],
   inglese: [
-    "the", "is", "are", "can", "could", "you", "your", "what", "where", "when",
-    "how", "do", "does", "i", "we", "my", "our", "have", "has", "please",
-    "possible", "would", "room", "need", "want", "thanks", "hello", "there",
+    // Ampliata 2026-08-25: prima mancavano parole comunissime nelle domande
+    // da ospite ("for", "after", "any", "open", "now", "food"…) e una frase
+    // inglese normale poteva pescare una sola parola-spia — es. "Is anything
+    // open for food after midnight" matchava solo "is", finiva sotto soglia e
+    // rispondeva in italiano. Aggiunte solo parole SENZA collisione con le
+    // altre 4 lingue (niente "a"/"am"/"in", che sono anche IT/DE).
+    "the", "is", "are", "can", "could", "will", "would", "you",
+    "your", "what", "where", "when", "how", "why", "who", "which", "do", "does",
+    "did", "i", "we", "my", "our", "us", "have", "has", "please", "possible",
+    "room", "need", "want", "get", "go", "thanks", "hello", "there", "here",
+    "this", "that", "any", "anything", "something", "some", "for", "after", "before",
+    "at", "to", "of", "and", "with", "not", "open", "closed", "available", "now",
+    "today", "tonight", "tomorrow", "late", "still", "around", "near", "food",
+    "breakfast", "dinner", "lunch", "much", "many", "time", "help", "book", "about",
   ],
   francese: [
     "le", "les", "est", "êtes", "vous", "votre", "que", "où", "quand", "comment",
     "avez", "avons", "je", "nous", "pouvez", "peut", "s'il", "merci", "bonjour",
     "chambre", "réserver", "combien",
+    // Ampliata 2026-08-25: stesso buco dell'inglese (parole di contenuto).
+    "ouvert", "ouverte", "maintenant", "manger", "quelque", "chose", "près",
+    "petit", "déjeuner", "dîner", "encore", "soir", "tard", "après", "pour", "avec",
   ],
   tedesco: [
     "der", "die", "das", "ist", "sind", "können", "sie", "ihr", "was", "wo",
     "wann", "wie", "haben", "ich", "wir", "bitte", "möchte", "zimmer", "danke",
     "hallo", "wieviel",
+    // Ampliata 2026-08-25: stesso buco dell'inglese (parole di contenuto).
+    "geöffnet", "jetzt", "essen", "etwas", "noch", "gibt", "einen", "eine",
+    "nach", "abend", "heute", "spät", "auch", "für", "mit",
   ],
   spagnolo: [
     "el", "los", "las", "es", "son", "puede", "puedo", "usted", "qué", "dónde",
     "cuándo", "cómo", "tiene", "tienen", "tengo", "hay", "está", "necesito",
     "por favor", "gracias", "hola", "habitación", "reservar", "cuánto",
+    // Ampliata 2026-08-25: stesso buco dell'inglese (parole di contenuto).
+    "quiero", "quisiera", "abierto", "abierta", "ahora", "comida", "cerca",
+    "algo", "hasta", "para", "esta", "tarde", "noche", "hoy", "cena",
   ],
 };
 
@@ -88,10 +114,17 @@ export function rileva(messaggio: string): Rilevamento {
   punteggi.sort((a, b) => b.match - a.match);
   const [primo, secondo] = punteggi;
 
+  const secondoMatch = secondo?.match ?? 0;
   const confident =
     messaggio.trim().length >= LUNGHEZZA_MIN_AFFIDABILE &&
     primo.match > 0 &&
-    primo.match - (secondo?.match ?? 0) >= MARGINE_MINIMO;
+    // Sicuro in due casi: (a) margine netto sul secondo candidato; (b) una
+    // sola lingua matcha del tutto (secondo a 0). Il caso (b) non è ambiguo —
+    // 1-contro-0 dice comunque quale lingua è — ed era proprio quello che
+    // lasciava scoperte le domande inglesi brevi fatte di parole di contenuto,
+    // dove finiva in lista una sola parola-spia (es. "is") e il ripiego
+    // generico veniva ignorato ~20% delle volte.
+    (primo.match - secondoMatch >= MARGINE_MINIMO || secondoMatch === 0);
 
   return { lingua: primo.lingua, confident };
 }
