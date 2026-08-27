@@ -185,17 +185,40 @@ const TTFT_TIMEOUT_MS = Number(process.env.CHAT_TTFT_TIMEOUT_MS) || 6000;
  *  arachidi; DeepSeek prometteva di far recapitare asciugamani in camera.
  *  Entrambi i modelli sbagliavano: e' un buco del prompt, non del fornitore.
  *
- *  Volutamente CORTO: un presidio lungo si diluisce come le regole di sopra. */
+ *  Volutamente CORTO: un presidio lungo si diluisce come le regole di sopra. Tetto
+ *  duro: due vincoli, mai di piu'. I fatti nuovi vanno nella scheda o nella KB, mai qui.
+ *
+ *  Due correzioni dopo l'audit del 2026-08-28:
+ *  - NON cablare qui il canale di contatto. La prima versione diceva "tasto 9 dal
+ *    telefono in camera": e' un fatto del solo Grand Hotel, ma questo file e' condiviso
+ *    dai 3 hotel — su Titano e Titano Suites il canale e' +39 0549 991007. Un dato
+ *    specifico in un file condiviso diventa un errore sugli altri due. Ora rimanda
+ *    genericamente al canale "previsto dalla scheda", che ogni hotel ha per conto suo
+ *    (e che per alcuni servizi non e' la Reception: il Centro Messegue' ha il tasto 471).
+ *  - Vietate anche le affermazioni IMPERSONALI. La prima versione vietava solo i
+ *    performativi in prima persona, quindi "the kitchen has been informed" passava:
+ *    stessa bugia, stesso danno, verbo non vietato.
+ *
+ *  Terza correzione, 2026-08-28: il divieto di INVENTARE non copriva il DEDURRE.
+ *  Misurato: a "sono allergico alla frutta a guscio, i cappellacci sono sicuri?" il
+ *  modello leggeva gli ingredienti dal menu e rispondeva "non contengono frutta a
+ *  guscio". Non inventava nulla — ragionava su dati veri e presentava l'inferenza come
+ *  garanzia, su una domanda di sicurezza alimentare. E' rimasto dentro il vincolo 2
+ *  invece di diventarne un terzo: il tetto di due vincoli e' esso stesso il presidio. */
 const GUARDIA_FINALE =
   "Due vincoli assoluti, prima di rispondere.\n" +
   "1) NON PUOI COMPIERE AZIONI. Non invii oggetti, non avvisi il personale, non prenoti, " +
   "non trasmetti messaggi alla cucina o alla Reception. Non dire MAI di aver fatto, di fare " +
-  "o che farai qualcosa (\"provvedo\", \"ho avvisato\", \"I will inform\", \"I'll have it sent\", " +
-  "\"sarà comunicato\"). Per ogni richiesta operativa di' che va rivolta alla Reception, " +
-  "tasto 9 dal telefono in camera.\n" +
-  "2) NON INVENTARE DATI. Se un prezzo, una tassa, un orario o un servizio non è scritto " +
-  "sopra, dì apertamente che non risulta fra le informazioni disponibili e rimanda alla " +
-  "Reception. Meglio ammettere di non saperlo che dare un numero plausibile.";
+  "o che farai qualcosa (\"provvedo\", \"ho avvisato\", \"I will inform\", \"I'll have it sent\"), " +
+  "NÉ che qualcosa sia già stato fatto, sia noto al personale o verrà fatto da altri " +
+  "(\"è stato segnalato\", \"the kitchen has been informed\", \"they will bring them shortly\"). " +
+  "Per ogni richiesta operativa indica il canale di contatto previsto dalla scheda qui sopra " +
+  "per quel servizio, e di\' che va rivolta lì.\n" +
+  "2) NON INVENTARE NÉ DEDURRE DATI. Se un prezzo, una tassa, un orario o un servizio non è " +
+  "scritto sopra, dì apertamente che non risulta fra le informazioni disponibili e rimanda al " +
+  "contatto della scheda. Meglio ammettere di non saperlo che dare un numero plausibile. " +
+  "In particolare non giudicare MAI se un piatto sia adatto a un'allergia o intolleranza, " +
+  "nemmeno leggendo gli ingredienti: di\' che va verificato col ristorante prima di ordinare.";
 
 interface AperturaStream {
   reader: ReadableStreamDefaultReader<Uint8Array>;
