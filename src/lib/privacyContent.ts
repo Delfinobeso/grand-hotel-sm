@@ -37,7 +37,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     dataItems: [
       {
         label: "Assistente AI (concierge)",
-        text: "I messaggi che scrivi in chat vengono inviati a un fornitore di intelligenza artificiale terzo (DeepSeek, con server anche al di fuori dell'UE) al solo scopo di generare la risposta. Non inserire dati personali sensibili (salute, documenti, pagamenti). La cronologia della conversazione resta nel tuo dispositivo. Le domande poste all'assistente e le relative risposte possono essere conservate in forma anonima, senza dati identificativi, per migliorare il servizio.",
+        text: "I messaggi che scrivi in chat vengono inviati a Mistral AI, fornitore europeo di intelligenza artificiale con sede in Francia, al solo scopo di generare la risposta. Mistral può conservare i messaggi fino a 30 giorni per il controllo degli abusi e non li utilizza per addestrare i propri modelli; alcuni trattamenti tecnici possono avvenire presso fornitori di infrastruttura situati anche fuori dall'UE. Non inserire dati personali sensibili (salute, documenti, pagamenti). La cronologia della conversazione resta nel tuo dispositivo. Le domande poste all'assistente e le relative risposte possono essere conservate in forma anonima, senza dati identificativi, per migliorare il servizio.",
       },
       {
         label: "Statistiche d'uso",
@@ -56,7 +56,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     rightsHeading: "Diritti",
     rightsText:
       "Puoi esercitare i diritti previsti dal GDPR (accesso, rettifica, cancellazione, opposizione) scrivendo a info@blasat.com.",
-    updated: "Ultimo aggiornamento: luglio 2026",
+    updated: "Ultimo aggiornamento: agosto 2026",
   },
   en: {
     pageTitle: "Privacy Policy",
@@ -68,7 +68,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     dataItems: [
       {
         label: "AI assistant (concierge)",
-        text: "The messages you write in chat are sent to a third-party artificial intelligence provider (DeepSeek, with servers also located outside the EU) solely to generate the reply. Please do not enter sensitive personal data (health, documents, payments). Your conversation history remains on your device. Questions asked to the assistant and the related replies may be stored anonymously, without identifying data, to improve the service.",
+        text: "The messages you write in chat are sent to Mistral AI, a European artificial intelligence provider based in France, solely to generate the reply. Mistral may retain messages for up to 30 days for abuse monitoring and does not use them to train its models; some technical processing may take place at infrastructure providers also located outside the EU. Please do not enter sensitive personal data (health, documents, payments). Your conversation history remains on your device. Questions asked to the assistant and the related replies may be stored anonymously, without identifying data, to improve the service.",
       },
       {
         label: "Usage statistics",
@@ -87,7 +87,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     rightsHeading: "Your rights",
     rightsText:
       "You may exercise the rights provided by the GDPR (access, rectification, erasure, objection) by writing to info@blasat.com.",
-    updated: "Last updated: July 2026",
+    updated: "Last updated: August 2026",
   },
   fr: {
     pageTitle: "Politique de confidentialité",
@@ -99,7 +99,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     dataItems: [
       {
         label: "Assistant IA (concierge)",
-        text: "Les messages que vous écrivez dans le chat sont envoyés à un fournisseur tiers d'intelligence artificielle (DeepSeek, avec des serveurs également situés hors UE) dans le seul but de générer la réponse. Ne saisissez pas de données personnelles sensibles (santé, documents, paiements). L'historique de la conversation reste sur votre appareil. Les questions posées à l'assistant et les réponses correspondantes peuvent être conservées de façon anonyme, sans donnée identifiante, afin d'améliorer le service.",
+        text: "Les messages que vous écrivez dans le chat sont envoyés à Mistral AI, fournisseur européen d'intelligence artificielle établi en France, dans le seul but de générer la réponse. Mistral peut conserver les messages jusqu'à 30 jours à des fins de contrôle des abus et ne les utilise pas pour entraîner ses modèles ; certains traitements techniques peuvent avoir lieu chez des fournisseurs d'infrastructure situés également hors UE. Ne saisissez pas de données personnelles sensibles (santé, documents, paiements). L'historique de la conversation reste sur votre appareil. Les questions posées à l'assistant et les réponses correspondantes peuvent être conservées de façon anonyme, sans donnée identifiante, afin d'améliorer le service.",
       },
       {
         label: "Statistiques d'utilisation",
@@ -118,7 +118,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     rightsHeading: "Droits",
     rightsText:
       "Vous pouvez exercer les droits prévus par le RGPD (accès, rectification, effacement, opposition) en écrivant à info@blasat.com.",
-    updated: "Dernière mise à jour : juillet 2026",
+    updated: "Dernière mise à jour : août 2026",
   },
   de: {
     pageTitle: "Datenschutzerklärung",
@@ -130,7 +130,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     dataItems: [
       {
         label: "KI-Assistent (Concierge)",
-        text: "Die Nachrichten, die Sie im Chat schreiben, werden ausschließlich zur Erzeugung der Antwort an einen externen Anbieter künstlicher Intelligenz (DeepSeek, mit Servern auch außerhalb der EU) gesendet. Geben Sie keine sensiblen personenbezogenen Daten ein (Gesundheit, Dokumente, Zahlungen). Der Gesprächsverlauf verbleibt auf Ihrem Gerät. Die an den Assistenten gestellten Fragen und die zugehörigen Antworten können anonymisiert, ohne identifizierende Daten, zur Verbesserung des Dienstes gespeichert werden.",
+        text: "Die Nachrichten, die Sie im Chat schreiben, werden ausschließlich zur Erzeugung der Antwort an Mistral AI gesendet, einen europäischen Anbieter künstlicher Intelligenz mit Sitz in Frankreich. Mistral kann die Nachrichten bis zu 30 Tage zur Missbrauchskontrolle speichern und verwendet sie nicht zum Training der eigenen Modelle; einzelne technische Verarbeitungen können auch bei Infrastrukturanbietern außerhalb der EU erfolgen. Geben Sie keine sensiblen personenbezogenen Daten ein (Gesundheit, Dokumente, Zahlungen). Der Gesprächsverlauf verbleibt auf Ihrem Gerät. Die an den Assistenten gestellten Fragen und die zugehörigen Antworten können anonymisiert, ohne identifizierende Daten, zur Verbesserung des Dienstes gespeichert werden.",
       },
       {
         label: "Nutzungsstatistiken",
@@ -149,7 +149,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     rightsHeading: "Rechte",
     rightsText:
       "Sie können die im Rahmen der DSGVO vorgesehenen Rechte (Auskunft, Berichtigung, Löschung, Widerspruch) ausüben, indem Sie an info@blasat.com schreiben.",
-    updated: "Letzte Aktualisierung: Juli 2026",
+    updated: "Letzte Aktualisierung: August 2026",
   },
   es: {
     pageTitle: "Política de privacidad",
@@ -161,7 +161,7 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     dataItems: [
       {
         label: "Asistente IA (concierge)",
-        text: "Los mensajes que escribe en el chat se envían a un proveedor externo de inteligencia artificial (DeepSeek, con servidores también fuera de la UE) únicamente para generar la respuesta. No introduzca datos personales sensibles (salud, documentos, pagos). El historial de la conversación permanece en su dispositivo. Las preguntas realizadas al asistente y las respuestas correspondientes pueden conservarse de forma anónima, sin datos identificativos, para mejorar el servicio.",
+        text: "Los mensajes que escribe en el chat se envían a Mistral AI, proveedor europeo de inteligencia artificial con sede en Francia, únicamente para generar la respuesta. Mistral puede conservar los mensajes hasta 30 días para el control de abusos y no los utiliza para entrenar sus modelos; algunos tratamientos técnicos pueden realizarse en proveedores de infraestructura situados también fuera de la UE. No introduzca datos personales sensibles (salud, documentos, pagos). El historial de la conversación permanece en su dispositivo. Las preguntas realizadas al asistente y las respuestas correspondientes pueden conservarse de forma anónima, sin datos identificativos, para mejorar el servicio.",
       },
       {
         label: "Estadísticas de uso",
@@ -180,6 +180,6 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
     rightsHeading: "Derechos",
     rightsText:
       "Puede ejercer los derechos previstos por el RGPD (acceso, rectificación, supresión, oposición) escribiendo a info@blasat.com.",
-    updated: "Última actualización: julio 2026",
+    updated: "Última actualización: agosto 2026",
   },
 };

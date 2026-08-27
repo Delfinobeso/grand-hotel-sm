@@ -102,14 +102,11 @@ function isAllowedCaller(req: NextRequest): boolean {
  *   mistral-small-4            95.6%           0.6s         4.5s
  *   mistral-medium-3.5        100.0%           2.5s         3.2s
  *
- * Da qui la scelta: Mistral Medium primario. DeepSeek resta come rete di
- * sicurezza sulla DISPONIBILITA', non sulla qualita': sbaglia lingua una volta
- * su dieci (rispondeva in italiano a tedeschi e inglesi), quindi e' il ripiego
- * "meglio di niente", non il riferimento. Non invertire la catena pensando che
- * sia il piu' affidabile.
- *
- * CHAT_PROVIDER=deepseek in env inverte la catena senza toccare il codice:
- * kill switch per tornare indietro in un minuto se Mistral desse problemi. */
+ * Da qui la scelta: Mistral Medium primario, Mistral Small come ripiego.
+ * DeepSeek e' USCITO dalla catena normale il 2026-08-27: sbagliava lingua una
+ * volta su dieci (rispondeva in italiano a tedeschi e inglesi) ed era l'unico
+ * pezzo che mandava i dati degli ospiti fuori dall'UE. Resta raggiungibile solo
+ * come uscita di emergenza esplicita — vedi catenaProvider(). */
 interface Provider {
   nome: string;
   url: string;
@@ -120,13 +117,24 @@ interface Provider {
 }
 
 const MISTRAL: Provider = {
-  nome: "mistral",
+  nome: "mistral-medium",
   url: "https://api.mistral.ai/v1/chat/completions",
   model: process.env.CHAT_MODEL_MISTRAL || "mistral-medium-latest",
   chiave: () => process.env.MISTRAL_API_KEY,
   // Su Mistral la cache del prefisso NON e' automatica come su DeepSeek: senza
   // questa chiave i ~11k token di system prompt si pagano pieni a ogni domanda.
   // La chiave e' per hotel: i tre prompt sono diversi, non devono condividere cache.
+  extra: (projectId) => ({ prompt_cache_key: projectId }),
+};
+
+/** Ripiego: stesso fornitore, stessa giurisdizione, modello piu' piccolo.
+ *  Copre il sovraccarico o un guasto del singolo modello, NON un blackout
+ *  dell'intera piattaforma Mistral — scelta deliberata, vedi catenaProvider(). */
+const MISTRAL_SMALL: Provider = {
+  nome: "mistral-small",
+  url: "https://api.mistral.ai/v1/chat/completions",
+  model: "mistral-small-latest",
+  chiave: () => process.env.MISTRAL_API_KEY,
   extra: (projectId) => ({ prompt_cache_key: projectId }),
 };
 
@@ -137,13 +145,25 @@ const DEEPSEEK: Provider = {
   chiave: () => process.env.DEEPSEEK_API_KEY,
 };
 
-/** Provider da provare in ordine, saltando quelli senza chiave configurata:
- *  un hotel a cui manca MISTRAL_API_KEY continua a funzionare su DeepSeek
- *  invece di rispondere 500. */
+/** Provider da provare in ordine, saltando quelli senza chiave configurata.
+ *
+ *  La catena normale resta DENTRO Mistral (Francia, UE): medium, poi small come
+ *  ripiego. Scelta presa il 2026-08-27 insieme all'informativa privacy, che
+ *  nomina Mistral come unico destinatario dei messaggi degli ospiti.
+ *
+ *  ⚠️ CHAT_PROVIDER=deepseek e' un'uscita di EMERGENZA, non una configurazione
+ *  normale: manda i messaggi degli ospiti fuori dall'UE (Cina) e rende
+ *  l'informativa privacy INESATTA finche' resta attiva. Se la usi, aggiorna
+ *  anche privacyContent.ts o spegnila appena possibile.
+ *
+ *  Il ripiego non copre un blackout totale di Mistral: a ~67 scambi/mese
+ *  l'assicurazione valeva meno della storia GDPR verso gli hotel. In quel caso
+ *  l'ospite vede FALLBACK_FATAL_ERROR, che lo manda in Reception. */
 function catenaProvider(): Provider[] {
-  const primario = process.env.CHAT_PROVIDER === "deepseek" ? DEEPSEEK : MISTRAL;
-  const riserva = primario === MISTRAL ? DEEPSEEK : MISTRAL;
-  return [primario, riserva].filter((p) => p.chiave());
+  if (process.env.CHAT_PROVIDER === "deepseek") {
+    return [DEEPSEEK].filter((p) => p.chiave());
+  }
+  return [MISTRAL, MISTRAL_SMALL].filter((p) => p.chiave());
 }
 
 /** Quanto si aspetta il PRIMO token prima di dichiarare morto un provider.
