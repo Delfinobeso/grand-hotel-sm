@@ -172,6 +172,31 @@ function catenaProvider(): Provider[] {
  *  dannoso: si ripiegherebbe su DeepSeek, che e' il modello peggiore. */
 const TTFT_TIMEOUT_MS = Number(process.env.CHAT_TTFT_TIMEOUT_MS) || 6000;
 
+/** Presidio finale contro i due modi in cui il concierge fa danno:
+ *  dichiarare di aver agito, e riempire un buco con un dato inventato.
+ *
+ *  ⚠️ Sta QUI, in coda ai messages, e non dentro il system prompt, per la
+ *  stessa ragione del promemoria lingua: le regole 2, 3 e 4 del prompt gia'
+ *  dicono "non inventare" e vengono ignorate lo stesso — dentro 35k caratteri
+ *  un'istruzione ripetuta non regge, la posizione conta piu' del testo.
+ *  Misurato il 2026-08-27 sul percorso di produzione: senza questo presidio
+ *  Mistral inventava una tassa di soggiorno inesistente ("€2,00 a persona,
+ *  dai 14 anni") e prometteva di avvisare la cucina di un'allergia alle
+ *  arachidi; DeepSeek prometteva di far recapitare asciugamani in camera.
+ *  Entrambi i modelli sbagliavano: e' un buco del prompt, non del fornitore.
+ *
+ *  Volutamente CORTO: un presidio lungo si diluisce come le regole di sopra. */
+const GUARDIA_FINALE =
+  "Due vincoli assoluti, prima di rispondere.\n" +
+  "1) NON PUOI COMPIERE AZIONI. Non invii oggetti, non avvisi il personale, non prenoti, " +
+  "non trasmetti messaggi alla cucina o alla Reception. Non dire MAI di aver fatto, di fare " +
+  "o che farai qualcosa (\"provvedo\", \"ho avvisato\", \"I will inform\", \"I'll have it sent\", " +
+  "\"sarà comunicato\"). Per ogni richiesta operativa di' che va rivolta alla Reception, " +
+  "tasto 9 dal telefono in camera.\n" +
+  "2) NON INVENTARE DATI. Se un prezzo, una tassa, un orario o un servizio non è scritto " +
+  "sopra, dì apertamente che non risulta fra le informazioni disponibili e rimanda alla " +
+  "Reception. Meglio ammettere di non saperlo che dare un numero plausibile.";
+
 interface AperturaStream {
   reader: ReadableStreamDefaultReader<Uint8Array>;
   decoder: TextDecoder;
@@ -339,6 +364,13 @@ export async function POST(req: NextRequest) {
       // il 100% misurato con questo stesso testo in coda ai messages.
       // Verificato il 2026-08-27 che Mistral accetta questo system finale
       // esattamente come DeepSeek: nessun errore, 90 scambi su 90 in lingua.
+      // ORDINE NON CASUALE: il presidio PRIMA, il promemoria lingua ULTIMO.
+      // Provato l'ordine opposto il 2026-08-27 e misurato: mettendo il presidio
+      // per ultimo l'aderenza linguistica scendeva (14/15, un tedesco tornato
+      // in italiano) perche' il promemoria perdeva la posizione finale da cui
+      // deriva tutta la sua efficacia. L'ultima riga letta dal modello deve
+      // restare quella sulla lingua.
+      { role: "system", content: GUARDIA_FINALE },
       { role: "system", content: promemoriaLingua(question) },
     ];
 
