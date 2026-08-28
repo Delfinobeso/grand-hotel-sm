@@ -330,6 +330,20 @@ export function costruisciFrammenti(
   }
 
   for (const loc of estraiLocaliMenu(menus)) {
+    // L'intestazione di ogni locale (descrizione + "Orari: …") è informazione
+    // di SCHEDA che vive dentro il menu: "A che ora è la colazione?" trovava la
+    // risposta solo in mezzo a un elenco di piatti, che diluisce l'embedding e
+    // sconta il tetto sui frammenti-menu. Misurato su Titano: rispondeva "non
+    // è nella scheda" mentre menus.ts diceva "Colazione 07:00-10:00". Qui il
+    // primo paragrafo diventa un frammento corto e denso, fonte "scheda".
+    const intro = loc.corpo.split(/\n\s*\n/)[0]?.trim() ?? "";
+    if (intro && intro.length <= 700 && !intro.includes("€")) {
+      frammenti.push({
+        sezione: `${loc.titolo} – info`,
+        testo: `[${loc.titolo} – informazioni e orari]\n${intro}`,
+        fonte: "scheda",
+      });
+    }
     const chunk = spezzaSeServe(loc.corpo);
     chunk.forEach((testo, i) => {
       const suffisso = chunk.length > 1 ? ` (parte ${i + 1}/${chunk.length})` : "";

@@ -447,6 +447,13 @@ export async function POST(req: NextRequest) {
         try {
           // I token già consumati da apriStream() per scegliere il provider:
           // vanno emessi per primi, altrimenti l'inizio della risposta sparisce.
+          if (process.env.CONCIERGE_DEBUG === "1") {
+            // Solo preview: i frammenti scelti viaggiano nello stream come
+            // evento a sé. Il client legge solo `content`/`error` e lo ignora;
+            // il banco di prova lo registra. Sostituisce i log runtime, che
+            // per le preview non risultano consultabili.
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ debug: fonti.scelti })}\n\n`));
+          }
           for (const c of primi) {
             answerAcc += c;
             controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: c })}\n\n`));
