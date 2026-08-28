@@ -135,6 +135,13 @@ export function rileva(messaggio: string): Rilevamento {
  *  torna la variante generica: nei test resta comunque nettamente meglio del
  *  silenzio (~80% contro ~20% di aderenza), senza il rischio di nominare la
  *  lingua sbagliata. */
+// 2026-08-28: aggiunta la frase sulle risposte lunghe. Misurato che con le
+// fonti recuperate (v2) la domanda spagnola "¿Qué puedo visitar en San Marino
+// en un día?" tornava in italiano una volta su due: risposta lunga, costruita
+// parafrasando la guida turistica che è in italiano. Le risposte brevi non
+// deviavano. La correzione sta QUI, nell'ultimo messaggio, perché è la
+// posizione che ha dimostrato di reggere (una frase equivalente nel prompt di
+// comportamento non bastava).
 export function promemoriaLingua(messaggioOspite: string): string {
   const { lingua, confident } = rileva(messaggioOspite);
 
@@ -142,7 +149,8 @@ export function promemoriaLingua(messaggioOspite: string): string {
     return (
       `PROMEMORIA CRITICO PRIMA DI RISPONDERE: l'ultimo messaggio dell'ospite è in ${lingua.toUpperCase()}. ` +
       `Scrivi l'INTERA risposta in ${lingua}, anche se le informazioni che usi per rispondere sono in italiano. ` +
-      `Vale sempre, anche per le risposte brevi che rimandano alla Reception.`
+      `Vale sempre, anche per le risposte brevi che rimandano alla Reception e per quelle lunghe che descrivono ` +
+      `luoghi o itinerari: le fonti sono in italiano, TRADUCILE, non copiarne le frasi.`
     );
   }
 

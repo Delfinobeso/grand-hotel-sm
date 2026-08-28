@@ -77,6 +77,28 @@ const GLOSSARIO: Array<[RegExp, string]> = [
 
 /** Testo da usare per l'embedding di un frammento: il testo stesso più le
  *  traduzioni dei termini di dominio che contiene. Mai mostrato al modello. */
+/** Lato domanda: se l'ospite usa un termine del glossario (in qualunque delle
+ *  5 lingue), i frammenti che contengono il termine italiano corrispondente
+ *  ricevono un piccolo bonus di similarità. Misurato il 2026-08-28 su Suites:
+ *  anche col glossario nell'embedding, "Um wie viel Uhr gibt es Frühstück?"
+ *  dava 0.69-0.72 a otto frammenti e lasciava fuori "Orari: Colazione
+ *  07:00-10:00" — le similarità di una domanda corta si affollano e non
+ *  discriminano. Il bonus è lessicale e deterministico: "Frühstück" nella
+ *  domanda → +BONUS ai frammenti con "colazion". Non sostituisce l'embedding,
+ *  lo sblocca nei pareggi. */
+const BONUS_LESSICALE = 0.06;
+const GLOSSARIO_INVERSO: Array<[RegExp, RegExp]> = GLOSSARIO.map(([reIt, trad]) => [
+  reIt,
+  new RegExp("\\b(" + trad.split(/\s+/).map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")\\b", "i"),
+]);
+export function bonusLessicale(domanda: string, testoFrammento: string): number {
+  let bonus = 0;
+  for (const [reIt, reTrad] of GLOSSARIO_INVERSO) {
+    if ((reIt.test(domanda) || reTrad.test(domanda)) && reIt.test(testoFrammento)) bonus += BONUS_LESSICALE;
+  }
+  return Math.min(bonus, BONUS_LESSICALE * 2);
+}
+
 export function testoPerEmbedding(testo: string): string {
   const chiavi: string[] = [];
   for (const [re, trad] of GLOSSARIO) if (re.test(testo)) chiavi.push(trad);
@@ -730,7 +752,10 @@ export async function recuperaFonti(
     degradato = true;
     scelti = ["<degradato: tutti i frammenti>"];
   } else {
-    const punteggi = indice.frammenti.map((f, i) => ({ f, sim: similitudineCoseno(vettoreQuery, vettoriFrammenti[i]) }));
+    const punteggi = indice.frammenti.map((f, i) => ({
+      f,
+      sim: similitudineCoseno(vettoreQuery, vettoriFrammenti[i]) + bonusLessicale(domanda, f.testo),
+    }));
     // Domande su allergie/intolleranze: NESSUN frammento di menu. La regola
     // "non giudicare se un piatto è adatto" regge finché il modello non ha un
     // elenco di piatti sotto gli occhi: misurato il 2026-08-28 che con più
