@@ -21,6 +21,68 @@
 import { buildKbBlock, type KbItem } from "./conciergeKb";
 import vettoriPrecalcolatiRaw from "./conciergeVectors.json";
 
+/* ---- Glossario per il recupero cross-lingua ------------------------------
+ * Le fonti sono in italiano, gli ospiti scrivono in 5 lingue. Misurato il
+ * 2026-08-28 su Titano Suites: "Um wie viel Uhr gibt es Frühstück?" dava
+ * similarità 0.66-0.69 a OTTO frammenti sbagliati (Caffè Titano, palestra,
+ * lavanderia...) e lasciava fuori quello con "Colazione 07:00-10:00": con
+ * query brevi in tedesco l'embedding non lega "Frühstück" a "colazione".
+ * Rimedio senza chiamate in più: a ogni frammento si accoda, SOLO nel testo
+ * usato per l'embedding (mai in quello mostrato al modello), la traduzione
+ * dei termini di dominio che contiene. Cosi' "colazione" nel frammento e
+ * "Frühstück" nella domanda si incontrano nello stesso spazio. E' la stessa
+ * filosofia di languageDetect: liste di parole, zero rete, deterministico. */
+const GLOSSARIO: Array<[RegExp, string]> = [
+  [/\bcolazion/i, "breakfast Frühstück petit-déjeuner desayuno"],
+  [/\bpranz/i, "lunch Mittagessen déjeuner almuerzo"],
+  [/\bcen[ae]\b/i, "dinner Abendessen dîner cena"],
+  [/\bristorant/i, "restaurant Restaurant restaurant restaurante"],
+  [/\bmen[uù]\b/i, "menu Speisekarte carte carta"],
+  [/\bcaff[eè]\b|\bbar\b/i, "coffee café bar Kaffee"],
+  [/\bparchegg|\bgarage\b/i, "parking garage Parkplatz Tiefgarage stationnement aparcamiento"],
+  [/\bauto\b|\bmacchin/i, "car Auto voiture coche"],
+  [/\belettric|\bcolonnin/i, "electric charging EV Ladestation recharge électrique carga eléctrica"],
+  [/\bwi-?fi\b|\binternet\b/i, "wifi WLAN internet password contraseña mot de passe Passwort"],
+  [/\bpiscin/i, "pool swimming Schwimmbad piscine piscina"],
+  [/\bpalestr|\bfitness/i, "gym fitness Fitnessraum salle de sport gimnasio"],
+  [/\bspa\b|\bbenesser|\bmassagg|\bsauna/i, "spa wellness massage Massage Wellness masaje bien-être"],
+  [/\blavander|\bstiratur|\blavaggio/i, "laundry ironing Wäsche Wäscherei blanchisserie lavandería"],
+  [/\bcheck-?in\b/i, "check-in arrival Anreise arrivée llegada"],
+  [/\bcheck-?out\b/i, "check-out departure late checkout Abreise départ salida"],
+  [/\bminibar|\bfrigo/i, "minibar fridge Minibar Kühlschrank réfrigérateur nevera"],
+  [/\btass[ae]\b|\bimposta/i, "tax city tax Kurtaxe taxe de séjour tasa turística"],
+  [/\bprezz|\bcost[oi]\b|\btariff|\bsupplement/i, "price cost fee Preis Kosten prix coût precio"],
+  [/\borari|\bapert|\bchius/i, "hours opening times open closed Öffnungszeiten horaires horario abierto"],
+  [/\basciugaman/i, "towels Handtücher serviettes toallas"],
+  [/\bcuscin/i, "pillow Kissen oreiller almohada"],
+  [/\bpulizi|\briassett|\bhousekeeping/i, "cleaning housekeeping Reinigung nettoyage limpieza"],
+  [/\bsvegli/i, "wake-up call Weckruf réveil despertador"],
+  [/\btaxi\b|\btransfer|\bnavett/i, "taxi transfer shuttle Taxi navette"],
+  [/\baeroport/i, "airport Flughafen aéroport aeropuerto"],
+  [/\bbici/i, "bike bicycle Fahrrad vélo bicicleta"],
+  [/\bbambin/i, "children kids Kinder enfants niños"],
+  [/\banimal|\bcan[ei]\b/i, "pets dog Haustiere Hund animaux chien mascotas perro"],
+  [/\bchiav/i, "key room key Schlüssel clé llave"],
+  [/\bcassafort/i, "safe safety deposit Safe Tresor coffre-fort caja fuerte"],
+  [/\bbagagl|\bvalig/i, "luggage baggage Gepäck bagages equipaje"],
+  [/\bghiaccio/i, "ice Eis glace hielo"],
+  [/\ballerg|\bintolleran|\bglutine|\bvegan|\bvegetarian/i, "allergy allergen gluten-free vegan vegetarian Allergie glutenfrei allergie sans gluten alergia sin gluten"],
+  [/\bfum[ao]|\bsigarett/i, "smoking Rauchen fumer fumar"],
+  [/\breception\b|\bricevimento/i, "reception front desk Rezeption réception recepción"],
+  [/\bcamer[ae]\b|\bsuite/i, "room suite Zimmer chambre habitación"],
+  [/\bmuse[oi]\b|\btorr[ei]\b|\bvisit|\bturist/i, "museum towers visit sightseeing Museum Türme besichtigen musée tours visiter museo torres visitar"],
+  [/\bfarmaci|\bmedic|\bospedal|\bemergenz/i, "pharmacy doctor hospital emergency Apotheke Arzt Krankenhaus Notfall pharmacie médecin urgence farmacia médico urgencia"],
+  [/\bfunivi/i, "cable car Seilbahn téléphérique teleférico"],
+];
+
+/** Testo da usare per l'embedding di un frammento: il testo stesso più le
+ *  traduzioni dei termini di dominio che contiene. Mai mostrato al modello. */
+export function testoPerEmbedding(testo: string): string {
+  const chiavi: string[] = [];
+  for (const [re, trad] of GLOSSARIO) if (re.test(testo)) chiavi.push(trad);
+  return chiavi.length ? `${testo}\n[${chiavi.join(" ")}]` : testo;
+}
+
 export interface Frammento {
   sezione: string;
   testo: string;
@@ -406,6 +468,8 @@ const EMBED_TIMEOUT_MS = 1500;
 // poco. Il modello ha riempito il buco inventando "7:30 nella sala dedicata".
 // Tre frammenti in più costano ~2KB e alzano il richiamo dove serve.
 const TOP_N_FRAMMENTI = 8;
+// Segnali di domanda su allergie/intolleranze nelle 5 lingue (vedi uso in recuperaFonti).
+const RE_ALLERGIE = /allerg|intolleran|celiac|glutine|gluten|lattos|lactos|laktos|vegan|vegetarian|frutta a guscio|\bnut(s)?\b|noci|arachid|peanut|Erdnuss|Nuss|noix|arachide|nueces|cacahuete|crostace|shellfish|Schalentier|fruits de mer|marisco/i;
 // Sopra questa soglia di voci KB si passa dal "allega tutte" al ranking per
 // similarità (stessa logica dei frammenti, top-5). Sotto soglia, KB ancora
 // piccola (~20 voci a poche righe l'una restano leggere anche allegate per
@@ -558,7 +622,7 @@ async function otteniVettoriFrammenti(indice: Indice): Promise<number[][] | null
 
   const esistente = cacheFrammentiVettori.get(indice.hash);
   if (esistente) return esistente;
-  const vettori = await chiediEmbeddingsBatch(indice.frammenti.map((f) => f.testo));
+  const vettori = await chiediEmbeddingsBatch(indice.frammenti.map((f) => testoPerEmbedding(f.testo)));
   if (vettori) cacheFrammentiVettori.set(indice.hash, vettori);
   return vettori;
 }
@@ -667,7 +731,14 @@ export async function recuperaFonti(
     scelti = ["<degradato: tutti i frammenti>"];
   } else {
     const punteggi = indice.frammenti.map((f, i) => ({ f, sim: similitudineCoseno(vettoreQuery, vettoriFrammenti[i]) }));
-    frammentiScelti = selezionaDiversificato(punteggi, TOP_N_FRAMMENTI, MAX_MENU_NEL_TOP);
+    // Domande su allergie/intolleranze: NESSUN frammento di menu. La regola
+    // "non giudicare se un piatto è adatto" regge finché il modello non ha un
+    // elenco di piatti sotto gli occhi: misurato il 2026-08-28 che con più
+    // menu in contesto dichiarava "il menu Green Gourmet è interamente senza
+    // glutine" — il menu dice solo "Green Gourmet". Per un allergico la
+    // risposta giusta è sempre "verifichi col ristorante": i piatti non servono.
+    const maxMenu = RE_ALLERGIE.test(domanda) ? 0 : MAX_MENU_NEL_TOP;
+    frammentiScelti = selezionaDiversificato(punteggi, TOP_N_FRAMMENTI, maxMenu);
     const simDi = new Map(punteggi.map((p) => [p.f, p.sim]));
     scelti = frammentiScelti.map((f) => `${f.sezione}(${(simDi.get(f) ?? 0).toFixed(2)})`);
     degradato = false;

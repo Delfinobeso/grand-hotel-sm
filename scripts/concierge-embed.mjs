@@ -182,13 +182,14 @@ async function main() {
 
   const { SYSTEM_PROMPT_BASE, TRAILING } = concierge;
   const { MENUS } = menus;
-  const { costruisciFrammenti, hashTesto } = indice;
+  const { costruisciFrammenti, hashTesto, testoPerEmbedding } = indice;
 
   if (
     typeof SYSTEM_PROMPT_BASE !== "string" ||
     typeof TRAILING !== "string" ||
     typeof MENUS !== "string" ||
     typeof costruisciFrammenti !== "function" ||
+    typeof testoPerEmbedding !== "function" ||
     typeof hashTesto !== "function"
   ) {
     fallisci(
@@ -210,7 +211,8 @@ async function main() {
 
   let vettori;
   try {
-    vettori = await chiediEmbeddingsBatch(chiave, frammenti.map((f) => f.testo));
+    // Stesso testo usato a runtime nel percorso lazy: frammento + glossario cross-lingua.
+    vettori = await chiediEmbeddingsBatch(chiave, frammenti.map((f) => testoPerEmbedding(f.testo)));
   } catch (e) {
     fallisci(`chiamata embeddings Mistral fallita: ${e?.message || e}`);
     return;
