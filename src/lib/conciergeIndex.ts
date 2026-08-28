@@ -399,7 +399,13 @@ const EMBED_MODEL = "mistral-embed";
 // piuttosto che far aspettare l'ospite. Vale per OGNI chiamata embeddings
 // (frammenti e query), ciascuna per conto suo.
 const EMBED_TIMEOUT_MS = 1500;
-const TOP_N_FRAMMENTI = 5;
+// 5 -> 8 il 2026-08-28: misurato su Titano Suites che alla domanda tedesca
+// "Um wie viel Uhr gibt es Frühstück?" il frammento giusto (L'Arengo – info,
+// "Colazione 07:00-10:00") restava fuori dal top-5: con query brevi in
+// un'altra lingua le similarità si affollano fra 0.67 e 0.69 e discriminano
+// poco. Il modello ha riempito il buco inventando "7:30 nella sala dedicata".
+// Tre frammenti in più costano ~2KB e alzano il richiamo dove serve.
+const TOP_N_FRAMMENTI = 8;
 // Sopra questa soglia di voci KB si passa dal "allega tutte" al ranking per
 // similarità (stessa logica dei frammenti, top-5). Sotto soglia, KB ancora
 // piccola (~20 voci a poche righe l'una restano leggere anche allegate per
