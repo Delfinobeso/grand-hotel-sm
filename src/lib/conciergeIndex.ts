@@ -612,7 +612,7 @@ export async function recuperaFonti(
   domanda: string,
   indice: Indice,
   opts: RecuperaFontiOpts = {},
-): Promise<{ testo: string; degradato: boolean }> {
+): Promise<{ testo: string; degradato: boolean; scelti: string[] }> {
   const kbItemsPromise = Promise.resolve(opts.kbItems ?? []);
 
   // I 3 round-trip di rete partono tutti qui, non in serie: il vettore KB
@@ -636,13 +636,20 @@ export async function recuperaFonti(
 
   let frammentiScelti: Frammento[];
   let degradato: boolean;
+  // Etichette diagnostiche "sezione(similarità)" dei frammenti scelti: la
+  // route le logga solo con CONCIERGE_DEBUG=1 (preview). Senza, un recupero
+  // che manca il frammento giusto è indistinguibile da un modello reticente.
+  let scelti: string[] = [];
 
   if (!vettoriFrammenti || !vettoreQuery || vettoriFrammenti.length !== indice.frammenti.length) {
     frammentiScelti = indice.frammenti;
     degradato = true;
+    scelti = ["<degradato: tutti i frammenti>"];
   } else {
     const punteggi = indice.frammenti.map((f, i) => ({ f, sim: similitudineCoseno(vettoreQuery, vettoriFrammenti[i]) }));
     frammentiScelti = selezionaDiversificato(punteggi, TOP_N_FRAMMENTI, MAX_MENU_NEL_TOP);
+    const simDi = new Map(punteggi.map((p) => [p.f, p.sim]));
+    scelti = frammentiScelti.map((f) => `${f.sezione}(${(simDi.get(f) ?? 0).toFixed(2)})`);
     degradato = false;
   }
 
@@ -657,5 +664,5 @@ export async function recuperaFonti(
     frammentiScelti.map((f) => f.testo).join("\n\n") +
     kbTesto;
 
-  return { testo, degradato };
+  return { testo, degradato, scelti };
 }

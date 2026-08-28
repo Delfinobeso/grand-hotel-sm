@@ -354,6 +354,12 @@ export async function POST(req: NextRequest) {
     const fontiPromise = recuperaFonti(domandaQuery, indice, { kbItems: kbPromise });
     const [, fonti] = await Promise.all([kbPromise, fontiPromise]);
     const degradato = fonti.degradato;
+    if (process.env.CONCIERGE_DEBUG === "1") {
+      // Solo in preview: quali frammenti ha scelto il recupero e con che
+      // similarità. È il dato che serve per distinguere "recupero sbagliato"
+      // da "modello reticente" quando una risposta nota viene negata.
+      console.log(`[concierge-debug] q="${domandaQuery.slice(0, 80)}" -> ${fonti.scelti.join(" | ")}`);
+    }
 
     // Il log si ATTENDE prima di chiudere lo stream. Verificato sul campo
     // (preview Vercel, 2026-08-06): con after() di Next la POST non parte
