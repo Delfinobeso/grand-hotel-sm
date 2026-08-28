@@ -4,8 +4,8 @@ import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { SYSTEM_PROMPT_BASE, TRAILING, FALLBACK_STREAM_ERROR, FALLBACK_FATAL_ERROR } from "@/lib/concierge";
 import { getVerifiedAnswers } from "@/lib/conciergeKb";
 import { promemoriaLingua } from "@/lib/languageDetect";
-import { getIndice, recuperaFonti } from "@/lib/conciergeIndex";
-import { buildBehaviorPrompt } from "@/lib/conciergeBehavior";
+import { getIndice, recuperaFonti, estraiRegolaMenu } from "@/lib/conciergeIndex";
+import { buildBehaviorPrompt, GUARDIA_DEGRADO } from "@/lib/conciergeBehavior";
 import { HOTEL } from "@/lib/hotel";
 
 interface ChatMsg {
@@ -143,8 +143,13 @@ const MISTRAL: Provider = {
   model: process.env.CHAT_MODEL_MISTRAL || "mistral-medium-latest",
   chiave: () => process.env.MISTRAL_API_KEY,
   // Su Mistral la cache del prefisso NON e' automatica come su DeepSeek: senza
-  // questa chiave i ~11k token di system prompt si pagano pieni a ogni domanda.
-  // La chiave e' per hotel: i tre prompt sono diversi, non devono condividere cache.
+  // questa chiave anche il poco che e' cacheable si pagherebbe pieno a ogni
+  // domanda. Con il concierge v2 il prefisso cacheable e' SOLO il prompt di
+  // comportamento (~2KB, conciergeBehavior.ts): le fonti e la storia, che
+  // cambiano a ogni turno, non sono in cima ai messages e quindi non
+  // beneficiano comunque della cache. La chiave resta impostata perche'
+  // innocua (per hotel: i tre prompt sono diversi, non devono condividere
+  // cache), non perche' copra ancora i ~11k token del vecchio prompt v1.
   extra: (projectId) => ({ prompt_cache_key: projectId }),
 };
 
@@ -364,15 +369,31 @@ export async function POST(req: NextRequest) {
       return logExchange(req, question, answer, ok, providerUsato, degradato);
     };
 
+    const regolaMenu = estraiRegolaMenu(TRAILING);
+
     const messages = [
       // Prompt di comportamento (v2): sostituisce sia il vecchio preambolo di
-      // SYSTEM_PROMPT_BASE sia GUARDIA_FINALE. Corto apposta — vedi
+      // SYSTEM_PROMPT_BASE sia GUARDIA_FINALE. Corto apposta, e con la regola
+      // MENÙ per-hotel iniettata verbatim dal TRAILING — vedi
       // conciergeBehavior.ts per il perché.
-      { role: "system", content: buildBehaviorPrompt({ hotel: HOTEL.name, telefonoReception: HOTEL.phone }) },
-      ...history,
-      // Blocco FONTI: solo i frammenti pertinenti alla domanda (+ core sempre
-      // presente + KB), non più l'intera scheda. Vedi conciergeIndex.ts.
+      { role: "system", content: buildBehaviorPrompt({ hotel: HOTEL.name, telefonoReception: HOTEL.phone, regolaMenu }) },
+      // Blocco FONTI: subito dopo il prompt di comportamento, PRIMA della
+      // storia. Misurato il 2026-08-27/28: con le fonti in coda alla storia
+      // (ordine precedente) l'aderenza linguistica scendeva (12/15 contro
+      // 15/15) perché la massa di testo italiano finiva accanto alla domanda
+      // dell'ospite; inoltre al turno 2 la storia salvata conteneva risposte
+      // generate con frammenti diversi da quelli allegati in QUESTO turno,
+      // ed averle adiacenti confondeva il modello su quali fossero validi.
+      // Vedi conciergeIndex.ts per come si compone.
       { role: "system", content: fonti.testo },
+      ...history,
+      // Guardia aggiunta SOLO quando il recupero fonti è degradato (tutti i
+      // frammenti allegati, ~32KB indifferenziati invece di ~8KB mirati):
+      // penultima posizione, subito prima del promemoria lingua — è la
+      // posizione misurata che regge quando la massa di contesto è grande.
+      // Vedi conciergeBehavior.ts (GUARDIA_DEGRADO) per il perché non è un
+      // semplice ripristino del comportamento pre-v2.
+      ...(degradato ? [{ role: "system", content: GUARDIA_DEGRADO }] : []),
       // Il promemoria lingua va DOPO la storia E dopo le fonti, mai dentro un
       // prompt statico: è per-turno (non deve finire nello storico salvato
       // dal client) e la sua posizione in coda ai messages è ciò che lo rende
@@ -382,10 +403,11 @@ export async function POST(req: NextRequest) {
       // Verificato il 2026-08-27 che Mistral accetta questo system finale
       // esattamente come DeepSeek: nessun errore, 90 scambi su 90 in lingua.
       // ORDINE NON CASUALE, INVARIATO dal v1: DEVE restare l'ULTIMO elemento
-      // dell'array. Provato l'ordine opposto il 2026-08-27 e misurato:
-      // spostandolo via dall'ultima posizione l'aderenza linguistica scendeva
-      // (14/15, un tedesco tornato in italiano) perché il promemoria perdeva
-      // la posizione finale da cui deriva tutta la sua efficacia.
+      // dell'array, ANCHE quando la guardia di degrado sopra è presente.
+      // Provato l'ordine opposto il 2026-08-27 e misurato: spostandolo via
+      // dall'ultima posizione l'aderenza linguistica scendeva (14/15, un
+      // tedesco tornato in italiano) perché il promemoria perdeva la
+      // posizione finale da cui deriva tutta la sua efficacia.
       { role: "system", content: promemoriaLingua(question) },
     ];
 
