@@ -2,18 +2,27 @@ import { NextRequest, NextResponse } from "next/server";
 import { MENUS } from "@/lib/menus";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { SYSTEM_PROMPT_BASE, TRAILING, FALLBACK_STREAM_ERROR, FALLBACK_FATAL_ERROR } from "@/lib/concierge";
-import { getVerifiedAnswers, buildKbBlock, type KbItem } from "@/lib/conciergeKb";
+import { getVerifiedAnswers } from "@/lib/conciergeKb";
 import { promemoriaLingua } from "@/lib/languageDetect";
-
-// Il blocco KB va IN CODA: la recency dà priorità reale alle risposte
-// verificate e mette le regole di guardia anti-injection come ultima parola.
-function buildSystemPrompt(kbItems: KbItem[]): string {
-  return SYSTEM_PROMPT_BASE + "\n\n" + MENUS + "\n\n" + TRAILING + buildKbBlock(kbItems);
-}
+import { getIndice, recuperaFonti } from "@/lib/conciergeIndex";
+import { buildBehaviorPrompt } from "@/lib/conciergeBehavior";
+import { HOTEL } from "@/lib/hotel";
 
 interface ChatMsg {
   role: "user" | "assistant";
   content: string;
+}
+
+/** Query per il recupero fonti: gli ultimi 2 messaggi utente concatenati. Un
+ *  solo messaggio spesso non basta (i follow-up tipo "e si pagano al
+ *  check-out?" non hanno parole chiave da soli), 2 è il compromesso — oltre
+ *  rischia di trascinare dentro il contesto sbagliato da una domanda precedente. */
+function ultimiMessaggiUtente(storia: ChatMsg[], n: number): string {
+  return storia
+    .filter((m) => m.role === "user")
+    .slice(-n)
+    .map((m) => m.content)
+    .join("\n");
 }
 
 // Mappa host -> projectId per l'analytics first-party (fleet-wide, dato non sensibile).
@@ -34,7 +43,14 @@ function projectIdDi(req: NextRequest): string {
   return PROJECT_ID_BY_HOST[host] || host;
 }
 
-function logExchange(req: NextRequest, question: string, answer: string, ok: string, prov: string): Promise<void> {
+function logExchange(
+  req: NextRequest,
+  question: string,
+  answer: string,
+  ok: string,
+  prov: string,
+  deg: boolean,
+): Promise<void> {
   const projectId = projectIdDi(req);
   return fetch("https://analytics.blasat.com/api/track", {
     method: "POST",
@@ -48,6 +64,11 @@ function logExchange(req: NextRequest, question: string, answer: string, ok: str
       // Quale modello ha risposto: senza questo un fallback silenzioso su
       // DeepSeek sarebbe invisibile e non sapremmo mai che Mistral sta cedendo.
       prov,
+      // Campo additivo (v2): il recupero fonti è degradato a "tutti i
+      // frammenti" per un errore embeddings (timeout, chiave, rete). Serve a
+      // distinguere "poco pertinente per scelta" da "poco pertinente perché
+      // il recupero non ha funzionato". L'analytics lo ignora se non lo conosce.
+      deg,
     }),
     // Tetto duro: questa POST viene attesa prima di chiudere lo stream, quindi
     // un analytics lento terrebbe acceso l'indicatore "sto scrivendo". Meglio
@@ -172,53 +193,12 @@ function catenaProvider(): Provider[] {
  *  dannoso: si ripiegherebbe su DeepSeek, che e' il modello peggiore. */
 const TTFT_TIMEOUT_MS = Number(process.env.CHAT_TTFT_TIMEOUT_MS) || 6000;
 
-/** Presidio finale contro i due modi in cui il concierge fa danno:
- *  dichiarare di aver agito, e riempire un buco con un dato inventato.
- *
- *  ⚠️ Sta QUI, in coda ai messages, e non dentro il system prompt, per la
- *  stessa ragione del promemoria lingua: le regole 2, 3 e 4 del prompt gia'
- *  dicono "non inventare" e vengono ignorate lo stesso — dentro 35k caratteri
- *  un'istruzione ripetuta non regge, la posizione conta piu' del testo.
- *  Misurato il 2026-08-27 sul percorso di produzione: senza questo presidio
- *  Mistral inventava una tassa di soggiorno inesistente ("€2,00 a persona,
- *  dai 14 anni") e prometteva di avvisare la cucina di un'allergia alle
- *  arachidi; DeepSeek prometteva di far recapitare asciugamani in camera.
- *  Entrambi i modelli sbagliavano: e' un buco del prompt, non del fornitore.
- *
- *  Volutamente CORTO: un presidio lungo si diluisce come le regole di sopra. Tetto
- *  duro: due vincoli, mai di piu'. I fatti nuovi vanno nella scheda o nella KB, mai qui.
- *
- *  Due correzioni dopo l'audit del 2026-08-28:
- *  - NON cablare qui il canale di contatto. La prima versione diceva "tasto 9 dal
- *    telefono in camera": e' un fatto del solo Grand Hotel, ma questo file e' condiviso
- *    dai 3 hotel — su Titano e Titano Suites il canale e' +39 0549 991007. Un dato
- *    specifico in un file condiviso diventa un errore sugli altri due. Ora rimanda
- *    genericamente al canale "previsto dalla scheda", che ogni hotel ha per conto suo
- *    (e che per alcuni servizi non e' la Reception: il Centro Messegue' ha il tasto 471).
- *  - Vietate anche le affermazioni IMPERSONALI. La prima versione vietava solo i
- *    performativi in prima persona, quindi "the kitchen has been informed" passava:
- *    stessa bugia, stesso danno, verbo non vietato.
- *
- *  Terza correzione, 2026-08-28: il divieto di INVENTARE non copriva il DEDURRE.
- *  Misurato: a "sono allergico alla frutta a guscio, i cappellacci sono sicuri?" il
- *  modello leggeva gli ingredienti dal menu e rispondeva "non contengono frutta a
- *  guscio". Non inventava nulla — ragionava su dati veri e presentava l'inferenza come
- *  garanzia, su una domanda di sicurezza alimentare. E' rimasto dentro il vincolo 2
- *  invece di diventarne un terzo: il tetto di due vincoli e' esso stesso il presidio. */
-const GUARDIA_FINALE =
-  "Due vincoli assoluti, prima di rispondere.\n" +
-  "1) NON PUOI COMPIERE AZIONI. Non invii oggetti, non avvisi il personale, non prenoti, " +
-  "non trasmetti messaggi alla cucina o alla Reception. Non dire MAI di aver fatto, di fare " +
-  "o che farai qualcosa (\"provvedo\", \"ho avvisato\", \"I will inform\", \"I'll have it sent\"), " +
-  "NÉ che qualcosa sia già stato fatto, sia noto al personale o verrà fatto da altri " +
-  "(\"è stato segnalato\", \"the kitchen has been informed\", \"they will bring them shortly\"). " +
-  "Per ogni richiesta operativa indica il canale di contatto previsto dalla scheda qui sopra " +
-  "per quel servizio, e di\' che va rivolta lì.\n" +
-  "2) NON INVENTARE NÉ DEDURRE DATI. Se un prezzo, una tassa, un orario o un servizio non è " +
-  "scritto sopra, dì apertamente che non risulta fra le informazioni disponibili e rimanda al " +
-  "contatto della scheda. Meglio ammettere di non saperlo che dare un numero plausibile. " +
-  "In particolare non giudicare MAI se un piatto sia adatto a un'allergia o intolleranza, " +
-  "nemmeno leggendo gli ingredienti: di\' che va verificato col ristorante prima di ordinare.";
+// GUARDIA_FINALE (il presidio "non agire, non inventare/dedurre" misurato il
+// 2026-08-27/28 su Mistral e DeepSeek) è stato sostituito dal prompt di
+// comportamento in conciergeBehavior.ts, che copre la stessa cosa in modo
+// permanente invece che come rinforzo per-turno. Storia e misure delle
+// correzioni restano nel git log di questo file (vedi commit e314423,
+// 47f3eb0) per chi deve ricostruire il perché di una singola frase.
 
 interface AperturaStream {
   reader: ReadableStreamDefaultReader<Uint8Array>;
@@ -354,13 +334,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "API key non configurata" }, { status: 500 });
     }
 
-    // KB verificata: la fetch parte qui (si sovrappone al lavoro già fatto)
-    // e si risolve da cache nella quasi totalità dei casi. Mai un throw.
-    const kbItems = await getVerifiedAnswers();
-    const systemPrompt = buildSystemPrompt(kbItems);
-
     const lastUserMsg = [...history].reverse().find((m) => m.role === "user");
     question = lastUserMsg ? lastUserMsg.content : "";
+
+    // Recupero fonti (v2, embeddings) e KB verificata partono IN PARALLELO,
+    // non in serie: kbPromise è passata dentro opts.kbItems e recuperaFonti
+    // la attende internamente, ma la fetch verso l'endpoint KB è già in volo
+    // da subito. Mai un throw da questo blocco: recuperaFonti degrada da sola
+    // a "tutti i frammenti" su qualunque errore (vedi conciergeIndex.ts), e
+    // getVerifiedAnswers() non lancia mai (vedi conciergeKb.ts).
+    const indice = getIndice(SYSTEM_PROMPT_BASE, MENUS, TRAILING);
+    const domandaQuery = ultimiMessaggiUtente(history, 2);
+    const kbPromise = getVerifiedAnswers();
+    const fontiPromise = recuperaFonti(domandaQuery, indice, { kbItems: kbPromise });
+    const [, fonti] = await Promise.all([kbPromise, fontiPromise]);
+    const degradato = fonti.degradato;
 
     // Il log si ATTENDE prima di chiudere lo stream. Verificato sul campo
     // (preview Vercel, 2026-08-06): con after() di Next la POST non parte
@@ -373,27 +361,31 @@ export async function POST(req: NextRequest) {
     // chiama, il primo vince.
     finishLog = (answer: string, ok: string) => {
       finishLog = null; // one-shot: i chiamanti usano finishLog?.()
-      return logExchange(req, question, answer, ok, providerUsato);
+      return logExchange(req, question, answer, ok, providerUsato, degradato);
     };
 
     const messages = [
-      { role: "system", content: systemPrompt },
+      // Prompt di comportamento (v2): sostituisce sia il vecchio preambolo di
+      // SYSTEM_PROMPT_BASE sia GUARDIA_FINALE. Corto apposta — vedi
+      // conciergeBehavior.ts per il perché.
+      { role: "system", content: buildBehaviorPrompt({ hotel: HOTEL.name, telefonoReception: HOTEL.phone }) },
       ...history,
-      // Il promemoria lingua va DOPO la storia, mai dentro systemPrompt: è
-      // per-turno (non deve finire nello storico salvato dal client) e la
-      // sua posizione in coda ai messages è ciò che lo rende efficace —
-      // verificato che un rinforzo identico messo dentro il system prompt
-      // (per quanto in cima o ripetuto) non basta: ~20% di aderenza contro
-      // il 100% misurato con questo stesso testo in coda ai messages.
+      // Blocco FONTI: solo i frammenti pertinenti alla domanda (+ core sempre
+      // presente + KB), non più l'intera scheda. Vedi conciergeIndex.ts.
+      { role: "system", content: fonti.testo },
+      // Il promemoria lingua va DOPO la storia E dopo le fonti, mai dentro un
+      // prompt statico: è per-turno (non deve finire nello storico salvato
+      // dal client) e la sua posizione in coda ai messages è ciò che lo rende
+      // efficace — verificato che un rinforzo identico messo altrove (per
+      // quanto in cima o ripetuto) non basta: ~20% di aderenza contro il
+      // 100% misurato con questo stesso testo in coda ai messages.
       // Verificato il 2026-08-27 che Mistral accetta questo system finale
       // esattamente come DeepSeek: nessun errore, 90 scambi su 90 in lingua.
-      // ORDINE NON CASUALE: il presidio PRIMA, il promemoria lingua ULTIMO.
-      // Provato l'ordine opposto il 2026-08-27 e misurato: mettendo il presidio
-      // per ultimo l'aderenza linguistica scendeva (14/15, un tedesco tornato
-      // in italiano) perche' il promemoria perdeva la posizione finale da cui
-      // deriva tutta la sua efficacia. L'ultima riga letta dal modello deve
-      // restare quella sulla lingua.
-      { role: "system", content: GUARDIA_FINALE },
+      // ORDINE NON CASUALE, INVARIATO dal v1: DEVE restare l'ULTIMO elemento
+      // dell'array. Provato l'ordine opposto il 2026-08-27 e misurato:
+      // spostandolo via dall'ultima posizione l'aderenza linguistica scendeva
+      // (14/15, un tedesco tornato in italiano) perché il promemoria perdeva
+      // la posizione finale da cui deriva tutta la sua efficacia.
       { role: "system", content: promemoriaLingua(question) },
     ];
 

@@ -7,7 +7,10 @@
  */
 
 const WINDOW_MS = 10 * 60 * 1000; // 10 minuti
-const MAX_REQUESTS = 20;
+// Override via env per il banco di prova concierge-v2 in preview (env preview
+// a 200, per non farsi bloccare durante i test): la produzione, senza la env,
+// resta al default di 20.
+const MAX_REQUESTS = Number(process.env.CHAT_RATE_LIMIT_MAX) || 20;
 const MAX_MAP_SIZE = 500;
 
 const requestLog = new Map<string, number[]>();
