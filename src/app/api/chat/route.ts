@@ -6,7 +6,7 @@ import { getVerifiedAnswers } from "@/lib/conciergeKb";
 import { promemoriaLingua } from "@/lib/languageDetect";
 import { getIndice, recuperaFonti, estraiRegolaMenu } from "@/lib/conciergeIndex";
 import { buildBehaviorPrompt, GUARDIA_DEGRADO } from "@/lib/conciergeBehavior";
-import { numeroWhatsappReception, creaTrasformatoreWa } from "@/lib/conciergeWhatsapp";
+import { numeroWhatsappReception, strutturaWhatsappReception, creaTrasformatoreWa, rimuoviLinkWa } from "@/lib/conciergeWhatsapp";
 import { HOTEL } from "@/lib/hotel";
 
 interface ChatMsg {
@@ -332,6 +332,16 @@ export async function POST(req: NextRequest) {
     }
     history = history.map((m) => ({ ...m, content: m.content.slice(0, 1000) }));
 
+    // I bottoni WhatsApp generati nei turni precedenti NON tornano al modello.
+    // Il client rimanda tutta la conversazione, link inclusi: lasciandoglieli
+    // vedere il modello li ricopia accanto al marcatore nuovo (due bottoni
+    // gemelli, visto in browser il 2026-08-31) o peggio ripropone un link
+    // VECCHIO, con dentro la camera o la richiesta di prima. Il link lo
+    // costruisce il server dal marcatore, quindi nello storico non serve.
+    history = history.map((m) =>
+      m.role === "assistant" ? { ...m, content: rimuoviLinkWa(m.content) } : m,
+    );
+
     if (!checkRateLimit(ip)) {
       return NextResponse.json({ error: "rate_limited" }, { status: 429 });
     }
@@ -384,13 +394,16 @@ export async function POST(req: NextRequest) {
     // sotto è un passante: comportamento identico a prima, senza rami
     // condizionali sparsi. Vedi conciergeWhatsapp.ts.
     const whatsappReception = numeroWhatsappReception();
+    // Nome della struttura nel messaggio precompilato: serve solo dove due
+    // hotel condividono lo stesso numero di Reception (Titano e Suites).
+    const strutturaWhatsapp = strutturaWhatsappReception();
 
     const messages = [
       // Prompt di comportamento (v2): sostituisce sia il vecchio preambolo di
       // SYSTEM_PROMPT_BASE sia GUARDIA_FINALE. Corto apposta, e con la regola
       // MENÙ per-hotel iniettata verbatim dal TRAILING — vedi
       // conciergeBehavior.ts per il perché.
-      { role: "system", content: buildBehaviorPrompt({ hotel: HOTEL.name, telefonoReception: HOTEL.phone, regolaMenu, whatsappReception }) },
+      { role: "system", content: buildBehaviorPrompt({ hotel: HOTEL.name, telefonoReception: HOTEL.phone, regolaMenu, whatsappReception, strutturaWhatsapp }) },
       // Blocco FONTI: subito dopo il prompt di comportamento, PRIMA della
       // storia. Misurato il 2026-08-27/28: con le fonti in coda alla storia
       // (ordine precedente) l'aderenza linguistica scendeva (12/15 contro
@@ -459,7 +472,10 @@ export async function POST(req: NextRequest) {
     // mezzo: raro quanto basta per non vedersi in prova, e garantito in
     // produzione. `answerAcc` accumula la versione per il LOG, in cui il
     // bottone è ridotto alla sua etichetta senza URL — vedi conciergeWhatsapp.ts.
-    const wa = creaTrasformatoreWa(whatsappReception);
+    // Al trasformatore serve anche ciò che l'ospite ha scritto: è così che
+    // riconosce un numero di camera inventato dal modello e scarta il bottone
+    // invece di mandare la richiesta alla porta sbagliata.
+    const wa = creaTrasformatoreWa(whatsappReception, ultimiMessaggiUtente(history, 10));
     const emetti = (controller: ReadableStreamDefaultController, pezzo: string) => {
       const { out, log } = wa.push(pezzo);
       answerAcc += log;

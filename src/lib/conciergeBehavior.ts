@@ -79,6 +79,32 @@
  *     string e va percent-encoded. La codifica la fa il server
  *     (conciergeWhatsapp.ts), che sa anche ricucire il marcatore quando lo
  *     streaming lo taglia in due. Vedi lì per il perché di ogni pezzo.
+ *     ⚠️ Il messaggio dentro il marcatore va SEMPRE in italiano, anche con un
+ *     ospite tedesco, perché non è parte della risposta: è un foglietto per la
+ *     Reception, che è italiana. Non è una sfumatura — misurato il 2026-08-31,
+ *     senza dirlo esplicitamente il modello lo scriveva in tedesco 3 volte su
+ *     3, perché il PROMEMORIA CRITICO in coda ai messages (languageDetect.ts)
+ *     ordina di scrivere "l'INTERA risposta" nella lingua dell'ospite e vince
+ *     su tutto — com'è giusto che sia. La cura NON è indebolire quel
+ *     promemoria, che è una severità conquistata al 100% di aderenza: è
+ *     dichiarare qui che il marcatore non fa parte della risposta, e ridurre
+ *     così il conflitto a una questione di ambito.
+ *     Il nome della struttura nell'intestazione (strutturaWhatsapp) serve solo
+ *     dove due hotel condividono lo stesso numero — Titano e Suites, confermato
+ *     da Aziz il 2026-08-31: senza, «Camera 204» non dice a quale dei due
+ *     appartenga. Sta fra parentesi DOPO il numero di camera, non davanti,
+ *     perché il numero in testa è un vincolo esplicito (la Reception legge di
+ *     sguardo mentre fa altro).
+ *     ⚠️ Il numero di camera NON è verificabile dal prompt. Misurato il
+ *     2026-08-31: con l'esempio concreto qui sopra, su 8 richieste operative
+ *     SENZA numero di camera il modello ha emesso il marcatore 3 volte — due
+ *     con l'intestazione vuota, e una con «Camera 204» ricopiata pari pari
+ *     dall'esempio. Per questo il divieto qui è scritto in modo esplicito E il
+ *     server controlla comunque, prima di costruire il link, che quelle cifre
+ *     compaiano nei messaggi dell'ospite (cameraAttendibile() in
+ *     conciergeWhatsapp.ts). Se togli uno dei due presidi resta il buco: un
+ *     messaggio che arriva alla Reception con la camera sbagliata manda
+ *     qualcuno a bussare alla porta di un altro ospite.
  */
 
 export interface BehaviorParams {
@@ -92,6 +118,12 @@ export interface BehaviorParams {
    *  si comporta esattamente come prima del 2026-08-31. È così che le due
    *  gemelle restano invariate pur condividendo questo file. Vedi (d). */
   whatsappReception?: string | null;
+  /** Nome della struttura da anteporre nel messaggio precompilato, da
+   *  strutturaWhatsappReception(). Serve SOLO dove due strutture condividono
+   *  lo stesso numero (Hotel Titano e Titano Suites): senza, la Reception non
+   *  sa di quale hotel sia la camera 204. Vuoto sul Grand Hotel, che ha un
+   *  numero suo — e lì il messaggio resta corto com'era. */
+  strutturaWhatsapp?: string | null;
 }
 
 // 2026-08-28 (sera): "SE NON LO SAI" copre anche i MECCANISMI. Caso reale di
@@ -101,13 +133,26 @@ export interface BehaviorParams {
 // servizio" non conteneva "come funziona qualcosa", e una domanda sì/no su
 // un meccanismo plausibile passava per buon senso da albergo.
 export function buildBehaviorPrompt(p: BehaviorParams): string {
+  // Intestazione del messaggio precompilato. Il numero di camera resta SEMPRE
+  // in testa (vincolo di Aziz: la Reception legge di sguardo mentre fa altro);
+  // il nome della struttura, quando serve, va subito dopo fra parentesi invece
+  // che davanti, così disambigua senza spostare il dato operativo dal primo
+  // posto. Il nome lo porta la configurazione, il modello lo ricopia e basta.
+  const intestazione = p.strutturaWhatsapp
+    ? `Camera <numero> (${p.strutturaWhatsapp})`
+    : "Camera <numero>";
+  const esempio = p.strutturaWhatsapp
+    ? `Camera 204 (${p.strutturaWhatsapp})`
+    : "Camera 204";
+
   // Blocco WhatsApp: presente SOLO se il numero è configurato. Posizionato
   // dopo EMERGENZE apposta — così l'istruzione d'emergenza viene letta prima,
   // e il divieto qui dentro la richiama invece di contraddirla.
   const bloccoWhatsapp = p.whatsappReception
     ? `
 
-CONTATTO WHATSAPP CON LA RECEPTION: solo per le richieste operative elencate sopra (asciugamani, pulizie, sveglia, allergie da comunicare, prenotazioni, guasti), e MAI in emergenza — in emergenza vale soltanto il blocco qui sopra, senza alcun bottone. Serve il numero di camera: se non l'hai, offrilo con «posso metterla in contatto tramite WhatsApp — mi dice il numero di camera?» e fermati lì, senza marcatore. Quando hai sia la richiesta sia il numero di camera, chiudi la risposta con una riga fatta esattamente così: [[WA: messaggio]]. Il messaggio è quello che manderà l'OSPITE, quindi lo firma lui e deve suonare scritto da una persona: sempre in italiano anche se l'ospite ha scritto in un'altra lingua, aperto da «Camera <numero> —» perché la Reception lo legge di sguardo mentre fa altro, e poi la richiesta in prima persona, cortese e adatta a quel caso — mai una formula fissa, che ripetuta identica suona più meccanica di una frase secca (asciugamani: «è possibile avere degli asciugamani puliti?»; sveglia: «potrei essere svegliato alle 7?»; guasto: «il condizionatore non parte, potreste dare un'occhiata?»). Se l'ospite non ha scritto in italiano, va' a capo dentro il marcatore e riporta la sua frase originale fra virgolette, come controprova per la Reception. Non scrivere mai un indirizzo wa.me né un link: il marcatore è l'unico modo, al bottone ci pensa il sistema. Il marcatore SI AGGIUNGE e non sostituisce niente: il tasto 9 e il numero restano nella risposta come sempre. E soprattutto: quel messaggio NON è partito e tu non hai contattato nessuno — di' che può toccare il bottone qui sotto per inviarlo dal suo WhatsApp, e mai «ecco fatto» o qualunque cosa faccia credere che il contatto sia già avvenuto.`
+CONTATTO WHATSAPP CON LA RECEPTION: solo per le richieste operative elencate sopra (asciugamani, pulizie, sveglia, allergie da comunicare, prenotazioni, guasti), e MAI in emergenza — in emergenza vale soltanto il blocco qui sopra, senza alcun bottone. ⚠️ SERVE IL NUMERO DI CAMERA, e deve essere quello che l'OSPITE ti ha scritto in questa conversazione. Se non te l'ha ancora dato, offri il contatto con «posso metterla in contatto tramite WhatsApp — mi dice il numero di camera?» e FERMATI LÌ, senza marcatore: non scriverlo vuoto, non lasciare «Camera —» e soprattutto non metterci un numero che ti sei inventato o che hai letto in un esempio. Nessun bottone è molto meglio di un bottone che manda la richiesta alla camera di qualcun altro. Quando hai sia la richiesta sia il numero di camera, chiudi la risposta con una riga fatta esattamente così: [[WA: messaggio]]. ⚠️ Quello che sta dentro il marcatore NON è parte della risposta all'ospite: è un foglietto che arriva alla Reception, e la Reception è italiana. Va perciò scritto SEMPRE IN ITALIANO, anche quando l'ospite ha scritto in tedesco, inglese, francese o spagnolo, e anche quando il promemoria in coda ti ordina di scrivere l'intera risposta nella sua lingua: quel promemoria vale per ciò che l'ospite legge, non per il contenuto del marcatore. La risposta attorno al marcatore resta nella lingua dell'ospite, il marcatore no. Se l'ospite non ha scritto in italiano, dopo la richiesta va' a capo DENTRO il marcatore e riporta fra virgolette la sua frase originale, come controprova per la Reception. Il messaggio è quello che manderà l'OSPITE, quindi lo firma lui e deve suonare scritto da una persona: aperto da «${intestazione} —» perché la Reception lo legge di sguardo mentre fa altro, e poi la richiesta in prima persona, cortese e adatta a quel caso — mai una formula fissa, che ripetuta identica suona più meccanica di una frase secca (asciugamani: «è possibile avere degli asciugamani puliti?»; sveglia: «potrei essere svegliato alle 7?»; guasto: «il condizionatore non parte, potreste dare un'occhiata?»). Esempio di forma con un ospite tedesco (il numero è un segnaposto, non usarlo mai davvero): [[WA: ${esempio} — è possibile avere degli asciugamani puliti?
+"Wir bräuchten bitte frische Handtücher"]] Non scrivere mai un indirizzo wa.me né un link: il marcatore è l'unico modo, al bottone ci pensa il sistema. Il marcatore SI AGGIUNGE e non sostituisce niente: il tasto 9 e il numero restano nella risposta come sempre. E soprattutto: quel messaggio NON è partito e tu non hai contattato nessuno — di' che può toccare il bottone qui sotto per inviarlo dal suo WhatsApp, e mai «ecco fatto» o qualunque cosa faccia credere che il contatto sia già avvenuto.`
     : "";
 
   return `Sei il Concierge digitale del ${p.hotel}. Rispondi agli ospiti con cortesia e concretezza, come il concierge di un hotel 4 stelle.

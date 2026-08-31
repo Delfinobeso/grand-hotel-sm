@@ -71,6 +71,26 @@ export function numeroWhatsappReception(): string | null {
 }
 
 /**
+ * Nome della struttura da mettere nel messaggio precompilato, o null.
+ *
+ * Serve perché Hotel Titano e Titano Suites CONDIVIDONO lo stesso numero
+ * (+390549991007, confermato da Aziz il 2026-08-31): la stessa persona riceve
+ * i messaggi di due strutture diverse, e «Camera 204 — …» da solo non dice di
+ * quale 204 si tratti. Il Grand Hotel ha un numero suo e non ne ha bisogno:
+ * lì la variabile resta vuota e il messaggio non si allunga per niente.
+ *
+ * Il nome arriva dalla CONFIGURAZIONE, non da una deduzione del modello: il
+ * modello si limita a copiare la stringa che gli passiamo nel prompt. Ed è una
+ * variabile a parte da RECEPTION_WHATSAPP perché le due cose cambiano per
+ * ragioni diverse — il numero se la Reception cambia telefono, il nome se due
+ * strutture iniziano (o smettono) di condividere lo stesso apparecchio.
+ */
+export function strutturaWhatsappReception(): string | null {
+  const v = process.env.RECEPTION_WHATSAPP_STRUTTURA?.trim();
+  return v ? v.slice(0, 40) : null;
+}
+
+/**
  * Percent-encoding per il parametro `text` di wa.me.
  *
  * `encodeURIComponent` da solo NON basta, per un motivo che non c'entra con
@@ -105,6 +125,66 @@ function ripulisciMessaggio(m: string): string {
     .join("\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+/**
+ * Toglie i bottoni WhatsApp già generati dal testo di una risposta passata.
+ *
+ * Il client rimanda al server tutta la conversazione, e le risposte
+ * dell'assistente ci tornano COL LINK già costruito. Visto in browser il
+ * 2026-08-31: al secondo turno il modello ritrovava `[Scrivi su
+ * WhatsApp](https://wa.me/…)` nello storico e lo ricopiava tale e quale
+ * accanto al marcatore nuovo — due bottoni gemelli nella stessa risposta. Il
+ * guardiano "un bottone per risposta" del trasformatore non poteva vederlo,
+ * perché quel secondo link non nasceva da un marcatore: era testo copiato.
+ *
+ * Peggio del doppione sarebbe stato il caso lento: un link VECCHIO ricopiato
+ * al turno dopo, con dentro il numero di camera o la richiesta di prima, che
+ * l'ospite invia credendolo aggiornato.
+ *
+ * La cura è togliere al modello ciò che non deve ricopiare: i link li produce
+ * il server dal marcatore, quindi nello storico che gli passiamo non ne serve
+ * nessuno. Si toglie solo wa.me — [Chiama](tel:…) e le mappe restano, perché
+ * quelli vengono davvero dalle fonti e il modello fa bene a riproporli.
+ */
+export function rimuoviLinkWa(testo: string): string {
+  return testo
+    .replace(/\[[^\]\n]*\]\(https:\/\/wa\.me\/[^\s)]*\)/g, "")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+/**
+ * Il messaggio precompilato è valido solo se porta un numero di camera VERO,
+ * cioè uno che l'ospite ha davvero scritto in questa conversazione.
+ *
+ * Misurato il 2026-08-31 sulla preview, con l'esempio nel prompt: su 8
+ * richieste operative SENZA numero di camera il modello ha emesso il marcatore
+ * 3 volte — due con l'intestazione vuota («Camera  — è possibile…») e una,
+ * la peggiore, con «Camera 204» RICOPIATA DALL'ESEMPIO DEL PROMPT. Un
+ * messaggio che arriva alla Reception con il numero di camera di qualcun
+ * altro è un guasto peggiore del non avere il bottone: manda qualcuno a
+ * bussare alla porta sbagliata.
+ *
+ * Il prompt da solo non basta a chiudere questo buco, perché "non inventare"
+ * è esattamente il tipo di istruzione che un modello viola quando ha un
+ * esempio concreto sott'occhio. Il server invece può VERIFICARE, e ha in mano
+ * il dato che serve: i messaggi dell'ospite. Se le cifre della camera non
+ * compaiono in quello che l'ospite ha scritto, il bottone non si mostra e la
+ * risposta resta quella di sempre (tasto 9 e numero), che è il ripiego giusto.
+ *
+ * @param messaggio   contenuto del marcatore
+ * @param testoOspite tutti i messaggi dell'ospite di questa conversazione
+ */
+export function cameraAttendibile(messaggio: string, testoOspite: string): boolean {
+  // L'intestazione è «Camera <numero>» o «Camera <numero> (Struttura)».
+  const m = messaggio.match(/^\s*Camera\s+([0-9][0-9A-Za-z]*)/i);
+  if (!m) return false; // manca del tutto, o è rimasta vuota
+  const camera = m[1];
+  // Le cifre devono comparire fra le parole dell'ospite: "camera 204",
+  // "Zimmer 204", "room 118", o anche solo "204" da solo vanno tutti bene.
+  return new RegExp(`\\b${camera}\\b`, "i").test(testoOspite);
 }
 
 export interface PezzoTrasformato {
@@ -151,10 +231,19 @@ export interface TrasformatoreWa {
  * Quello che l'ospite VEDE è comunque l'etichetta, quindi il log resta fedele
  * a "questa risposta a questa domanda".
  */
-export function creaTrasformatoreWa(numero: string | null): TrasformatoreWa {
+export function creaTrasformatoreWa(
+  numero: string | null,
+  testoOspite: string = "",
+): TrasformatoreWa {
   let buf = "";
   /** Quanto del buffer corrente è un marcatore aperto e non ancora chiuso. */
   let dentroMarcatore = false;
+  /** Un bottone per risposta, non di più. Visto in prova il 2026-08-31 su un
+   *  ospite tedesco: il modello ha ripetuto il marcatore due volte identico e
+   *  la chat mostrava due bottoni gemelli. Due bottoni non servono mai — anche
+   *  con due richieste in un solo messaggio vanno alla stessa Reception, e
+   *  vanno detti in un messaggio solo — quindi dal secondo in poi si scartano. */
+  let giaEmesso = false;
 
   /** Lunghezza del suffisso di `s` che è anche prefisso di WA_APRE. */
   function codaAmbigua(s: string): number {
@@ -187,11 +276,21 @@ export function creaTrasformatoreWa(numero: string | null): TrasformatoreWa {
         const messaggio = ripulisciMessaggio(buf.slice(WA_APRE.length, fine));
         buf = buf.slice(fine + WA_CHIUDE.length);
         dentroMarcatore = false;
-        if (numero && messaggio) {
-          out += linkWhatsapp(numero, messaggio);
-          log += WA_ETICHETTA;
+        if (numero && messaggio && !giaEmesso) {
+          if (cameraAttendibile(messaggio, testoOspite)) {
+            out += linkWhatsapp(numero, messaggio);
+            log += WA_ETICHETTA;
+            giaEmesso = true;
+          } else {
+            // Numero di camera mancante o mai scritto dall'ospite: niente
+            // bottone. La risposta attorno resta valida (tasto 9 e numero).
+            console.error(
+              `[whatsapp] marcatore scartato, camera non attendibile: ${messaggio.slice(0, 60)}`,
+            );
+          }
         }
-        // numero assente o marcatore vuoto: sparisce e basta.
+        // Numero assente, marcatore vuoto o bottone già emesso: sparisce e
+        // basta. In nessuno di questi casi deve restare qualcosa a schermo.
         continue;
       }
 

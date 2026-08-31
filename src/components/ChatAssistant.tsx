@@ -105,9 +105,17 @@ function parseActions(text: string, lang: Lang): { clean: string; actions: ChatA
   const clean = text
     .replace(re, (_m, label: string, url: string) => {
       actions.push({ label: labels[label] ?? label, url });
-      return label;
+      // Il bottone WhatsApp arriva SEMPRE da solo sulla sua riga (lo compone
+      // il server dal marcatore, vedi conciergeWhatsapp.ts), quindi lasciarne
+      // l'etichetta nel testo produceva una riga orfana "Scrivi su WhatsApp"
+      // sopra il bottone — per giunta in italiano, perche' qui si traduce solo
+      // l'etichetta del bottone. Gli altri link il modello li scrive dentro
+      // una frase, e li' l'etichetta serve a non lasciare un buco.
+      return url.includes("wa.me") ? "" : label;
     })
     .replace(/[ \t]+([.,;:])/g, "$1")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
     .trim();
   return { clean, actions };
 }
