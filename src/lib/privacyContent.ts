@@ -48,6 +48,10 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
         text: "Salviamo l'indirizzo tecnico della sottoscrizione push per inviarti le notifiche; puoi revocarla in ogni momento dalle impostazioni del dispositivo.",
       },
       {
+        label: "Contatto WhatsApp con la Reception (solo se lo usi)",
+        text: "Se scegli di contattare la Reception tramite WhatsApp, il pulsante apre WhatsApp sul tuo dispositivo con un messaggio già scritto ma non inviato: sei tu a inviarlo, dal tuo account WhatsApp, e il tuo numero è quindi visibile alla Reception come in una normale conversazione. Il messaggio non passa da noi e non viene conservato da questa applicazione; la conversazione che ne segue è soggetta alle condizioni di WhatsApp e alle prassi dell'hotel.",
+      },
+      {
         label: "Preferenze",
         text: "Tema e lingua sono salvati solo nel tuo dispositivo (localStorage).",
       },
@@ -77,6 +81,10 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
       {
         label: "Push notifications (only if you enable them)",
         text: "We store the technical push subscription address to send you notifications; you may revoke it at any time from your device settings.",
+      },
+      {
+        label: "Contacting Reception via WhatsApp (only if you use it)",
+        text: "If you choose to contact Reception via WhatsApp, the button opens WhatsApp on your device with a pre-written but unsent message: you send it yourself, from your own WhatsApp account, so your number is visible to Reception as in any normal conversation. The message does not pass through us and is not stored by this application; the resulting conversation is subject to WhatsApp's terms and to the hotel's own practices.",
       },
       {
         label: "Preferences",
@@ -110,6 +118,10 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
         text: "Nous enregistrons l'adresse technique de l'abonnement push pour vous envoyer des notifications ; vous pouvez le révoquer à tout moment depuis les paramètres de votre appareil.",
       },
       {
+        label: "Contact WhatsApp avec la Réception (uniquement si vous l'utilisez)",
+        text: "Si vous choisissez de contacter la Réception via WhatsApp, le bouton ouvre WhatsApp sur votre appareil avec un message déjà rédigé mais non envoyé : c'est vous qui l'envoyez, depuis votre propre compte WhatsApp, et votre numéro est donc visible par la Réception comme dans une conversation normale. Le message ne transite pas par nous et n'est pas conservé par cette application ; la conversation qui s'ensuit est soumise aux conditions de WhatsApp et aux pratiques de l'hôtel.",
+      },
+      {
         label: "Préférences",
         text: "Le thème et la langue sont enregistrés uniquement sur votre appareil (localStorage).",
       },
@@ -141,6 +153,10 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
         text: "Wir speichern die technische Adresse des Push-Abonnements, um Ihnen Benachrichtigungen zu senden; Sie können dies jederzeit in den Geräteeinstellungen widerrufen.",
       },
       {
+        label: "WhatsApp-Kontakt mit der Rezeption (nur wenn Sie ihn nutzen)",
+        text: "Wenn Sie die Rezeption über WhatsApp kontaktieren, öffnet die Schaltfläche WhatsApp auf Ihrem Gerät mit einer bereits verfassten, aber nicht gesendeten Nachricht: Sie senden sie selbst, von Ihrem eigenen WhatsApp-Konto, sodass Ihre Nummer der Rezeption wie in einem normalen Gespräch sichtbar ist. Die Nachricht läuft nicht über uns und wird von dieser Anwendung nicht gespeichert; das anschließende Gespräch unterliegt den Bedingungen von WhatsApp und den Gepflogenheiten des Hotels.",
+      },
+      {
         label: "Einstellungen",
         text: "Design und Sprache werden ausschließlich auf Ihrem Gerät gespeichert (localStorage).",
       },
@@ -170,6 +186,10 @@ export const PRIVACY_CONTENT: Record<Lang, PrivacyContent> = {
       {
         label: "Notificaciones push (solo si las activa)",
         text: "Guardamos la dirección técnica de la suscripción push para enviarle notificaciones; puede revocarla en cualquier momento desde los ajustes de su dispositivo.",
+      },
+      {
+        label: "Contacto por WhatsApp con la Recepción (solo si lo utilizas)",
+        text: "Si eliges contactar con la Recepción por WhatsApp, el botón abre WhatsApp en tu dispositivo con un mensaje ya escrito pero no enviado: lo envías tú, desde tu propia cuenta de WhatsApp, por lo que tu número es visible para la Recepción como en cualquier conversación normal. El mensaje no pasa por nosotros ni lo conserva esta aplicación; la conversación posterior está sujeta a las condiciones de WhatsApp y a las prácticas del hotel.",
       },
       {
         label: "Preferencias",

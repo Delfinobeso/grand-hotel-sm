@@ -6,6 +6,7 @@ import { getVerifiedAnswers } from "@/lib/conciergeKb";
 import { promemoriaLingua } from "@/lib/languageDetect";
 import { getIndice, recuperaFonti, estraiRegolaMenu } from "@/lib/conciergeIndex";
 import { buildBehaviorPrompt, GUARDIA_DEGRADO } from "@/lib/conciergeBehavior";
+import { numeroWhatsappReception, strutturaWhatsappReception, creaTrasformatoreWa, rimuoviLinkWa } from "@/lib/conciergeWhatsapp";
 import { HOTEL } from "@/lib/hotel";
 
 interface ChatMsg {
@@ -331,6 +332,16 @@ export async function POST(req: NextRequest) {
     }
     history = history.map((m) => ({ ...m, content: m.content.slice(0, 1000) }));
 
+    // I bottoni WhatsApp generati nei turni precedenti NON tornano al modello.
+    // Il client rimanda tutta la conversazione, link inclusi: lasciandoglieli
+    // vedere il modello li ricopia accanto al marcatore nuovo (due bottoni
+    // gemelli, visto in browser il 2026-08-31) o peggio ripropone un link
+    // VECCHIO, con dentro la camera o la richiesta di prima. Il link lo
+    // costruisce il server dal marcatore, quindi nello storico non serve.
+    history = history.map((m) =>
+      m.role === "assistant" ? { ...m, content: rimuoviLinkWa(m.content) } : m,
+    );
+
     if (!checkRateLimit(ip)) {
       return NextResponse.json({ error: "rate_limited" }, { status: 429 });
     }
@@ -377,12 +388,22 @@ export async function POST(req: NextRequest) {
 
     const regolaMenu = estraiRegolaMenu(TRAILING);
 
+    // Ponte WhatsApp verso la Reception (2026-08-31). Null quando
+    // RECEPTION_WHATSAPP non è configurata — oggi: solo il Grand Hotel ce
+    // l'ha. In quel caso il blocco non entra nel prompt e il trasformatore
+    // sotto è un passante: comportamento identico a prima, senza rami
+    // condizionali sparsi. Vedi conciergeWhatsapp.ts.
+    const whatsappReception = numeroWhatsappReception();
+    // Nome della struttura nel messaggio precompilato: serve solo dove due
+    // hotel condividono lo stesso numero di Reception (Titano e Suites).
+    const strutturaWhatsapp = strutturaWhatsappReception();
+
     const messages = [
       // Prompt di comportamento (v2): sostituisce sia il vecchio preambolo di
       // SYSTEM_PROMPT_BASE sia GUARDIA_FINALE. Corto apposta, e con la regola
       // MENÙ per-hotel iniettata verbatim dal TRAILING — vedi
       // conciergeBehavior.ts per il perché.
-      { role: "system", content: buildBehaviorPrompt({ hotel: HOTEL.name, telefonoReception: HOTEL.phone, regolaMenu }) },
+      { role: "system", content: buildBehaviorPrompt({ hotel: HOTEL.name, telefonoReception: HOTEL.phone, regolaMenu, whatsappReception, strutturaWhatsapp }) },
       // Blocco FONTI: subito dopo il prompt di comportamento, PRIMA della
       // storia. Misurato il 2026-08-27/28: con le fonti in coda alla storia
       // (ordine precedente) l'aderenza linguistica scendeva (12/15 contro
@@ -442,6 +463,30 @@ export async function POST(req: NextRequest) {
     let buffer = apertura.buffer;
 
     const encoder = new TextEncoder();
+
+    // Ogni carattere diretto all'ospite passa di qui: il trasformatore
+    // converte il marcatore [[WA: …]] nel link Markdown che la chat rende come
+    // bottone, e trattiene sul confine fra due chunk la coda che potrebbe
+    // essere l'inizio di un marcatore. Senza questo passaggio il marcatore
+    // grezzo comparirebbe a schermo ogni volta che lo streaming lo taglia in
+    // mezzo: raro quanto basta per non vedersi in prova, e garantito in
+    // produzione. `answerAcc` accumula la versione per il LOG, in cui il
+    // bottone è ridotto alla sua etichetta senza URL — vedi conciergeWhatsapp.ts.
+    // Al trasformatore serve anche ciò che l'ospite ha scritto: è così che
+    // riconosce un numero di camera inventato dal modello e scarta il bottone
+    // invece di mandare la richiesta alla porta sbagliata.
+    const wa = creaTrasformatoreWa(whatsappReception, ultimiMessaggiUtente(history, 10));
+    const emetti = (controller: ReadableStreamDefaultController, pezzo: string) => {
+      const { out, log } = wa.push(pezzo);
+      answerAcc += log;
+      if (out) controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: out })}\n\n`));
+    };
+    const chiudiWa = (controller: ReadableStreamDefaultController) => {
+      const { out, log } = wa.flush();
+      answerAcc += log;
+      if (out) controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: out })}\n\n`));
+    };
+
     const stream = new ReadableStream({
       async start(controller) {
         try {
@@ -455,8 +500,7 @@ export async function POST(req: NextRequest) {
             controller.enqueue(encoder.encode(`data: ${JSON.stringify({ debug: fonti.scelti })}\n\n`));
           }
           for (const c of primi) {
-            answerAcc += c;
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: c })}\n\n`));
+            emetti(controller, c);
           }
           while (true) {
             const { done, value } = await reader.read();
@@ -469,6 +513,11 @@ export async function POST(req: NextRequest) {
               if (line.startsWith("data: ")) {
                 const data = line.slice(6);
                 if (data === "[DONE]") {
+                  // Flush PRIMA del [DONE]: il trasformatore può ancora
+                  // trattenere una coda ambigua, e quel pezzetto deve uscire
+                  // mentre lo stream è aperto. flush() è idempotente, quindi
+                  // la chiamata gemella dopo il ciclo non fa danni.
+                  chiudiWa(controller);
                   controller.enqueue(encoder.encode("data: [DONE]\n\n"));
                   continue;
                 }
@@ -476,8 +525,7 @@ export async function POST(req: NextRequest) {
                   const parsed = JSON.parse(data);
                   const content = parsed.choices?.[0]?.delta?.content;
                   if (content) {
-                    answerAcc += content; // accumulo per il log, stesso parse dell'enqueue
-                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
+                    emetti(controller, content); // accumula per il log e converte il marcatore
                   }
                 } catch {
                   // skip unparseable chunks
@@ -485,10 +533,14 @@ export async function POST(req: NextRequest) {
               }
             }
           }
+          chiudiWa(controller);
           await finishLog?.(answerAcc, "ok");
           controller.close();
         } catch (e) {
           console.error("Stream error:", e);
+          // Anche qui: quel che resta nel buffer va emesso, tranne un
+          // marcatore rimasto aperto, che flush() scarta invece di mostrare.
+          try { chiudiWa(controller); } catch { /* controller già chiuso */ }
           controller.enqueue(
             encoder.encode(
               `data: ${JSON.stringify({ error: FALLBACK_STREAM_ERROR })}\n\n`,

@@ -54,12 +54,78 @@
  *     futuro: niente deduzioni/stime/ipotetiche, nessuna azione promessa,
  *     nessun giudizio su allergie, emergenze senza preamboli, link solo dalle
  *     fonti in forma Markdown.
+ *
+ * (d) 2026-08-31 — il blocco "CONTATTO WHATSAPP CON LA RECEPTION", unica
+ *     aggiunta al testo dopo la revisione (c). Progetto deciso con Aziz lo
+ *     stesso giorno (vault, "GHSM — Ponte WhatsApp reception (decisione)"):
+ *     quando il concierge ha il quadro completo di una richiesta operativa —
+ *     cosa serve E il numero di camera — la risposta porta in fondo un bottone
+ *     che apre il WhatsApp DELL'OSPITE con il messaggio già scritto ma NON
+ *     inviato. Il ponte automatico (Blasat che inoltra e riporta) era stato
+ *     scartato da tre revisioni indipendenti; qui non si inoltra niente.
+ *     Tre cose da non rompere, in ordine di gravità:
+ *       - EMERGENZE HA LA PRECEDENZA. Il bottone non compare mai su malore,
+ *         incendio, allagamento, fumo, sicurezza: solo l'istruzione immediata.
+ *         Per questo il blocco sta DOPO quello delle emergenze e ne richiama
+ *         il divieto, invece di stare prima e sembrare un'alternativa.
+ *       - IL CONCIERGE NON HA FATTO NIENTE. Propone e basta. «Ecco fatto» o
+ *         qualunque formula che faccia credere il contatto già avvenuto è il
+ *         guasto peggiore possibile qui: l'ospite smetterebbe di chiamare la
+ *         Reception aspettando una risposta che nessuno ha ricevuto. La frase
+ *         dopo il bottone è più delicata dell'offerta (nota di Aziz).
+ *       - SI AGGIUNGE, NON SOSTITUISCE: tasto 9 e numero restano sempre.
+ *     Il marcatore [[WA: …]] NON è un dettaglio di stile: il modello non deve
+ *     comporre l'URL wa.me da sé, perché il messaggio viaggia dentro il query
+ *     string e va percent-encoded. La codifica la fa il server
+ *     (conciergeWhatsapp.ts), che sa anche ricucire il marcatore quando lo
+ *     streaming lo taglia in due. Vedi lì per il perché di ogni pezzo.
+ *     ⚠️ Il messaggio dentro il marcatore va SEMPRE in italiano, anche con un
+ *     ospite tedesco, perché non è parte della risposta: è un foglietto per la
+ *     Reception, che è italiana. Non è una sfumatura — misurato il 2026-08-31,
+ *     senza dirlo esplicitamente il modello lo scriveva in tedesco 3 volte su
+ *     3, perché il PROMEMORIA CRITICO in coda ai messages (languageDetect.ts)
+ *     ordina di scrivere "l'INTERA risposta" nella lingua dell'ospite e vince
+ *     su tutto — com'è giusto che sia. La cura NON è indebolire quel
+ *     promemoria, che è una severità conquistata al 100% di aderenza: è
+ *     dichiarare qui che il marcatore non fa parte della risposta, e ridurre
+ *     così il conflitto a una questione di ambito.
+ *     Il nome della struttura nell'intestazione (strutturaWhatsapp) nasce dal
+ *     fatto che Titano e Suites condividono lo stesso numero (confermato da
+ *     Aziz il 2026-08-31): senza, «Camera 204» non dice a quale dei due
+ *     appartenga. Si imposta però su TUTTI E TRE gli hotel — una regola sola
+ *     invece di una condizionale. Sta fra parentesi DOPO il numero di camera,
+ *     non davanti, perché il numero in testa è un vincolo esplicito (la
+ *     Reception legge di sguardo mentre fa altro).
+ *     ⚠️ Il numero di camera NON è verificabile dal prompt. Misurato il
+ *     2026-08-31: con l'esempio concreto qui sopra, su 8 richieste operative
+ *     SENZA numero di camera il modello ha emesso il marcatore 3 volte — due
+ *     con l'intestazione vuota, e una con «Camera 204» ricopiata pari pari
+ *     dall'esempio. Per questo il divieto qui è scritto in modo esplicito E il
+ *     server controlla comunque, prima di costruire il link, che quelle cifre
+ *     compaiano nei messaggi dell'ospite (cameraAttendibile() in
+ *     conciergeWhatsapp.ts). Se togli uno dei due presidi resta il buco: un
+ *     messaggio che arriva alla Reception con la camera sbagliata manda
+ *     qualcuno a bussare alla porta di un altro ospite.
  */
 
 export interface BehaviorParams {
   hotel: string;
   telefonoReception: string;
   regolaMenu: string;
+  /** Numero WhatsApp della Reception in sole cifre (da
+   *  numeroWhatsappReception(), conciergeWhatsapp.ts), oppure null/undefined.
+   *  ⚠️ Quando manca, il blocco CONTATTO WHATSAPP non viene proprio scritto nel
+   *  prompt: il modello non sa nemmeno che esista un marcatore, e il concierge
+   *  si comporta esattamente come prima del 2026-08-31. È così che le due
+   *  gemelle restano invariate pur condividendo questo file. Vedi (d). */
+  whatsappReception?: string | null;
+  /** Nome della struttura nel messaggio precompilato, da
+   *  strutturaWhatsappReception(). Nasce perché Hotel Titano e Titano Suites
+   *  condividono lo stesso numero (senza, la Reception non sa di quale hotel
+   *  sia la camera 204), ma va impostato su TUTTI E TRE: una regola sola si
+   *  mantiene meglio di una condizionale, e sul Grand Hotel non fa danno.
+   *  Se manca, il nome semplicemente non compare. */
+  strutturaWhatsapp?: string | null;
 }
 
 // 2026-08-28 (sera): "SE NON LO SAI" copre anche i MECCANISMI. Caso reale di
@@ -69,6 +135,28 @@ export interface BehaviorParams {
 // servizio" non conteneva "come funziona qualcosa", e una domanda sì/no su
 // un meccanismo plausibile passava per buon senso da albergo.
 export function buildBehaviorPrompt(p: BehaviorParams): string {
+  // Intestazione del messaggio precompilato. Il numero di camera resta SEMPRE
+  // in testa (vincolo di Aziz: la Reception legge di sguardo mentre fa altro);
+  // il nome della struttura, quando serve, va subito dopo fra parentesi invece
+  // che davanti, così disambigua senza spostare il dato operativo dal primo
+  // posto. Il nome lo porta la configurazione, il modello lo ricopia e basta.
+  const intestazione = p.strutturaWhatsapp
+    ? `Camera <numero> (${p.strutturaWhatsapp})`
+    : "Camera <numero>";
+  const esempio = p.strutturaWhatsapp
+    ? `Camera 204 (${p.strutturaWhatsapp})`
+    : "Camera 204";
+
+  // Blocco WhatsApp: presente SOLO se il numero è configurato. Posizionato
+  // dopo EMERGENZE apposta — così l'istruzione d'emergenza viene letta prima,
+  // e il divieto qui dentro la richiama invece di contraddirla.
+  const bloccoWhatsapp = p.whatsappReception
+    ? `
+
+CONTATTO WHATSAPP CON LA RECEPTION: solo per le richieste operative elencate sopra (asciugamani, pulizie, sveglia, allergie da comunicare, prenotazioni, guasti), e MAI in emergenza — in emergenza vale soltanto il blocco qui sopra, senza alcun bottone. ⚠️ SERVE IL NUMERO DI CAMERA, e deve essere quello che l'OSPITE ti ha scritto in questa conversazione. Se non te l'ha ancora dato, offri il contatto con «posso metterla in contatto tramite WhatsApp — mi dice il numero di camera?» e FERMATI LÌ, senza marcatore: non scriverlo vuoto, non lasciare «Camera —» e soprattutto non metterci un numero che ti sei inventato o che hai letto in un esempio. Nessun bottone è molto meglio di un bottone che manda la richiesta alla camera di qualcun altro. Quando hai sia la richiesta sia il numero di camera, chiudi la risposta con una riga fatta esattamente così: [[WA: messaggio]]. ⚠️ Quello che sta dentro il marcatore NON è parte della risposta all'ospite: è un foglietto che arriva alla Reception, e la Reception è italiana. Va perciò scritto SEMPRE IN ITALIANO, anche quando l'ospite ha scritto in tedesco, inglese, francese o spagnolo, e anche quando il promemoria in coda ti ordina di scrivere l'intera risposta nella sua lingua: quel promemoria vale per ciò che l'ospite legge, non per il contenuto del marcatore. La risposta attorno al marcatore resta nella lingua dell'ospite, il marcatore no. Se l'ospite non ha scritto in italiano, dopo la richiesta va' a capo DENTRO il marcatore e riporta fra virgolette la sua frase originale, come controprova per la Reception. Il messaggio è quello che manderà l'OSPITE, quindi lo firma lui e deve suonare scritto da una persona: aperto da «${intestazione} —» perché la Reception lo legge di sguardo mentre fa altro, e poi la richiesta in prima persona, cortese e adatta a quel caso — mai una formula fissa, che ripetuta identica suona più meccanica di una frase secca (asciugamani: «è possibile avere degli asciugamani puliti?»; sveglia: «potrei essere svegliato alle 7?»; guasto: «il condizionatore non parte, potreste dare un'occhiata?»). Esempio di forma con un ospite tedesco (il numero è un segnaposto, non usarlo mai davvero): [[WA: ${esempio} — è possibile avere degli asciugamani puliti?
+"Wir bräuchten bitte frische Handtücher"]] Non scrivere mai un indirizzo wa.me né un link: il marcatore è l'unico modo, al bottone ci pensa il sistema. Il marcatore SI AGGIUNGE e non sostituisce niente: il tasto 9 e il numero restano nella risposta come sempre. E soprattutto: quel messaggio NON è partito e tu non hai contattato nessuno — di' che può toccare il bottone qui sotto per inviarlo dal suo WhatsApp, e mai «ecco fatto» o qualunque cosa faccia credere che il contatto sia già avvenuto.`
+    : "";
+
   return `Sei il Concierge digitale del ${p.hotel}. Rispondi agli ospiti con cortesia e concretezza, come il concierge di un hotel 4 stelle.
 
 COSA SAI: solo ciò che trovi nel blocco "FONTI DISPONIBILI". Sono le uniche informazioni valide; se contengono una risposta ufficiale verificata, ha la precedenza su tutto. Sulle visite a San Marino rispondi liberamente quando le fonti lo coprono; per orari e biglietti aggiornati di torri e musei rimanda a museidistato.sm o alla Reception.
@@ -79,7 +167,7 @@ SE NON LO SAI: se un prezzo, un orario, una tassa, un servizio, il modo in cui q
 
 QUANDO RIMANDI ALLA RECEPTION (perché non sai, o perché serve un'azione): prima rispondi. Se una parte la sai, dilla; e comunque di' per esteso che quel dato ce l'ha la Reception, non solo che va contattata. Come raggiungerla viene dopo: il rimando non prende il posto della risposta. Devono esserci tutte e due le vie, il tasto 9 dal telefono in camera E il numero ${p.telefonoReception} per chi in camera non è; il link [Chiama](tel:...) delle fonti non sostituisce il tasto 9. Sono un contenuto da far arrivare, non una formula da ricopiare: dillo con parole tue, diverse ogni volta e adatte a quella domanda — una cortesia sempre identica suona più meccanica di una frase secca. Il numero scrivilo una volta sola: o in chiaro, o dentro il link, mai tutti e due nella stessa risposta. Cordiale non vuol dire rassicurante: non promettere a nome della Reception ("se ne occuperanno subito", "glieli porteranno"), e su un piatto e un'allergia non rassicurare mai, nemmeno di sfuggita — di' che è lì che si risolve, non che cosa faranno né quando.
 
-EMERGENZE (malore, incendio, sicurezza): di' subito di contattare la Reception (tasto 9 dalla camera, oppure ${p.telefonoReception}), attiva 24 ore su 24. Qui nessun preambolo di cortesia: l'istruzione per prima, e niente altro attorno. Non citare numeri di emergenza che non siano nelle fonti.
+EMERGENZE (malore, incendio, sicurezza): di' subito di contattare la Reception (tasto 9 dalla camera, oppure ${p.telefonoReception}), attiva 24 ore su 24. Qui nessun preambolo di cortesia: l'istruzione per prima, e niente altro attorno. Non citare numeri di emergenza che non siano nelle fonti.${bloccoWhatsapp}
 
 MENÙ: ${p.regolaMenu}
 
