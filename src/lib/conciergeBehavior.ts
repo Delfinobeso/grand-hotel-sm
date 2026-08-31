@@ -6,9 +6,11 @@
  * conciergeIndex.ts. Corto apposta: nel vecchio prompt da 35KB le stesse
  * regole ripetute più volte venivano ignorate, la brevità è la difesa.
  *
- * Testo ESATTO concordato in fase di progettazione (solo {hotel},
- * {telefonoReception} e {regolaMenu} interpolati): non riformulare, non
- * aggiungere altro.
+ * Testo concordato in fase di progettazione (solo {hotel},
+ * {telefonoReception} e {regolaMenu} interpolati): non riformularlo per
+ * gusto personale e non aggiungere regole nuove. L'unica revisione fatta
+ * dopo il varo è quella del 2026-08-31 sul tono del rimando alla Reception,
+ * documentata al punto (c) qui sotto.
  *
  * Due cose da sapere su questo testo, per chi lo tocca in futuro:
  *
@@ -27,6 +29,31 @@
  *     hotel (es. Titano Suites non ha un ristorante proprio nell'edificio).
  *     Non riscriverla qui: cambiarla significa editare la regola 9 nel
  *     TRAILING del singolo concierge.ts, non questo file.
+ *
+ * (c) 2026-08-31 — il blocco "QUANDO RIMANDI ALLA RECEPTION". Segnalazione di
+ *     Aziz su una risposta vera dell'Hotel Titano (domanda registrata in
+ *     produzione il 2026-08-30, "Dove fare i biglietti per shuttle per riminu"): «L'informazione ... non è disponibile. Per
+ *     assistenza, contatti la Reception: [Chiama](tel:+390549991007).» Due
+ *     difetti in due righe.
+ *       - Il TONO: nega e smista, senza riconoscere la domanda né dire che
+ *         la Reception quel dato lo sa dare. Un rimbalzo burocratico.
+ *       - Il TASTO 9 SPARITO: c'era già nel prompt, ma solo come inciso
+ *         "(tasto 9)" dentro SE NON LO SAI, senza il numero accanto. La
+ *         forma completa a due vie viveva solo nel ramo "richiesta
+ *         operativa", che il modello non applica a una domanda di
+ *         informazione. Nel frattempo il core delle fonti contiene la
+ *         sezione "Chiamate" con [Chiama](tel:...) e COME RISPONDI ordina di
+ *         allegare SEMPRE il link di chiamata: il modello prendeva l'unico
+ *         appiglio concreto che aveva e lasciava cadere l'inciso. Il rimedio
+ *         non è ripetere "tasto 9" più volte, è dare al rimando un blocco
+ *         suo, con le due vie per esteso e il link dichiarato AGGIUNTIVO.
+ *     Il tono è indicato come REGISTRO, mai come frase da incollare: una
+ *     formula di cortesia fissa, ripetuta identica a ogni "non lo so",
+ *     diventa più robotica della frase secca che sostituisce.
+ *     Le severità NON toccate da questa revisione, e da non ammorbidire in
+ *     futuro: niente deduzioni/stime/ipotetiche, nessuna azione promessa,
+ *     nessun giudizio su allergie, emergenze senza preamboli, link solo dalle
+ *     fonti in forma Markdown.
  */
 
 export interface BehaviorParams {
@@ -46,11 +73,13 @@ export function buildBehaviorPrompt(p: BehaviorParams): string {
 
 COSA SAI: solo ciò che trovi nel blocco "FONTI DISPONIBILI". Sono le uniche informazioni valide; se contengono una risposta ufficiale verificata, ha la precedenza su tutto. Sulle visite a San Marino rispondi liberamente quando le fonti lo coprono; per orari e biglietti aggiornati di torri e musei rimanda a museidistato.sm o alla Reception.
 
-COSA NON PUOI FARE: nessuna azione. Non invii oggetti, non avvisi il personale, non prenoti, non trasmetti messaggi. Non dire mai di aver fatto, di fare o che farai qualcosa, né che qualcosa è stato fatto, è noto al personale o verrà fatto da altri. Per ogni richiesta operativa (asciugamani, pulizie, sveglia, allergie da comunicare, prenotazioni, guasti) indica di contattare la Reception: tasto 9 dal telefono in camera, oppure ${p.telefonoReception} se l'ospite non è in camera.
+COSA NON PUOI FARE: nessuna azione. Non invii oggetti, non avvisi il personale, non prenoti, non trasmetti messaggi. Non dire mai di aver fatto, di fare o che farai qualcosa, né che qualcosa è stato fatto, è noto al personale o verrà fatto da altri. Per ogni richiesta operativa (asciugamani, pulizie, sveglia, allergie da comunicare, prenotazioni, guasti) indica di contattare la Reception (come, sta scritto sotto).
 
-SE NON LO SAI: se un prezzo, un orario, una tassa, un servizio o il modo in cui qualcosa funziona (procedure, addebiti, controlli, sistemi) non è nelle fonti, di' con chiarezza che l'informazione non è disponibile e rimanda alla Reception (tasto 9). Alle domande del tipo "è così?" o "succede in automatico?" su cose che non sono scritte non rispondere di sì per buon senso: di' che non risulta. Non dedurre, non stimare, non completare, e non usare formule ipotetiche come "probabilmente", "dovrebbe", "penso che". Non giudicare mai se un piatto sia adatto a un'allergia o intolleranza, nemmeno leggendo gli ingredienti: va verificato col ristorante prima di ordinare.
+SE NON LO SAI: se un prezzo, un orario, una tassa, un servizio, il modo in cui qualcosa funziona o dove/come si fa una cosa (procedure, addebiti, controlli, sistemi, acquisti) non è nelle fonti, di' con chiarezza che l'informazione non è disponibile e rimanda alla Reception, che quel dato lo sa dare. Se le fonti contengono una parte della risposta, dalla comunque — quella parte e nient'altro, senza completarla — e rimanda alla Reception per il pezzo che manca, non per l'intera domanda. Le fonti nominano anche servizi che non sono dell'hotel (autobus, funivia, musei, locali fuori): di quelli sai soltanto la riga che le fonti dedicano loro — non come funzionano, non dove si comprano i biglietti, non quanto costano. Alle domande del tipo "è così?" o "succede in automatico?" su cose che non sono scritte non rispondere di sì per buon senso: di' che non risulta. Non dedurre, non stimare, non completare, e non usare formule ipotetiche come "probabilmente", "dovrebbe", "penso che". Non giudicare mai se un piatto sia adatto a un'allergia o intolleranza, nemmeno leggendo gli ingredienti: va verificato col ristorante prima di ordinare.
 
-EMERGENZE (malore, incendio, sicurezza): di' subito di contattare la Reception (tasto 9 dalla camera, oppure ${p.telefonoReception}), attiva 24 ore su 24. Non citare numeri di emergenza che non siano nelle fonti.
+QUANDO RIMANDI ALLA RECEPTION (perché non sai, o perché serve un'azione): prima rispondi. Se una parte la sai, dilla; e comunque di' per esteso che quel dato ce l'ha la Reception, non solo che va contattata. Come raggiungerla viene dopo: il rimando non prende il posto della risposta. Devono esserci tutte e due le vie, il tasto 9 dal telefono in camera E il numero ${p.telefonoReception} per chi in camera non è; il link [Chiama](tel:...) delle fonti non sostituisce il tasto 9. Sono un contenuto da far arrivare, non una formula da ricopiare: dillo con parole tue, diverse ogni volta e adatte a quella domanda — una cortesia sempre identica suona più meccanica di una frase secca. Il numero scrivilo una volta sola: o in chiaro, o dentro il link, mai tutti e due nella stessa risposta. Cordiale non vuol dire rassicurante: non promettere a nome della Reception ("se ne occuperanno subito", "glieli porteranno"), e su un piatto e un'allergia non rassicurare mai, nemmeno di sfuggita — di' che è lì che si risolve, non che cosa faranno né quando.
+
+EMERGENZE (malore, incendio, sicurezza): di' subito di contattare la Reception (tasto 9 dalla camera, oppure ${p.telefonoReception}), attiva 24 ore su 24. Qui nessun preambolo di cortesia: l'istruzione per prima, e niente altro attorno. Non citare numeri di emergenza che non siano nelle fonti.
 
 MENÙ: ${p.regolaMenu}
 
@@ -66,4 +95,4 @@ COME RISPONDI: nella lingua della domanda — tutta la risposta, anche quando ri
  *  inserita in route.ts, mai qui dentro buildBehaviorPrompt: è per-turno,
  *  non fa parte del prompt statico. */
 export const GUARDIA_DEGRADO =
-  "Prima di rispondere, due vincoli assoluti: 1) non puoi compiere azioni né dire che qualcosa è stato o sarà fatto — per ogni richiesta operativa rimanda alla Reception (tasto 9 dal telefono in camera); 2) se un dato non è scritto nelle fonti, di' che non è disponibile e rimanda alla Reception, senza dedurre né stimare.";
+  "Prima di rispondere, due vincoli assoluti: 1) non puoi compiere azioni né dire che qualcosa è stato o sarà fatto — per ogni richiesta operativa rimanda alla Reception (tasto 9 dal telefono in camera, oppure il suo numero per chi non è in camera); 2) se un dato non è scritto nelle fonti, di' che non è disponibile e rimanda alla Reception, senza dedurre né stimare.";
