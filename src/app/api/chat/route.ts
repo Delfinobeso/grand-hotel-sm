@@ -33,6 +33,61 @@ const PROJECT_ID_BY_HOST: Record<string, string> = {
   "titanosuites.blasat.com": "titano-suites",
 };
 
+/** Token consumati da UNO scambio, come li dichiara il provider. */
+interface UsoToken {
+  /** prompt_tokens: prompt di comportamento + fonti + storia + domanda. */
+  in: number;
+  /** completion_tokens: la risposta generata. */
+  out: number;
+}
+
+/** Estrae `usage` da un chunk SSE gia' deserializzato.
+ *
+ *  ⚠️ QUESTA FUNZIONE NON DEVE MAI LANCIARE. Sta sul percorso di ogni singolo
+ *  chunk diretto all'ospite: un throw qui finirebbe nel catch dello stream e
+ *  trasformerebbe una risposta perfettamente valida in FALLBACK_STREAM_ERROR.
+ *  Contare i token è un di più; rispondere all'ospite è il lavoro. In ogni
+ *  caso dubbio si ritorna null e si tira dritto — l'analytics non incrementa
+ *  nulla e la dashboard mostra lo scambio come "senza misura".
+ *
+ *  Ritorna null (mai un oggetto a zero) quando il chunk non porta usage: è
+ *  così che il chiamante distingue "il provider non l'ha mandato" da "l'ha
+ *  mandato e vale zero". */
+function leggiUsage(parsed: unknown): UsoToken | null {
+  try {
+    const u = (parsed as { usage?: unknown } | null)?.usage as
+      | { prompt_tokens?: unknown; completion_tokens?: unknown }
+      | null
+      | undefined;
+    if (!u || typeof u !== "object") return null;
+    const num = (v: unknown) => {
+      const n = Number(v);
+      return Number.isFinite(n) && n >= 0 ? Math.round(n) : 0;
+    };
+    // Almeno uno dei due campi dev'essere un numero valido, altrimenti è un
+    // oggetto `usage` che non ci dice niente e vale come assente.
+    const okIn = Number.isFinite(Number(u.prompt_tokens));
+    const okOut = Number.isFinite(Number(u.completion_tokens));
+    if (!okIn && !okOut) return null;
+    return { in: num(u.prompt_tokens), out: num(u.completion_tokens) };
+  } catch {
+    return null;
+  }
+}
+
+/** Errore di apertura stream che si porta dietro lo stato HTTP, quando c'e'.
+ *  Serve SOLO a distinguere un rifiuto della richiesta (400: il corpo non
+ *  piace) da un guasto del provider (5xx, timeout, rete) — vedi
+ *  apriStreamConRipiego(). */
+class ErroreProvider extends Error {
+  status: number;
+  constructor(messaggio: string, status = 0) {
+    super(messaggio);
+    this.name = "ErroreProvider";
+    this.status = status;
+  }
+}
+
 /** Logga in modo anonimo lo scambio completo domanda+risposta (nessun IP).
  *  UN solo record per scambio, scritto a stream chiuso: "questa risposta a
  *  questa domanda" senza id di correlazione fragili. `ok` distingue gli esiti
@@ -51,6 +106,7 @@ function logExchange(
   ok: string,
   prov: string,
   deg: boolean,
+  uso: UsoToken | null,
 ): Promise<void> {
   const projectId = projectIdDi(req);
   return fetch("https://analytics.blasat.com/api/track", {
@@ -62,6 +118,15 @@ function logExchange(
       q: question.slice(0, 200),
       a: answer.slice(0, 700),
       ok,
+      // Consumo di token dichiarato dal provider (campi additivi v3). Assenti
+      // quando il provider non ha mandato il blocco `usage`: l'analytics in quel
+      // caso non incrementa nulla, e la card della dashboard lo dice invece di
+      // stimare. Un numero inventato sarebbe peggio di nessun numero, perché
+      // l'unica cosa che quella card deve saper fare è mostrare un'impennata.
+      // Il modello NON viaggia qui: è già `prov` qui sotto, ed è la stessa
+      // stringa con cui l'analytics separa i contatori (i prezzi per milione
+      // di token di medium, small e deepseek sono diversi fra loro).
+      ...(uso ? { tin: uso.in, tout: uso.out } : {}),
       // Quale modello ha risposto: senza questo un fallback silenzioso su
       // DeepSeek sarebbe invisibile e non sapremmo mai che Mistral sta cedendo.
       prov,
@@ -213,6 +278,14 @@ interface AperturaStream {
   buffer: string;
   /** Token gia' letti per decidere il provider: vanno emessi per primi. */
   primi: string[];
+  /** `usage` gia' incontrato durante la lettura di apertura. Normalmente null
+   *  (il blocco arriva in fondo allo stream), ma se la risposta e' cortissima
+   *  puo' capitare nello stesso pezzo dei primi token: senza questo campo
+   *  andrebbe perso, perche' quelle righe il ciclo principale non le rilegge. */
+  uso: UsoToken | null;
+  /** false se il provider ha rifiutato `stream_options` e siamo ripartiti
+   *  senza: nessun `usage` arrivera', e va detto invece che dato per zero. */
+  contaToken: boolean;
 }
 
 /** Apre lo stream su un provider e ritorna SOLO quando e' arrivato il primo
@@ -224,6 +297,7 @@ async function apriStream(
   p: Provider,
   messages: Array<{ role: string; content: string }>,
   projectId: string,
+  contaToken: boolean,
 ): Promise<AperturaStream> {
   const ctrl = new AbortController();
   // L'abort copre anche la lettura del corpo, non solo la connessione: e'
@@ -242,20 +316,30 @@ async function apriStream(
         temperature: 0.4,
         max_tokens: 1500,
         stream: true,
+        // Chiede al provider di chiudere lo stream con un chunk `usage`
+        // (prompt_tokens/completion_tokens). Campo dell'API compatibile
+        // OpenAI, supportato sia da Mistral sia da DeepSeek. Se un provider
+        // dovesse rifiutarlo con un 400, apriStreamConRipiego() riprova subito
+        // senza: contare i token non puo' far cadere la chat.
+        ...(contaToken ? { stream_options: { include_usage: true } } : {}),
         ...(p.extra?.(projectId) ?? {}),
       }),
       signal: ctrl.signal,
     });
 
     if (!res.ok) {
-      throw new Error(`${p.nome} HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
+      throw new ErroreProvider(
+        `${p.nome} HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`,
+        res.status,
+      );
     }
     const reader = res.body?.getReader();
-    if (!reader) throw new Error(`${p.nome}: stream non disponibile`);
+    if (!reader) throw new ErroreProvider(`${p.nome}: stream non disponibile`);
 
     const decoder = new TextDecoder();
     let buffer = "";
     const primi: string[] = [];
+    let uso: UsoToken | null = null;
     let finito = false;
 
     while (primi.length === 0 && !finito) {
@@ -269,8 +353,13 @@ async function apriStream(
         const data = riga.slice(6);
         if (data === "[DONE]") { finito = true; continue; }
         try {
-          const c = JSON.parse(data).choices?.[0]?.delta?.content;
+          const parsed = JSON.parse(data);
+          const c = parsed.choices?.[0]?.delta?.content;
           if (c) primi.push(c);
+          // Il chunk di usage ha `choices` vuoto, quindi non interferisce con
+          // la scelta del provider: si limita a farsi registrare se passa di qui.
+          const u = leggiUsage(parsed);
+          if (u) uso = u;
         } catch {
           // chunk non parsabile: ignorato come nel ciclo principale
         }
@@ -279,13 +368,52 @@ async function apriStream(
 
     // 200 seguito da zero contenuto e' un guasto quanto un 500: se lo lasciassimo
     // passare l'ospite vedrebbe una risposta vuota invece del fallback.
-    if (primi.length === 0) throw new Error(`${p.nome}: nessun contenuto`);
+    if (primi.length === 0) throw new ErroreProvider(`${p.nome}: nessun contenuto`);
 
     clearTimeout(sveglia);
-    return { reader, decoder, buffer, primi };
+    return { reader, decoder, buffer, primi, uso, contaToken };
   } catch (e) {
     clearTimeout(sveglia);
     ctrl.abort();
+    throw e;
+  }
+}
+
+/** apriStream + rete di sicurezza sul conteggio token.
+ *
+ *  ⚠️ Il perché di questa funzione, per chi la trovasse "un giro inutile".
+ *  Il 2026-08-31 una modifica allo storico dei messaggi ha rotto la chat su
+ *  tre hotel per ore: un campo del corpo che Mistral non accettava faceva
+ *  rifiutare l'INTERA richiesta con HTTP 400, e siccome medium e small
+ *  mandano lo stesso corpo, fallivano tutti e due — nessun ripiego, chat morta
+ *  per tutta la conversazione. `stream_options` è esattamente un altro campo
+ *  nuovo nello stesso corpo, aggiunto per una funzione ACCESSORIA (contare i
+ *  soldi). Non deve poter ripetere quella storia.
+ *
+ *  Quindi: su un 400 — l'unico stato che significa "il corpo non mi piace" —
+ *  si riprova UNA volta lo stesso provider senza `stream_options`. L'ospite
+ *  riceve la sua risposta, e a perdersi è solo il conteggio dei token, che è
+ *  il sacrificio giusto.
+ *
+ *  Il ritentativo è ristretto al 400 di proposito: su timeout, 5xx o errore di
+ *  rete il provider è genuinamente giù e riprovarlo raddoppierebbe l'attesa
+ *  prima del ripiego su mistral-small (6s → 12s), che l'ospite pagherebbe in
+ *  schermo bianco. Lì si fallisce subito, come prima. */
+async function apriStreamConRipiego(
+  p: Provider,
+  messages: Array<{ role: string; content: string }>,
+  projectId: string,
+): Promise<AperturaStream> {
+  try {
+    return await apriStream(p, messages, projectId, true);
+  } catch (e) {
+    if (e instanceof ErroreProvider && e.status === 400) {
+      console.error(
+        `[uso-token] ${p.nome} ha rifiutato la richiesta con 400: riprovo senza stream_options (i token di questo scambio non verranno contati)`,
+        e.message,
+      );
+      return await apriStream(p, messages, projectId, false);
+    }
     throw e;
   }
 }
@@ -298,6 +426,16 @@ export async function POST(req: NextRequest) {
   // Quale provider ha davvero risposto: finishLog lo legge al momento della
   // chiamata, quindi vale anche se il fallback e' scattato dopo la sua creazione.
   let providerUsato = "nessuno";
+  // Token dichiarati dal provider per QUESTO scambio. Resta null finché il
+  // chunk `usage` non arriva (è l'ultimo dello stream), e null resta se non
+  // arriva affatto: finishLog lo legge al momento della chiamata, quindi vale
+  // anche per i rami che terminano prima della fine del ciclo.
+  let usoToken: UsoToken | null = null;
+  // Copia GREZZA del blocco `usage` come lo ha scritto il provider, popolata
+  // solo con CONCIERGE_DEBUG=1. Serve a una cosa sola: poter confrontare, su
+  // una preview, quello che il modello DICHIARA con quello che noi
+  // REGISTRIAMO, senza doversi fidare della funzione che sta in mezzo.
+  let usoGrezzo: unknown = null;
   let finishLog: ((answer: string, ok: string) => Promise<void>) | null = null;
 
   try {
@@ -394,7 +532,7 @@ export async function POST(req: NextRequest) {
     // chiama, il primo vince.
     finishLog = (answer: string, ok: string) => {
       finishLog = null; // one-shot: i chiamanti usano finishLog?.()
-      return logExchange(req, question, answer, ok, providerUsato, degradato);
+      return logExchange(req, question, answer, ok, providerUsato, degradato, usoToken);
     };
 
     const regolaMenu = estraiRegolaMenu(TRAILING);
@@ -454,8 +592,11 @@ export async function POST(req: NextRequest) {
     let apertura: AperturaStream | null = null;
     for (const p of catenaProvider()) {
       try {
-        apertura = await apriStream(p, messages, projectId);
+        apertura = await apriStreamConRipiego(p, messages, projectId);
         providerUsato = p.nome;
+        // Un usage arrivato gia' in apertura (risposta cortissima) non deve
+        // perdersi: il ciclo principale non rilegge quelle righe.
+        usoToken = apertura.uso;
         break;
       } catch (e) {
         // Un provider che non parte non è fatale: si prova il successivo. Il
@@ -470,7 +611,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Errore del servizio" }, { status: 502 });
     }
 
-    const { reader, decoder, primi } = apertura;
+    const { reader, decoder, primi, contaToken } = apertura;
     let buffer = apertura.buffer;
 
     const encoder = new TextEncoder();
@@ -538,6 +679,17 @@ export async function POST(req: NextRequest) {
                   if (content) {
                     emetti(controller, content); // accumula per il log e converte il marcatore
                   }
+                  // Consumo di token: ULTIMO chunk dello stream, `choices`
+                  // vuoto e `usage` valorizzato. Non viene emesso verso
+                  // l'ospite — è contabilità, non testo. leggiUsage() non
+                  // lancia mai per costruzione: se il blocco è assente,
+                  // malformato o incomprensibile ritorna null, si resta senza
+                  // misura e la risposta prosegue identica a prima.
+                  const u = leggiUsage(parsed);
+                  if (u) {
+                    usoToken = u;
+                    if (process.env.CONCIERGE_DEBUG === "1") usoGrezzo = parsed.usage;
+                  }
                 } catch {
                   // skip unparseable chunks
                 }
@@ -560,6 +712,18 @@ export async function POST(req: NextRequest) {
             answerAcc = FALLBACK_STREAM_ERROR;
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ content: FALLBACK_STREAM_ERROR })}\n\n`),
+            );
+          }
+          if (process.env.CONCIERGE_DEBUG === "1") {
+            // Solo preview: i token dichiarati dal provider viaggiano nello
+            // stream come evento a sé, esattamente come i frammenti scelti.
+            // È così che si verifica che il numero REGISTRATO nell'analytics
+            // coincida con quello DICHIARATO dal modello, invece di doversi
+            // fidare. Il client legge solo `content`/`error` e lo ignora.
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({ uso: usoToken, usoGrezzo, prov: providerUsato, conta: contaToken })}\n\n`,
+              ),
             );
           }
           await finishLog?.(answerAcc, "ok");
