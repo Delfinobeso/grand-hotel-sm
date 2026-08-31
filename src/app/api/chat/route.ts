@@ -133,6 +133,17 @@ function motivoDi(e: unknown): MotivoGuasto {
 interface Tempi {
   ttft: number | null;
   tot: number;
+  /** Millisecondi spesi PRIMA di chiamare il modello: recupero fonti,
+   *  embeddings, KB, composizione del prompt. E' la meta' della latenza che
+   *  dipende da NOI e non dal fornitore: senza questo numero, davanti a un
+   *  ttft di 4s non si sa se il modello e' lento o se lo siamo noi, e ogni
+   *  decisione sulle soglie e' a occhio. Zero = non misurato. */
+  pre: number;
+  /** Millisecondi della SOLA chiamata embeddings della domanda, il pezzo di
+   *  `pre` che passa dalla rete (il resto e' lavoro locale). Zero = non
+   *  misurato: nessuna chiamata partita, oppure recuperaFonti non l'ha
+   *  riportato. */
+  emb: number;
 }
 
 /** Logga in modo anonimo lo scambio completo domanda+risposta (nessun IP).
@@ -158,9 +169,26 @@ function logExchange(
   guasti: Guasto[],
 ): Promise<void> {
   const projectId = projectIdDi(req);
+  // Segreto server-to-server per gli eventi `chatq`. Questo log parte dalla
+  // FUNZIONE, mai dal browser, quindi puo' portarsi dietro un token senza
+  // esporlo a nessuno — ed e' l'unica ragione per cui qui si puo' fare quello
+  // che per le pageview della PWA sarebbe impossibile.
+  //
+  // Senza la variabile d'ambiente si manda esattamente la richiesta di prima:
+  // l'analytics e' in fase "osserva" e la accetta comunque, annotando che e'
+  // arrivata senza credenziali. E' l'ordine giusto — prima tutti mandano il
+  // token, poi si stringe — perche' stringendo per primi un hotel non
+  // aggiornato smetterebbe di registrare in silenzio.
+  //
+  // ⚠️ Come tutto il resto di questa funzione: mai un throw. Se la variabile
+  // manca, manca l'header e basta; la chat non se ne accorge.
+  const segreto = process.env.ANALYTICS_TRACK_TOKEN;
   return fetch("https://analytics.blasat.com/api/track", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(segreto ? { Authorization: `Bearer ${segreto}` } : {}),
+    },
     body: JSON.stringify({
       project: projectId,
       event: "chatq",
@@ -192,6 +220,13 @@ function logExchange(
       // perché l'ospite non ha visto niente da cui contare.
       ...(tempi.ttft !== null ? { ttft: tempi.ttft } : {}),
       tot: tempi.tot,
+      // Pre-modello ed embeddings (campi additivi v5). Stessa disciplina di
+      // tutto il resto: si mandano solo se valgono qualcosa, e un analytics
+      // che non li conosce li ignora senza accorgersene. Non si manda mai uno
+      // zero: zero qui e "assente" di la' sono la stessa cosa (non misurato),
+      // e mandarlo costerebbe due contatori che poi si leggono come "istantaneo".
+      ...(tempi.pre > 0 ? { pre: tempi.pre } : {}),
+      ...(tempi.emb > 0 ? { emb: tempi.emb } : {}),
       // Chi ha fallito prima di quello che ha risposto. Vuoto nel caso normale
       // (il primario ce l'ha fatta), e allora non si manda proprio: il payload
       // dello scambio buono resta identico a prima.
@@ -488,6 +523,13 @@ export async function POST(req: NextRequest) {
   // Resta null finché non esce niente: null significa "non misurato", zero
   // significherebbe "istantaneo", e confonderli falserebbe ogni media.
   let ttft: number | null = null;
+  // Tempo del pre-modello e della chiamata embeddings (campi additivi v5).
+  // Dichiarati QUI, fuori dal try, per la stessa ragione di question/answerAcc:
+  // il catch fatale deve poter loggare quel che aveva gia' misurato. Restano a
+  // zero se l'errore scoppia prima, e zero vuol dire "non misurato" — mai un
+  // throw, mai un valore inventato.
+  let msPre = 0;
+  let msEmb = 0;
   // Provider che hanno fallito PRIMA di quello che ha risposto (o tutti,
   // se non ha risposto nessuno).
   const guasti: Guasto[] = [];
@@ -586,6 +628,11 @@ export async function POST(req: NextRequest) {
     const fontiPromise = recuperaFonti(domandaQuery, indice, { kbItems: kbPromise });
     const [, fonti] = await Promise.all([kbPromise, fontiPromise]);
     const degradato = fonti.degradato;
+    // Number() difensivo: se un domani recuperaFonti smettesse di riportarlo
+    // (o riportasse qualcosa di strano) qui resta zero invece di propagare un
+    // NaN fino all'analytics, dove passerebbe i controlli e sporcherebbe una
+    // somma mensile che si puo' solo incrementare.
+    msEmb = Number.isFinite(fonti.msEmbedding) ? Math.max(0, Math.round(fonti.msEmbedding)) : 0;
     if (process.env.CONCIERGE_DEBUG === "1") {
       // Solo in preview: quali frammenti ha scelto il recupero e con che
       // similarità. È il dato che serve per distinguere "recupero sbagliato"
@@ -609,7 +656,7 @@ export async function POST(req: NextRequest) {
       // prima che lo stream si chiuda.
       return logExchange(
         req, question, answer, ok, providerUsato, degradato, usoToken,
-        { ttft, tot: Date.now() - t0 },
+        { ttft, tot: Date.now() - t0, pre: msPre, emb: msEmb },
         guasti,
       );
     };
@@ -642,8 +689,9 @@ export async function POST(req: NextRequest) {
       // Vedi conciergeIndex.ts per come si compone.
       { role: "system", content: fonti.testo },
       ...history,
-      // Guardia aggiunta SOLO quando il recupero fonti è degradato (tutti i
-      // frammenti allegati, ~32KB indifferenziati invece di ~8KB mirati):
+      // Guardia aggiunta SOLO quando il recupero fonti è degradato (embeddings
+      // giù: i frammenti li sceglie il ripiego lessicale, che è deterministico
+      // ma non capisce il senso della domanda come la similarità semantica):
       // penultima posizione, subito prima del promemoria lingua — è la
       // posizione misurata che regge quando la massa di contesto è grande.
       // Vedi conciergeBehavior.ts (GUARDIA_DEGRADO) per il perché non è un
@@ -665,6 +713,13 @@ export async function POST(req: NextRequest) {
       // posizione finale da cui deriva tutta la sua efficacia.
       { role: "system", content: promemoriaLingua(question) },
     ];
+
+    // Fine del pre-modello: tutto quello che viene dopo questa riga e' attesa
+    // del fornitore. Il confine e' QUI e non dopo `apriStream`: la prima
+    // chiamata di rete al modello parte dentro il ciclo qui sotto, quindi
+    // `pre` resta il nostro contorno puro (fonti + KB + prompt) e non ci si
+    // mescola mai un timeout del provider.
+    msPre = Date.now() - t0;
 
     // Si scorre la catena finché un provider non produce il primo token.
     const projectId = projectIdDi(req);
@@ -823,7 +878,7 @@ export async function POST(req: NextRequest) {
             // fidare. Il client legge solo `content`/`error` e lo ignora.
             controller.enqueue(
               encoder.encode(
-                `data: ${JSON.stringify({ uso: usoToken, usoGrezzo, prov: providerUsato, conta: contaToken, ttft, tot: Date.now() - t0, guasti })}\n\n`,
+                `data: ${JSON.stringify({ uso: usoToken, usoGrezzo, prov: providerUsato, conta: contaToken, ttft, tot: Date.now() - t0, pre: msPre, emb: msEmb, guasti })}\n\n`,
               ),
             );
           }

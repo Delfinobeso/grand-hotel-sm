@@ -9,13 +9,17 @@
  * domanda, scelti con embeddings. Il modello vede ~8KB invece di 35.
  *
  * Codice DIFENSIVO per costruzione: qualunque errore nel recupero (rete,
- * chiave assente, formato di risposta inatteso) deve degradare a "tutti i
- * frammenti", mai propagare un throw verso la route — altrimenti il
- * fallback su DeepSeek (che non ha embeddings Mistral, vedi route.ts) si
- * romperebbe insieme al percorso normale. Quando degrada, route.ts aggiunge
- * una guardia per-turno (GUARDIA_DEGRADO, conciergeBehavior.ts) che rende
- * accettabile passare da ~8KB mirati a ~32KB indifferenziati — vedi il
- * commento su `degradato` in recuperaFonti() qui sotto.
+ * chiave assente, formato di risposta inatteso) deve degradare al RIPIEGO
+ * LESSICALE, mai propagare un throw verso la route — altrimenti il fallback
+ * su DeepSeek (che non ha embeddings Mistral, vedi route.ts) si romperebbe
+ * insieme al percorso normale. Quando degrada si sceglie lo stesso numero di
+ * frammenti del caso buono, con glossario e sovrapposizione lessicale invece
+ * della similarita' coseno (vedi punteggioLessicale): niente rete, niente
+ * attesa. Fino al 2026-08-31 qui si allegavano TUTTI i frammenti, il che
+ * peggiorava il contesto proprio nel momento in cui era gia' compromesso.
+ * `degradato` resta comunque true e route.ts continua ad aggiungere la
+ * guardia per-turno (GUARDIA_DEGRADO, conciergeBehavior.ts): il recupero
+ * resta di seconda scelta, e va detto.
  */
 
 import { buildKbBlock, type KbItem } from "./conciergeKb";
@@ -97,6 +101,88 @@ export function bonusLessicale(domanda: string, testoFrammento: string): number 
     if ((reIt.test(domanda) || reTrad.test(domanda)) && reIt.test(testoFrammento)) bonus += BONUS_LESSICALE;
   }
   return Math.min(bonus, BONUS_LESSICALE * 2);
+}
+
+/* ---- Ranking lessicale di riserva ---------------------------------------
+ * Serve a UNA cosa sola: scegliere gli 8 frammenti quando le embeddings non
+ * rispondono. Prima qui si allegavano TUTTI e 36 i frammenti (~35KB invece di
+ * ~11KB), ed era un'amplificazione del guasto: si pagavano i 1500ms di attesa
+ * per consegnare al modello un contesto PEGGIORE di quello normale. Non e'
+ * solo piu' lento — con molto contesto non pertinente il modello inventa di
+ * piu', quindi il momento in cui il recupero si rompe era anche il momento in
+ * cui il concierge diventava piu' bugiardo. La rete che si rompe non deve
+ * poter peggiorare le risposte.
+ *
+ * Il rimedio non aggiunge niente di nuovo: riusa il glossario multilingua che
+ * gia' esiste qui sopra. Zero rete, zero millisecondi, deterministico — le
+ * stesse proprieta' di languageDetect. */
+
+/** Come bonusLessicale ma SENZA il tetto di due concetti. Il tetto ha senso
+ *  quando questo bonus fa da spareggio a una similarita' coseno vera (non deve
+ *  poterla ribaltare); qui il bonus e' l'UNICO segnale che abbiamo, e tapparlo
+ *  butterebbe via proprio l'informazione che serve — una domanda che tocca tre
+ *  concetti deve poter battere una che ne tocca uno. */
+function bonusLessicaleNonTappato(domanda: string, testoFrammento: string): number {
+  let bonus = 0;
+  for (const [reIt, reTrad] of GLOSSARIO_INVERSO) {
+    if ((reIt.test(domanda) || reTrad.test(domanda)) && reIt.test(testoFrammento)) bonus += 1;
+  }
+  return bonus;
+}
+
+/** Parole troppo comuni per dire qualcosa, nelle 5 lingue del concierge. Senza
+ *  questa lista "a che ora e' la colazione?" fa sovrapposizione alta con
+ *  qualunque frammento contenga "la" e "e". Non e' una lista completa e non
+ *  deve esserlo: bastano le parole che compaiono ovunque. */
+const STOPWORD = new Set([
+  "che","cosa","come","dove","quando","quanto","quale","quali","per","con","del","della","delle","dei","degli","dal","dalla","alle","alla","allo","agli","nel","nella","sul","sulla","una","uno","gli","gli","non","piu","ora","ore","essere","sono","siamo","posso","potete","vorrei","avete","c'e","ce","mi","ci","si","il","lo","la","le","un","di","da","in","su","tra","fra","al","ai","se","ma","o","e","a","è",
+  "what","where","when","how","much","many","the","and","for","with","from","are","is","can","could","would","you","your","have","has","there","this","that","get","does","do","i","it","of","to","at","in","on","a","an","my",
+  "was","wie","wo","wann","viel","der","die","das","den","dem","des","und","fur","für","mit","von","ist","sind","kann","konnen","können","ich","sie","es","gibt","haben","hat","ein","eine","einen","einem","zu","im","am","auf","bei","uhr",
+  "que","quoi","ou","où","quand","comment","combien","le","la","les","des","du","de","et","pour","avec","est","sont","peux","puis","pouvez","je","vous","il","y","a","un","une","dans","sur","au","aux",
+  "cual","cuales","donde","cuando","como","cuanto","que","los","las","del","para","con","por","es","son","puedo","pueden","tengo","hay","el","un","una","en","al","y","o",
+]);
+
+/** Normalizza per il confronto lessicale: minuscole, accenti via, punteggiatura
+ *  via, parole corte e stopword fuori. Deterministico, nessuna dipendenza. */
+function tokenizza(testo: string): string[] {
+  return testo
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9àäöüßçéèêëîïôûùñ\s]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w.length >= 3 && !STOPWORD.has(w));
+}
+
+/** Punteggio lessicale di un frammento per una domanda. Due addendi:
+ *
+ *  1. SOVRAPPOSIZIONE NORMALIZZATA — quante delle parole di contenuto della
+ *     domanda compaiono nel frammento, divise per quante ne aveva la domanda.
+ *     Normalizzata sulla DOMANDA e non sul frammento: dividere per la
+ *     lunghezza del frammento premierebbe i frammenti corti a caso, mentre
+ *     quello che vogliamo sapere e' "quanta parte di cio' che ha chiesto
+ *     l'ospite si trova qui dentro". Sta sempre fra 0 e 1.
+ *
+ *  2. GLOSSARIO — il ponte fra le lingue. La sovrapposizione da sola non vede
+ *     niente quando l'ospite scrive "Frühstück" e il frammento dice
+ *     "colazione": e' esattamente il caso per cui il glossario esiste. Pesa
+ *     PIU' della sovrapposizione (0.8 per concetto contro un massimo di 1
+ *     per l'intera sovrapposizione) perche' un concetto di dominio azzeccato
+ *     e' un segnale molto piu' forte di qualche parola in comune.
+ *
+ *  Mai un throw: solo stringhe, insiemi e somme. */
+const PESO_GLOSSARIO = 0.8;
+
+export function punteggioLessicale(domanda: string, testoFrammento: string): number {
+  const parole = new Set(tokenizza(domanda));
+  let sovrapposizione = 0;
+  if (parole.size > 0) {
+    const nelFrammento = new Set(tokenizza(testoFrammento));
+    let comuni = 0;
+    for (const w of parole) if (nelFrammento.has(w)) comuni++;
+    sovrapposizione = comuni / parole.size;
+  }
+  return sovrapposizione + PESO_GLOSSARIO * bonusLessicaleNonTappato(domanda, testoFrammento);
 }
 
 export function testoPerEmbedding(testo: string): string {
@@ -706,20 +792,37 @@ export interface RecuperaFontiOpts {
  *  messaggi utente concatenati dal chiamante: i follow-up brevi come "e si
  *  pagano al check-out?" non hanno parole chiave da soli) e compone il
  *  blocco unico da allegare ai messages. Mai un throw: su qualunque errore
- *  di rete/formato ritorna TUTTI i frammenti con `degradato: true`. NON è
- *  equivalente al comportamento pre-v2 (che non aveva alcuna guardia
- *  per-turno, solo GUIDA_FINALE nel prompt statico): route.ts, quando
- *  `degradato` è true, aggiunge GUARDIA_DEGRADO (conciergeBehavior.ts) come
- *  penultimo messaggio — è quella guardia, non l'equivalenza col pre-v2, che
- *  rende accettabile passare da ~8KB mirati a ~32KB indifferenziati. Il
- *  fallback DeepSeek (che non ha embeddings Mistral) continua comunque a
- *  funzionare in entrambi i casi. */
+ *  di rete/formato ripiega sul ranking LESSICALE (punteggioLessicale) e
+ *  ritorna gli stessi TOP_N_FRAMMENTI del caso buono, con `degradato: true`.
+ *  Il segnale resta acceso di proposito: senza similarita' semantica il
+ *  recupero e' comunque di seconda scelta, quindi route.ts continua ad
+ *  aggiungere GUARDIA_DEGRADO (conciergeBehavior.ts) come penultimo
+ *  messaggio, e l'analytics continua a vedere che le embeddings non hanno
+ *  risposto. Cambia COSA si allega, non l'onesta' del segnale. Il fallback
+ *  DeepSeek (che non ha embeddings Mistral) continua a funzionare in
+ *  entrambi i casi. */
 export async function recuperaFonti(
   domanda: string,
   indice: Indice,
   opts: RecuperaFontiOpts = {},
-): Promise<{ testo: string; degradato: boolean; scelti: string[] }> {
+): Promise<{ testo: string; degradato: boolean; scelti: string[]; msEmbedding: number }> {
   const kbItemsPromise = Promise.resolve(opts.kbItems ?? []);
+
+  // Durata della SOLA chiamata embeddings della domanda (campo additivo v5).
+  //
+  // Si misura QUESTA e non l'intero Promise.all qui sotto: i vettori dei
+  // frammenti arrivano dai precalcolati (zero rete) e la KB e' una fetch
+  // diversa, mentre l'embedding della domanda e' l'unico round-trip che sta
+  // SEMPRE sul percorso critico di ogni scambio. E' il numero che dice se
+  // l'attesa dell'ospite la produce il modello o il nostro contorno.
+  //
+  // ⚠️ NON DEVE MAI LANCIARE ne' cambiare il comportamento: due Date.now() e
+  // una sottrazione dentro un .then() che ritorna esattamente cio' che
+  // ritornava prima. Se qualcosa non torna resta 0 — mai un throw, mai un
+  // ritardo. Zero significa "non misurato" ed e' esattamente cio' che vale
+  // quando la chiamata non e' nemmeno partita (chiave assente).
+  const tEmb = Date.now();
+  let msEmbedding = 0;
 
   // I 3 round-trip di rete partono tutti qui, non in serie: il vettore KB
   // dipende dal numero di voci KB (kbItemsPromise), quindi è incatenato SU
@@ -735,7 +838,10 @@ export async function recuperaFonti(
 
   const [vettoriFrammenti, vettoreQuery, kbItems, vettoriKb] = await Promise.all([
     otteniVettoriFrammenti(indice),
-    chiediEmbeddings([domanda]).then((v) => v?.[0] ?? null),
+    chiediEmbeddings([domanda]).then((v) => {
+      msEmbedding = Date.now() - tEmb;
+      return v?.[0] ?? null;
+    }),
     kbItemsPromise,
     vettoriKbPromise,
   ]);
@@ -748,9 +854,30 @@ export async function recuperaFonti(
   let scelti: string[] = [];
 
   if (!vettoriFrammenti || !vettoreQuery || vettoriFrammenti.length !== indice.frammenti.length) {
-    frammentiScelti = indice.frammenti;
+    // RIPIEGO LESSICALE (2026-08-31). Prima qui si allegavano TUTTI i
+    // frammenti. Era un'amplificazione del guasto: dopo aver pagato 1500ms di
+    // attesa si consegnava al modello ~35KB indifferenziati invece degli ~11KB
+    // mirati del caso buono — piu' lento E meno pertinente, cioe' esattamente
+    // le condizioni in cui un modello inventa di piu'. Adesso si sceglie con
+    // il glossario e la sovrapposizione lessicale: nessuna rete, nessun
+    // millisecondo, stesso numero di frammenti del caso normale.
+    //
+    // ⚠️ `degradato` RESTA true, ed e' voluto: il recupero e' comunque di
+    // seconda scelta (nessuna similarita' semantica vera) e route.ts deve
+    // continuare a iniettare GUARDIA_DEGRADO. Qui cambia COSA si allega, non
+    // l'onesta' del segnale. Chi legge l'analytics deve continuare a vedere
+    // che le embeddings non hanno risposto.
+    const punteggi = indice.frammenti.map((f) => ({
+      f,
+      sim: punteggioLessicale(domanda, f.testo),
+    }));
+    // Stesso tetto ai menu del ramo buono: senza, una domanda che sfiora il
+    // cibo si porta via tutti gli 8 posti con i piatti di un locale solo.
+    const maxMenu = RE_ALLERGIE.test(domanda) ? 0 : MAX_MENU_NEL_TOP;
+    frammentiScelti = selezionaDiversificato(punteggi, TOP_N_FRAMMENTI, maxMenu);
+    const simDi = new Map(punteggi.map((p) => [p.f, p.sim]));
+    scelti = frammentiScelti.map((f) => `${f.sezione}(lex ${(simDi.get(f) ?? 0).toFixed(2)})`);
     degradato = true;
-    scelti = ["<degradato: tutti i frammenti>"];
   } else {
     const punteggi = indice.frammenti.map((f, i) => ({
       f,
@@ -780,5 +907,5 @@ export async function recuperaFonti(
     frammentiScelti.map((f) => f.testo).join("\n\n") +
     kbTesto;
 
-  return { testo, degradato, scelti };
+  return { testo, degradato, scelti, msEmbedding };
 }
