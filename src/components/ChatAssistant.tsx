@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, type Transition } from "framer-motion";
-import { ConciergeBell, Send, Phone, X, MapPin, CalendarCheck, ExternalLink, type LucideIcon } from "lucide-react";
+import { ConciergeBell, Send, Phone, X, MapPin, CalendarCheck, ExternalLink, MessageCircle, type LucideIcon } from "lucide-react";
 import { HOTEL } from "@/lib/hotel";
 import type { Lang } from "@/lib/content";
 import { EASE_EXPO, SHEET, SHEET_EXIT, BACKDROP_FADE } from "@/components/ui";
@@ -67,6 +67,7 @@ const ACTION_LABELS: Record<Lang, Record<string, string>> = {
     "Apri in Mappe": "Open in Maps",
     "Chiama la Reception": "Call Reception",
     Chiama: "Call",
+    "Scrivi su WhatsApp": "Message on WhatsApp",
     "Prenota La Terrazza": "Book La Terrazza",
     "Visiona il menù": "View the menu",
   },
@@ -74,6 +75,7 @@ const ACTION_LABELS: Record<Lang, Record<string, string>> = {
     "Apri in Mappe": "Ouvrir dans Maps",
     "Chiama la Reception": "Appeler la Réception",
     Chiama: "Appeler",
+    "Scrivi su WhatsApp": "Écrire sur WhatsApp",
     "Prenota La Terrazza": "Réserver La Terrazza",
     "Visiona il menù": "Voir le menu",
   },
@@ -81,6 +83,7 @@ const ACTION_LABELS: Record<Lang, Record<string, string>> = {
     "Apri in Mappe": "In Karten öffnen",
     "Chiama la Reception": "Rezeption anrufen",
     Chiama: "Anrufen",
+    "Scrivi su WhatsApp": "Per WhatsApp schreiben",
     "Prenota La Terrazza": "La Terrazza reservieren",
     "Visiona il menù": "Speisekarte ansehen",
   },
@@ -88,6 +91,7 @@ const ACTION_LABELS: Record<Lang, Record<string, string>> = {
     "Apri in Mappe": "Abrir en Maps",
     "Chiama la Reception": "Llamar a Recepción",
     Chiama: "Llamar",
+    "Scrivi su WhatsApp": "Escribir por WhatsApp",
     "Prenota La Terrazza": "Reservar La Terrazza",
     "Visiona il menù": "Ver el menú",
   },
@@ -112,6 +116,10 @@ function actionIcon(url: string): LucideIcon {
   if (url.startsWith("tel:")) return Phone;
   if (url.includes("thefork")) return CalendarCheck;
   if (url.includes("maps")) return MapPin;
+  // Ponte WhatsApp verso la Reception (2026-08-31): senza questa riga il
+  // bottone prenderebbe l'icona generica "link esterno" e sembrerebbe un
+  // rimando qualsiasi, invece di un messaggio da inviare.
+  if (url.includes("wa.me")) return MessageCircle;
   return ExternalLink;
 }
 
