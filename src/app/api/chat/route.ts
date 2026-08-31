@@ -545,6 +545,23 @@ export async function POST(req: NextRequest) {
             }
           }
           chiudiWa(controller);
+          // Risposta finita a ZERO caratteri visibili. Succede quando il
+          // modello scrive SOLO il marcatore e il marcatore viene scartato
+          // (numero di camera non attendibile): resta una nuvoletta vuota in
+          // chat, che per l'ospite e' un guasto muto. Raro — 0 su 12 turni in
+          // riproduzione — ma la via esiste, e una risposta vuota qui e' anche
+          // il messaggio vuoto che al turno dopo farebbe rifiutare la
+          // richiesta dall'API (vedi il guasto delle 13:05 del 2026-08-31,
+          // curato con `ripulito || "…"` piu' sopra: quello e' il rimedio a
+          // valle, questo e' il rimedio a monte). Meglio la frase che manda in
+          // Reception: e' esattamente la via che l'ospite deve prendere.
+          if (answerAcc.trim() === "") {
+            console.error("[whatsapp] risposta vuota dopo il filtro del marcatore: uso il fallback");
+            answerAcc = FALLBACK_STREAM_ERROR;
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ content: FALLBACK_STREAM_ERROR })}\n\n`),
+            );
+          }
           await finishLog?.(answerAcc, "ok");
           controller.close();
         } catch (e) {
