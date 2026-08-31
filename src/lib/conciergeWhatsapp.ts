@@ -73,11 +73,20 @@ export function numeroWhatsappReception(): string | null {
 /**
  * Nome della struttura da mettere nel messaggio precompilato, o null.
  *
- * Serve perché Hotel Titano e Titano Suites CONDIVIDONO lo stesso numero
+ * Nasce perché Hotel Titano e Titano Suites CONDIVIDONO lo stesso numero
  * (+390549991007, confermato da Aziz il 2026-08-31): la stessa persona riceve
  * i messaggi di due strutture diverse, e «Camera 204 — …» da solo non dice di
- * quale 204 si tratti. Il Grand Hotel ha un numero suo e non ne ha bisogno:
- * lì la variabile resta vuota e il messaggio non si allunga per niente.
+ * quale 204 si tratti.
+ *
+ * ⚠️ Va impostata su TUTTI E TRE gli hotel, non solo sui due che condividono
+ * il numero (decisione di Aziz, 2026-08-31). Al Grand Hotel non serve a
+ * disambiguare, ma una regola sola — "il messaggio porta sempre il nome della
+ * struttura" — si mantiene meglio di una condizionale che vale su due hotel
+ * su tre, e sul Grand Hotel non fa danno. Il codice regge comunque il caso
+ * "non impostata": in quel caso il nome semplicemente non compare.
+ *
+ * Tienilo CORTO (è il vincolo "non allungare il messaggio"): "Titano Suites",
+ * "Hotel Titano", "Grand Hotel" — non la ragione sociale per esteso.
  *
  * Il nome arriva dalla CONFIGURAZIONE, non da una deduzione del modello: il
  * modello si limita a copiare la stringa che gli passiamo nel prompt. Ed è una

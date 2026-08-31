@@ -89,12 +89,13 @@
  *     promemoria, che è una severità conquistata al 100% di aderenza: è
  *     dichiarare qui che il marcatore non fa parte della risposta, e ridurre
  *     così il conflitto a una questione di ambito.
- *     Il nome della struttura nell'intestazione (strutturaWhatsapp) serve solo
- *     dove due hotel condividono lo stesso numero — Titano e Suites, confermato
- *     da Aziz il 2026-08-31: senza, «Camera 204» non dice a quale dei due
- *     appartenga. Sta fra parentesi DOPO il numero di camera, non davanti,
- *     perché il numero in testa è un vincolo esplicito (la Reception legge di
- *     sguardo mentre fa altro).
+ *     Il nome della struttura nell'intestazione (strutturaWhatsapp) nasce dal
+ *     fatto che Titano e Suites condividono lo stesso numero (confermato da
+ *     Aziz il 2026-08-31): senza, «Camera 204» non dice a quale dei due
+ *     appartenga. Si imposta però su TUTTI E TRE gli hotel — una regola sola
+ *     invece di una condizionale. Sta fra parentesi DOPO il numero di camera,
+ *     non davanti, perché il numero in testa è un vincolo esplicito (la
+ *     Reception legge di sguardo mentre fa altro).
  *     ⚠️ Il numero di camera NON è verificabile dal prompt. Misurato il
  *     2026-08-31: con l'esempio concreto qui sopra, su 8 richieste operative
  *     SENZA numero di camera il modello ha emesso il marcatore 3 volte — due
@@ -118,11 +119,12 @@ export interface BehaviorParams {
    *  si comporta esattamente come prima del 2026-08-31. È così che le due
    *  gemelle restano invariate pur condividendo questo file. Vedi (d). */
   whatsappReception?: string | null;
-  /** Nome della struttura da anteporre nel messaggio precompilato, da
-   *  strutturaWhatsappReception(). Serve SOLO dove due strutture condividono
-   *  lo stesso numero (Hotel Titano e Titano Suites): senza, la Reception non
-   *  sa di quale hotel sia la camera 204. Vuoto sul Grand Hotel, che ha un
-   *  numero suo — e lì il messaggio resta corto com'era. */
+  /** Nome della struttura nel messaggio precompilato, da
+   *  strutturaWhatsappReception(). Nasce perché Hotel Titano e Titano Suites
+   *  condividono lo stesso numero (senza, la Reception non sa di quale hotel
+   *  sia la camera 204), ma va impostato su TUTTI E TRE: una regola sola si
+   *  mantiene meglio di una condizionale, e sul Grand Hotel non fa danno.
+   *  Se manca, il nome semplicemente non compare. */
   strutturaWhatsapp?: string | null;
 }
 
