@@ -88,6 +88,53 @@ class ErroreProvider extends Error {
   }
 }
 
+/** Perché un provider non ha risposto. Lista corta e stabile: serve a
+ *  DECIDERE (il primario cede perché è lento, o perché sbaglia?), non a fare
+ *  diagnosi fine — quella resta nei log della funzione. Sapere quante volte si
+ *  ripiega senza sapere perché non fa cambiare idea a nessuno. */
+type MotivoGuasto = "timeout" | "http" | "vuoto" | "altro";
+
+/** Un provider che ha fallito, e perché. Zero, uno o due per scambio. */
+interface Guasto {
+  m: string;
+  r: MotivoGuasto;
+}
+
+/** ⚠️ NON DEVE MAI LANCIARE: gira dentro il catch del ciclo provider, e un
+ *  throw qui trasformerebbe "il primario è lento, provo il secondo" in una
+ *  chat morta. Nel dubbio: "altro". */
+function motivoDi(e: unknown): MotivoGuasto {
+  try {
+    // Il nostro AbortController ha tagliato l'attesa del primo token: è
+    // ESATTAMENTE il caso che fa scattare il ripiego, e va tenuto separato da
+    // un errore del fornitore — le due cose si curano in modo opposto (alzare
+    // la soglia, oppure cambiare modello).
+    const nome = (e as { name?: unknown } | null)?.name;
+    if (nome === "AbortError" || nome === "TimeoutError") return "timeout";
+    if (e instanceof ErroreProvider) {
+      if (e.status > 0) return "http";
+      // 200 seguito da zero contenuto: il fornitore ha detto sì e non ha
+      // scritto niente. Non è un errore HTTP e non è una lentezza.
+      if (e.message.includes("nessun contenuto")) return "vuoto";
+    }
+    return "altro";
+  } catch {
+    return "altro";
+  }
+}
+
+/** Tempi di UNO scambio, in millisecondi interi.
+ *  ttft = quanto ha aspettato l'OSPITE prima di vedere il primo carattere.
+ *  Misurato dall'ingresso nella route, quindi comprende anche il recupero
+ *  fonti e gli eventuali tentativi falliti: è una misura dell'attesa vissuta,
+ *  non della velocità pura del modello. È la domanda giusta — "quanto aspetta
+ *  un ospite?" — e la risposta cambia se a rispondere è stato il ripiego.
+ *  tot  = fino a stream chiuso (poco prima di controller.close()). */
+interface Tempi {
+  ttft: number | null;
+  tot: number;
+}
+
 /** Logga in modo anonimo lo scambio completo domanda+risposta (nessun IP).
  *  UN solo record per scambio, scritto a stream chiuso: "questa risposta a
  *  questa domanda" senza id di correlazione fragili. `ok` distingue gli esiti
@@ -107,6 +154,8 @@ function logExchange(
   prov: string,
   deg: boolean,
   uso: UsoToken | null,
+  tempi: Tempi,
+  guasti: Guasto[],
 ): Promise<void> {
   const projectId = projectIdDi(req);
   return fetch("https://analytics.blasat.com/api/track", {
@@ -135,6 +184,18 @@ function logExchange(
       // distinguere "poco pertinente per scelta" da "poco pertinente perché
       // il recupero non ha funzionato". L'analytics lo ignora se non lo conosce.
       deg,
+      // Tempi e ripieghi (campi additivi v4). Come per i token: se manca il
+      // dato non si manda niente e l'analytics non incrementa nulla, invece di
+      // scrivere uno zero che poi si legge come "risposta istantanea".
+      // ttft assente = nessun primo token è mai uscito (tutti i provider giù):
+      // quello scambio conta come tempo TOTALE ma non come attesa percepita,
+      // perché l'ospite non ha visto niente da cui contare.
+      ...(tempi.ttft !== null ? { ttft: tempi.ttft } : {}),
+      tot: tempi.tot,
+      // Chi ha fallito prima di quello che ha risposto. Vuoto nel caso normale
+      // (il primario ce l'ha fatta), e allora non si manda proprio: il payload
+      // dello scambio buono resta identico a prima.
+      ...(guasti.length ? { guasti: guasti.slice(0, 4) } : {}),
     }),
     // Tetto duro: questa POST viene attesa prima di chiudere lo stream, quindi
     // un analytics lento terrebbe acceso l'indicatore "sto scrivendo". Meglio
@@ -419,6 +480,17 @@ async function apriStreamConRipiego(
 }
 
 export async function POST(req: NextRequest) {
+  // Primo istante utile dentro la route: da qui si contano sia l'attesa
+  // percepita dall'ospite sia la durata totale. Date.now() e una sottrazione,
+  // niente che possa lanciare.
+  const t0 = Date.now();
+  // Millisecondi fino al PRIMO carattere davvero uscito verso l'ospite.
+  // Resta null finché non esce niente: null significa "non misurato", zero
+  // significherebbe "istantaneo", e confonderli falserebbe ogni media.
+  let ttft: number | null = null;
+  // Provider che hanno fallito PRIMA di quello che ha risposto (o tutti,
+  // se non ha risposto nessuno).
+  const guasti: Guasto[] = [];
   // Dichiarati FUORI dal try: il catch fatale deve poter loggare lo scambio
   // (question/risposta parziale) anche quando l'errore scoppia a metà.
   let question = "";
@@ -532,7 +604,14 @@ export async function POST(req: NextRequest) {
     // chiama, il primo vince.
     finishLog = (answer: string, ok: string) => {
       finishLog = null; // one-shot: i chiamanti usano finishLog?.()
-      return logExchange(req, question, answer, ok, providerUsato, degradato, usoToken);
+      // I tempi si leggono ADESSO, non alla creazione della chiusura: `tot` è
+      // la durata fino a questo preciso momento, che è l'ultimo istante utile
+      // prima che lo stream si chiuda.
+      return logExchange(
+        req, question, answer, ok, providerUsato, degradato, usoToken,
+        { ttft, tot: Date.now() - t0 },
+        guasti,
+      );
     };
 
     const regolaMenu = estraiRegolaMenu(TRAILING);
@@ -603,6 +682,11 @@ export async function POST(req: NextRequest) {
         // log resta visibile nei log della funzione, e `prov` nell'analytics
         // dice quale ha risposto davvero.
         console.error(`Provider ${p.nome} non disponibile:`, e);
+        // Registrato anche nell'analytics, col motivo: è l'unico modo per
+        // sapere se il primario cede per lentezza (timeout) o per guasto
+        // (http), che è la differenza fra "alza la soglia" e "cambia modello".
+        // motivoDi() non lancia mai; il push su un array locale nemmeno.
+        guasti.push({ m: p.nome, r: motivoDi(e) });
       }
     }
 
@@ -631,12 +715,26 @@ export async function POST(req: NextRequest) {
     const emetti = (controller: ReadableStreamDefaultController, pezzo: string) => {
       const { out, log } = wa.push(pezzo);
       answerAcc += log;
-      if (out) controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: out })}\n\n`));
+      if (out) {
+        // Il cronometro dell'attesa si ferma qui e non prima: `pezzo` può
+        // essere trattenuto dal trasformatore WhatsApp (marcatore a cavallo di
+        // due chunk), e in quel caso l'ospite non ha ancora visto NIENTE.
+        // Fermarlo all'arrivo del token dal modello darebbe un numero più
+        // bello e sbagliato.
+        if (ttft === null) ttft = Date.now() - t0;
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: out })}\n\n`));
+      }
     };
     const chiudiWa = (controller: ReadableStreamDefaultController) => {
       const { out, log } = wa.flush();
       answerAcc += log;
-      if (out) controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: out })}\n\n`));
+      if (out) {
+        // Anche questa è una via da cui può uscire il PRIMO carattere: una
+        // risposta cortissima può restare tutta nel trasformatore fino al
+        // flush. Senza questa riga quello scambio risulterebbe "mai risposto".
+        if (ttft === null) ttft = Date.now() - t0;
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: out })}\n\n`));
+      }
     };
 
     const stream = new ReadableStream({
@@ -710,6 +808,9 @@ export async function POST(req: NextRequest) {
           if (answerAcc.trim() === "") {
             console.error("[whatsapp] risposta vuota dopo il filtro del marcatore: uso il fallback");
             answerAcc = FALLBACK_STREAM_ERROR;
+            // Anche il ripiego è testo che l'ospite legge: l'attesa l'ha
+            // vissuta comunque, e va contata.
+            if (ttft === null) ttft = Date.now() - t0;
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ content: FALLBACK_STREAM_ERROR })}\n\n`),
             );
@@ -722,7 +823,7 @@ export async function POST(req: NextRequest) {
             // fidare. Il client legge solo `content`/`error` e lo ignora.
             controller.enqueue(
               encoder.encode(
-                `data: ${JSON.stringify({ uso: usoToken, usoGrezzo, prov: providerUsato, conta: contaToken })}\n\n`,
+                `data: ${JSON.stringify({ uso: usoToken, usoGrezzo, prov: providerUsato, conta: contaToken, ttft, tot: Date.now() - t0, guasti })}\n\n`,
               ),
             );
           }
