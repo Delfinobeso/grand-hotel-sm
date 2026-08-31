@@ -78,12 +78,16 @@ export function numeroWhatsappReception(): string | null {
  * i messaggi di due strutture diverse, e «Camera 204 — …» da solo non dice di
  * quale 204 si tratti.
  *
- * ⚠️ Va impostata su TUTTI E TRE gli hotel, non solo sui due che condividono
- * il numero (decisione di Aziz, 2026-08-31). Al Grand Hotel non serve a
- * disambiguare, ma una regola sola — "il messaggio porta sempre il nome della
- * struttura" — si mantiene meglio di una condizionale che vale su due hotel
- * su tre, e sul Grand Hotel non fa danno. Il codice regge comunque il caso
- * "non impostata": in quel caso il nome semplicemente non compare.
+ * ⚠️ Si imposta SOLO su Hotel Titano e Titano Suites, NON sul Grand Hotel.
+ * Storia breve, perche' e' cambiata due volte: il 2026-08-31 era stata decisa
+ * la regola unica "su tutti e tre" (una regola sola si mantiene meglio di una
+ * condizionale), ma alla prova dal vivo sul Grand Hotel «Camera 202 (Grand
+ * Hotel) — …» e' risultato rumore: dove il numero e' dedicato la Reception sa
+ * gia' dove lavora, e il nome serve solo a disambiguare fra due strutture che
+ * condividono l'apparecchio. Regola revocata lo stesso giorno.
+ * Lasciare la variabile NON impostata e' il caso normale, non un ripiego: il
+ * prompt produce allora «Camera <numero> —» pulito, senza parentesi vuote ne'
+ * spazi doppi (verificato).
  *
  * Tienilo CORTO (è il vincolo "non allungare il messaggio"): "Titano Suites",
  * "Hotel Titano", "Grand Hotel" — non la ragione sociale per esteso.

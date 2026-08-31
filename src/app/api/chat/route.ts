@@ -338,9 +338,20 @@ export async function POST(req: NextRequest) {
     // gemelli, visto in browser il 2026-08-31) o peggio ripropone un link
     // VECCHIO, con dentro la camera o la richiesta di prima. Il link lo
     // costruisce il server dal marcatore, quindi nello storico non serve.
-    history = history.map((m) =>
-      m.role === "assistant" ? { ...m, content: rimuoviLinkWa(m.content) } : m,
-    );
+    history = history.map((m) => {
+      if (m.role !== "assistant") return m;
+      const ripulito = rimuoviLinkWa(m.content);
+      // ⚠️ GUASTO IN PRODUZIONE 2026-08-31, 3 conversazioni rotte sul Grand Hotel.
+      // Quando la risposta del concierge conteneva SOLO il bottone WhatsApp, qui
+      // restava una stringa vuota — e Mistral rifiuta l'INTERA richiesta con
+      //   HTTP 400 "Assistant message must have either content or tool_calls".
+      // Fallivano cosi' sia mistral-medium sia il ripiego mistral-small (stesso
+      // corpo, stesso errore), quindi `prov=nessuno` e la chat restava rotta per
+      // tutto il resto della conversazione, non per un messaggio solo.
+      // Si rimpiazza invece di togliere il messaggio: eliminarlo lascerebbe due
+      // turni utente di fila, che e' un secondo modo di far arrabbiare l'API.
+      return { ...m, content: ripulito || "…" };
+    });
 
     if (!checkRateLimit(ip)) {
       return NextResponse.json({ error: "rate_limited" }, { status: 429 });
