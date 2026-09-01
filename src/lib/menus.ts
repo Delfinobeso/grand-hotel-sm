@@ -1,9 +1,9 @@
 // Menu dei ristoranti GHSM Group — aggiornato automaticamente da cron job
-// Ultimo aggiornamento: 2026-08-01
+// Ultimo aggiornamento: 2026-09-01
 // Fonti: linktr.ee/laterrazza, linktr.ee/caffetitanosanmarino
 
 export const MENUS = `
-## MENÙ RISTORANTI E BAR (fonte: PDF ufficiali — aggiornato 2026-08-01)
+## MENÙ RISTORANTI E BAR (fonte: PDF ufficiali — aggiornato 2026-09-01)
 
 ### RISTORANTE LA TERRAZZA (cucina haute-cuisine, panoramico, Hotel Titano)
 Menu alla carta dello Chef Saverio Guida. Coperto €3,50 (include entrée e pane fatto in casa).
